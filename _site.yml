@@ -1,0 +1,14 @@
+name: "Yay internet!"
+output_dir: "."
+navbar:
+  title: "Home"
+  right:
+    - text: "About"
+      href: about.html
+    - icon: fa-solid fa-keyboard
+      href: mailto:<you@youremail.com>
+    - icon: fa-github fa-lg
+      href: http://github.com/cheekayc/
+output:
+  html_document:
+    theme: sandstone
