@@ -57,9 +57,9 @@ It contains `r ncol(bakery_df)` variables and `r nrow(bakery_df)` observations.
 Firstly, we used `read_csv()` to import the dataset "Bakery_sales.csv", and applied `janitor::clean_names()` to change the variables' names into lower cases. Next, we tidied dataset by applying `mutate()` to remove the euro sign "€", change "," to ".", convert `unit_price` to numeric form, and renamed the `article` as `product_name`. Finally, we deleted the missing data via `filter()` and `article` via `select()`. 
 
 
-### Pie Charts
+### Visualization
 
-A pie chart showing the percentage of each product’s sale count (top 10)
+#### Top 10 favorite bakery types
 ```{r}
 plot_pie =
   bakery_df %>% 
@@ -68,11 +68,10 @@ plot_pie =
   arrange(desc(n_obs)) %>% 
   head(10) %>% 
   plot_ly(labels = ~product_name, values = ~n_obs, type = 'pie', colors = "viridis") %>% 
-  layout(title = 'Top 10 favoriate bakeries',
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+  layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie
 ```
 
-
+The pie chart shows the total of sale counts of top 10 favorite bakery types from 2021-01-01 to 2022-09-30. As the plot shows that the `TRADITIONAL BAGUETTE` (67,689; 42.5%) is the most favorite bakery . The rest ranking from top 2 to top 10 favorite bakeries are  `COUPE` (20,470; 12.90%), `BAGUETTE` (15,292; 9,61%) `BANETTE` (15,130; 9.51%), `CROISSANT` (11,508; 7.23%), `PAIN AU CHOCOLAT` (10,578; 6.65%), `SPECIAL BREAD` (5195; 3.26%), `CEREAL BAGUETTE` (4961; 3,12%), `FORMULE SANDWITCH` (4202; 2.64%), `BOULE 400G` (4099; 2.58%), respectively. 

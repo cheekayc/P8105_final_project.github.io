@@ -435,10 +435,10 @@ to “.”, convert <code>unit_price</code> to numeric form, and renamed the
 the missing data via <code>filter()</code> and <code>article</code> via
 <code>select()</code>.</p>
 </div>
-<div id="pie-charts" class="section level3">
-<h3>Pie Charts</h3>
-<p>A pie chart showing the percentage of each product’s sale count (top
-10)</p>
+<div id="visualization" class="section level3">
+<h3>Visualization</h3>
+<div id="top-10-favorite-bakery-types" class="section level4">
+<h4>Top 10 favorite bakery types</h4>
 <pre class="r"><code>plot_pie =
   bakery_df %&gt;% 
   group_by(product_name) %&gt;% 
@@ -446,13 +446,23 @@ the missing data via <code>filter()</code> and <code>article</code> via
   arrange(desc(n_obs)) %&gt;% 
   head(10) %&gt;% 
   plot_ly(labels = ~product_name, values = ~n_obs, type = &#39;pie&#39;, colors = &quot;viridis&quot;) %&gt;% 
-  layout(title = &#39;Top 10 favoriate bakeries&#39;,
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+  layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie</code></pre>
-<div id="htmlwidget-dc1f6e411c5bdfc64294" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-dc1f6e411c5bdfc64294">{"x":{"visdat":{"32b4265e3ce1":["function () ","plotlyVisDat"]},"cur_data":"32b4265e3ce1","attrs":{"32b4265e3ce1":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-a334c53a64e0f0f87224" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a334c53a64e0f0f87224">{"x":{"visdat":{"35fe57d635fa":["function () ","plotlyVisDat"]},"cur_data":"35fe57d635fa","attrs":{"35fe57d635fa":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>The pie chart shows the total of sale counts of top 10 favorite
+bakery types from 2021-01-01 to 2022-09-30. As the plot shows that the
+<code>TRADITIONAL BAGUETTE</code> (67,689; 42.5%) is the most favorite
+bakery . The rest ranking from top 2 to top 10 favorite bakeries are
+<code>COUPE</code> (20,470; 12.90%), <code>BAGUETTE</code> (15,292;
+9,61%) <code>BANETTE</code> (15,130; 9.51%), <code>CROISSANT</code>
+(11,508; 7.23%), <code>PAIN AU CHOCOLAT</code> (10,578; 6.65%),
+<code>SPECIAL BREAD</code> (5195; 3.26%), <code>CEREAL BAGUETTE</code>
+(4961; 3,12%), <code>FORMULE SANDWITCH</code> (4202; 2.64%),
+<code>BOULE 400G</code> (4099; 2.58%), respectively.</p>
+</div>
 </div>
 
 
