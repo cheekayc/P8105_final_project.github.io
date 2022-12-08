@@ -7,3 +7,32 @@ output:
 ---
 
 Something about our group
+
+# Team member 1 
+Chee Kay Cheong 
+
+email: cc4778@cumc.columbia.edu
+
+Department of Epidemiology, Mailman School of Public Health, Columbia University 
+
+# Team member 2 
+Yishan Chen 
+
+email: yc4016@cumc.columbia.edu
+
+Department of Biostatistics, Mailman School of Public Health, Columbia University 
+
+# Team member 3 
+Jiayi Yang
+
+email: jy3186@cumc.columbia.edu
+
+Department of Epidemiology, Mailman School of Public Health, Columbia University 
+
+# Team member 4 
+Yuxin Liu 
+
+email: yl4610@cumc.columbia.edu
+
+Department of Epidemiology, Mailman School of Public Health, Columbia University 
+
