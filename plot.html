@@ -393,7 +393,8 @@ div.tocify {
 library(tidyverse)
 library(lubridate)
 library(plotly)
-library(patchwork)</code></pre>
+library(patchwork)
+library(viridis)</code></pre>
 <div id="summary-of-the-used-packages-and-dependencies"
 class="section level3">
 <h3>Summary of the used packages and dependencies</h3>
@@ -450,18 +451,86 @@ the missing data via <code>filter()</code> and <code>article</code> via
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie</code></pre>
-<div id="htmlwidget-a334c53a64e0f0f87224" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-a334c53a64e0f0f87224">{"x":{"visdat":{"35fe57d635fa":["function () ","plotlyVisDat"]},"cur_data":"35fe57d635fa","attrs":{"35fe57d635fa":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-bafce0245cac2fa53239" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-bafce0245cac2fa53239">{"x":{"visdat":{"3de51bcc4344":["function () ","plotlyVisDat"]},"cur_data":"3de51bcc4344","attrs":{"3de51bcc4344":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>The pie chart shows the total of sale counts of top 10 favorite
 bakery types from 2021-01-01 to 2022-09-30. As the plot shows that the
 <code>TRADITIONAL BAGUETTE</code> (67,689; 42.5%) is the most favorite
 bakery . The rest ranking from top 2 to top 10 favorite bakeries are
 <code>COUPE</code> (20,470; 12.90%), <code>BAGUETTE</code> (15,292;
-9,61%) <code>BANETTE</code> (15,130; 9.51%), <code>CROISSANT</code>
+9.61%) <code>BANETTE</code> (15,130; 9.51%), <code>CROISSANT</code>
 (11,508; 7.23%), <code>PAIN AU CHOCOLAT</code> (10,578; 6.65%),
 <code>SPECIAL BREAD</code> (5195; 3.26%), <code>CEREAL BAGUETTE</code>
-(4961; 3,12%), <code>FORMULE SANDWITCH</code> (4202; 2.64%),
+(4961; 3.12%), <code>FORMULE SANDWITCH</code> (4202; 2.64%), and
 <code>BOULE 400G</code> (4099; 2.58%), respectively.</p>
+</div>
+<div id="top-10-favorite-bakery-types-in-20212022"
+class="section level4">
+<h4>Top 10 favorite bakery types in 2021/2022</h4>
+<pre class="r"><code>plot_pie =
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) 
+  
+plot_pie_2021 = 
+  plot_pie %&gt;% 
+  filter(year == 2021) %&gt;%
+  group_by(product_name) %&gt;% 
+  summarize(n_obs = n()) %&gt;% 
+  arrange(desc(n_obs)) %&gt;% 
+  head(10) %&gt;% 
+  plot_ly(labels = ~product_name, values = ~n_obs) %&gt;% 
+  add_pie(hole = 0.6) %&gt;% 
+  layout(title = &#39;Top 10 favoriate bakeries in 2021&#39;,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+plot_pie_2022 = 
+  plot_pie %&gt;% 
+  filter(year == 2022) %&gt;%
+  group_by(product_name) %&gt;% 
+  summarize(n_obs = n()) %&gt;% 
+  arrange(desc(n_obs)) %&gt;% 
+  head(10) %&gt;% 
+  plot_ly(labels = ~product_name, values = ~n_obs) %&gt;% 
+  add_pie(hole = 0.6) %&gt;% 
+  layout(title = &#39;Top 10 favoriate bakeries in 2022&#39;,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+plot_pie_2021</code></pre>
+<div id="htmlwidget-880ca4dad156e787ee17" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-880ca4dad156e787ee17">{"x":{"visdat":{"3de57108c9b9":["function () ","plotlyVisDat"]},"cur_data":"3de57108c9b9","attrs":{"3de57108c9b9":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2021","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","CEREAL BAGUETTE","SPECIAL BREAD","CAMPAGNE","BOULE 400G"],"values":[37399,11759,8713,8575,6291,5739,3070,2936,2289,2283],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>plot_pie_2022</code></pre>
+<div id="htmlwidget-145b79633e018dd0cc80" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-145b79633e018dd0cc80">{"x":{"visdat":{"3de577f3caa8":["function () ","plotlyVisDat"]},"cur_data":"3de577f3caa8","attrs":{"3de577f3caa8":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2022","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","FORMULE SANDWICH","CEREAL BAGUETTE","BOULE 400G"],"values":[30290,8711,6579,6555,5217,4839,2259,1976,1891,1816],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>The first donut chart shows the total of sale counts of top 10
+favorite bakery types from 2021-01-01 to 2021-12-31. As the plot shows
+that the <code>TRADITIONAL BAGUETTE</code> (37,399; 42%) is the most
+favorite bakery . The rest ranking from top 2 to top 10 favorite
+bakeries are <code>COUPE</code> (11,759; 13.2%), <code>BAGUETTE</code>
+(8713; 9.78%) <code>BANETTE</code> (8575; 9.63%), <code>CROISSANT</code>
+(6291; 7.06%), <code>PAIN AU CHOCOLAT</code> (5739; 6.44%),
+<code>CEREAL BAGUETTE</code> (3070; 3.45%), <code>SPECIAL BREAD</code>
+(2936; 3.3%), <code>CAMPAGNE</code> (2289; 2.57%), and
+<code>BOULE 400G</code> (2283; 2.46%), respectively.</p>
+<p>The second donut chart shows the total of sale counts of top 10
+favorite bakery types from 2022-01-01 to 2022-09-30. As the plot shows
+that the <code>TRADITIONAL BAGUETTE</code> (30,290; 43.2%) is the most
+favorite bakery . The rest ranking from top 2 to top 10 favorite
+bakeries are <code>COUPE</code> (8711; 12.4%), <code>BAGUETTE</code>
+(6579; 9.38%) <code>BANETTE</code> (6555; 9.35%), <code>CROISSANT</code>
+(5217; 7.44%), <code>PAIN AU CHOCOLAT</code> (4839; 6.9%),
+<code>SPECIAL BREAD</code> (2259; 3.22%), <code>FORMULE SANDWITCH</code>
+(1976; 2.82%), <code>CEREAL BAGUETTE</code> (1891; 2.7%), and
+<code>BOULE 400G</code> (1816; 2.59%), respectively.</p>
+<p>Compared donut charts of 2021 and 2022, the ranking of top 1-6
+favorite bakeries does not change. <code>CAMPAGNE</code> dropped out of
+the top 10 list, and <code>FORMULE SANDWITCH</code> was added the top 10
+favorite bakery types in 2022. Top 7-9 moved slightly from 2021 to 2022.
+Top 10 <code>BOULE 400G</code> stayed in the same position.</p>
 </div>
 </div>
 

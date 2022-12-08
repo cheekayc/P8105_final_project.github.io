@@ -13,6 +13,7 @@ library(tidyverse)
 library(lubridate)
 library(plotly)
 library(patchwork)
+library(viridis)
 ```
 
 ### Summary of the used packages and dependencies
@@ -57,6 +58,7 @@ It contains `r ncol(bakery_df)` variables and `r nrow(bakery_df)` observations.
 Firstly, we used `read_csv()` to import the dataset "Bakery_sales.csv", and applied `janitor::clean_names()` to change the variables' names into lower cases. Next, we tidied dataset by applying `mutate()` to remove the euro sign "€", change "," to ".", convert `unit_price` to numeric form, and renamed the `article` as `product_name`. Finally, we deleted the missing data via `filter()` and `article` via `select()`. 
 
 
+
 ### Visualization
 
 #### Top 10 favorite bakery types
@@ -74,4 +76,54 @@ plot_pie =
 plot_pie
 ```
 
-The pie chart shows the total of sale counts of top 10 favorite bakery types from 2021-01-01 to 2022-09-30. As the plot shows that the `TRADITIONAL BAGUETTE` (67,689; 42.5%) is the most favorite bakery . The rest ranking from top 2 to top 10 favorite bakeries are  `COUPE` (20,470; 12.90%), `BAGUETTE` (15,292; 9,61%) `BANETTE` (15,130; 9.51%), `CROISSANT` (11,508; 7.23%), `PAIN AU CHOCOLAT` (10,578; 6.65%), `SPECIAL BREAD` (5195; 3.26%), `CEREAL BAGUETTE` (4961; 3,12%), `FORMULE SANDWITCH` (4202; 2.64%), `BOULE 400G` (4099; 2.58%), respectively. 
+The pie chart shows the total of sale counts of top 10 favorite bakery types from 2021-01-01 to 2022-09-30. As the plot shows that the `TRADITIONAL BAGUETTE` (67,689; 42.5%) is the most favorite bakery . The rest ranking from top 2 to top 10 favorite bakeries are  `COUPE` (20,470; 12.90%), `BAGUETTE` (15,292; 9.61%) `BANETTE` (15,130; 9.51%), `CROISSANT` (11,508; 7.23%), `PAIN AU CHOCOLAT` (10,578; 6.65%), `SPECIAL BREAD` (5195; 3.26%), `CEREAL BAGUETTE` (4961; 3.12%), `FORMULE SANDWITCH` (4202; 2.64%), and `BOULE 400G` (4099; 2.58%), respectively. 
+
+
+#### Top 10 favorite bakery types in 2021/2022
+```{r}
+plot_pie =
+  bakery_df %>% 
+  separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) 
+  
+plot_pie_2021 = 
+  plot_pie %>% 
+  filter(year == 2021) %>%
+  group_by(product_name) %>% 
+  summarize(n_obs = n()) %>% 
+  arrange(desc(n_obs)) %>% 
+  head(10) %>% 
+  plot_ly(labels = ~product_name, values = ~n_obs) %>% 
+  add_pie(hole = 0.6) %>% 
+  layout(title = 'Top 10 favoriate bakeries in 2021',
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+plot_pie_2022 = 
+  plot_pie %>% 
+  filter(year == 2022) %>%
+  group_by(product_name) %>% 
+  summarize(n_obs = n()) %>% 
+  arrange(desc(n_obs)) %>% 
+  head(10) %>% 
+  plot_ly(labels = ~product_name, values = ~n_obs) %>% 
+  add_pie(hole = 0.6) %>% 
+  layout(title = 'Top 10 favoriate bakeries in 2022',
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+plot_pie_2021
+plot_pie_2022
+```
+
+The first donut chart shows the total of sale counts of top 10 favorite bakery types from 2021-01-01 to 2021-12-31. As the plot shows that the `TRADITIONAL BAGUETTE` (37,399; 42%) is the most favorite bakery . The rest ranking from top 2 to top 10 favorite bakeries are  `COUPE` (11,759; 13.2%), `BAGUETTE` (8713; 9.78%) `BANETTE` (8575; 9.63%), `CROISSANT` (6291; 7.06%), `PAIN AU CHOCOLAT` (5739; 6.44%), `CEREAL BAGUETTE` (3070; 3.45%), `SPECIAL BREAD` (2936; 3.3%), `CAMPAGNE` (2289; 2.57%), and `BOULE 400G` (2283; 2.46%), respectively. 
+
+The second donut chart shows the total of sale counts of top 10 favorite bakery types from 2022-01-01 to 2022-09-30. As the plot shows that the `TRADITIONAL BAGUETTE` (30,290; 43.2%) is the most favorite bakery . The rest ranking from top 2 to top 10 favorite bakeries are  `COUPE` (8711; 12.4%), `BAGUETTE` (6579; 9.38%) `BANETTE` (6555; 9.35%), `CROISSANT` (5217; 7.44%), `PAIN AU CHOCOLAT` (4839; 6.9%), `SPECIAL BREAD` (2259; 3.22%), `FORMULE SANDWITCH` (1976; 2.82%), `CEREAL BAGUETTE` (1891; 2.7%), and `BOULE 400G` (1816; 2.59%), respectively. 
+
+Compared donut charts of 2021 and 2022, the ranking of top 1-6 favorite bakeries does not change. `CAMPAGNE` dropped out of the top 10 list, and `FORMULE SANDWITCH` was added the top 10 favorite bakery types in 2022. Top 7-9 moved slightly from 2021 to 2022. Top 10 `BOULE 400G` stayed in the same position. 
+
+
+
+
