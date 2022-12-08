@@ -2,9 +2,18 @@ name: "Yay internet!"
 output_dir: "."
 navbar:
   title: "Home"
-  right:
-    - text: "About"
+  left:
+      - text: "About"
       href: about.html
+  right:
+    - text: "Statistical Analyses"
+      href: statistical_analyses.html
+    - text: "Exploratory Analyses"
+      href: plot.html
+    - text: "Forecast Analyses"
+      href: forecast.html
+    - text: "Final Report"
+      href: final_report.html
     - icon: fa-solid fa-keyboard
       href: mailto:<you@youremail.com>
     - icon: fa-github fa-lg
