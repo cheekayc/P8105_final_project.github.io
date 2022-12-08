@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Statistical Analyses</title>
+
+<script src="site_libs/header-attrs-2.16/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/sandstone.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="mailto:&lt;you@youremail.com&gt;">
+    <span class="fa fa-solid fa-keyboard"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="http://github.com/cheekayc/">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Statistical Analyses</h1>
+
+</div>
+
+
+<pre class="r"><code>knitr::opts_chunk$set(message = FALSE)
+
+library(tidyverse)
+library(lubridate)
+library(plotly)
+library(mgcv)</code></pre>
+<pre><code>## Loading required package: nlme</code></pre>
+<pre><code>## 
+## Attaching package: &#39;nlme&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:forecast&#39;:
+## 
+##     getResponse</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     collapse</code></pre>
+<pre><code>## This is mgcv 1.8-40. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.</code></pre>
+<pre class="r"><code>library(moments)
+library(modelr)</code></pre>
+<p>Data input and cleaning</p>
+<pre class="r"><code>bakery_df =
+  read_csv(&quot;./Data/Bakery_sales.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(
+    unit_price = str_replace(unit_price, &quot;€&quot;, &quot;&quot;),
+    unit_price = str_replace(unit_price, &quot;,&quot;, &quot;.&quot;),
+    unit_price = as.numeric(unit_price),
+    product_name = article, 
+    rev = quantity * unit_price
+    ) %&gt;% 
+  filter(product_name != &quot;.&quot;) %&gt;% 
+  select(-article)
+
+bakery_df</code></pre>
+<pre><code>## # A tibble: 234,000 × 8
+##       x1 date       time   ticket_number quantity unit_price product_name    rev
+##    &lt;dbl&gt; &lt;date&gt;     &lt;time&gt;         &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;
+##  1     0 2021-01-02 08:38         150040        1       0.9  BAGUETTE       0.9 
+##  2     1 2021-01-02 08:38         150040        3       1.2  PAIN AU CHOC…  3.6 
+##  3     4 2021-01-02 09:14         150041        2       1.2  PAIN AU CHOC…  2.4 
+##  4     5 2021-01-02 09:14         150041        1       1.15 PAIN           1.15
+##  5     8 2021-01-02 09:25         150042        5       1.2  TRADITIONAL …  6   
+##  6    11 2021-01-02 09:25         150043        2       0.9  BAGUETTE       1.8 
+##  7    12 2021-01-02 09:25         150043        3       1.1  CROISSANT      3.3 
+##  8    15 2021-01-02 09:27         150044        1       1.05 BANETTE        1.05
+##  9    18 2021-01-02 09:32         150045        3       1.2  TRADITIONAL …  3.6 
+## 10    19 2021-01-02 09:32         150045        6       1.1  CROISSANT      6.6 
+## # … with 233,990 more rows</code></pre>
+<div id="anova" class="section level3">
+<h3>ANOVA</h3>
+<p>ANOVA tests whether there is a difference in means of the groups at
+each level (each individual month) of the independent variable.</p>
+<p>One way anova test can test if the mean sales of quarter 1 (Jan -
+Mar) is different from the mean sales of quarter 3 (Jun - Aug).</p>
+<p>The null hypothesis is that there is no difference in the mean sales
+of 1st quarter and 3rd quarter.<br />
+The alternative hypothesis is that the means are different from one
+another.</p>
+<pre class="r"><code>anova_df =
+  bakery_df %&gt;% 
+  mutate(
+    year = year(date),
+    month = month(date)
+    ) 
+  
+
+third_sales = 
+  anova_df %&gt;% 
+  filter((month == 6)|(month == 7)|(month == 8)) %&gt;% 
+  group_by(year, month) %&gt;% 
+  summarize(third_sales = n()) %&gt;% 
+  group_by(year, month) %&gt;% 
+  mutate(ID = cur_group_id())
+  
+first_sales = 
+  anova_df %&gt;% 
+  filter((month == 1) |(month == 2)|(month == 3)) %&gt;% 
+  group_by(year, month) %&gt;% 
+  summarize(first_sales = n()) %&gt;% 
+  group_by(year, month) %&gt;% 
+  mutate(ID = cur_group_id())
+  
+anova_test_df = 
+  left_join(third_sales, first_sales, by = c(&quot;ID&quot;))
+
+anova_test_df</code></pre>
+<pre><code>## # A tibble: 6 × 7
+##   year.x month.x third_sales    ID year.y month.y first_sales
+##    &lt;dbl&gt;   &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;dbl&gt;       &lt;int&gt;
+## 1   2021       6       10856     1   2021       1        6562
+## 2   2021       7       17592     2   2021       2        7817
+## 3   2021       8       20344     3   2021       3        9233
+## 4   2022       6       10678     4   2022       1        6273
+## 5   2022       7       18242     5   2022       2        7795
+## 6   2022       8       20135     6   2022       3        8251</code></pre>
+<pre class="r"><code>one.way &lt;- aov(first_sales ~ third_sales, data = anova_test_df)
+
+summary(one.way)</code></pre>
+<pre><code>##             Df  Sum Sq Mean Sq F value  Pr(&gt;F)   
+## third_sales  1 5350152 5350152   33.15 0.00451 **
+## Residuals    4  645565  161391                   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The ANOVA test p-value is 0.00451 which is less than alpha level of
+0.05, so we reject the null hypothesis and conclude that the mean sales
+in quarter 1 is statistically significantly different from the mean
+sales of quarter 3.</p>
+</div>
+<div
+id="simple-linear-regression-for-croissant-and-test-the-model-using-cross-validation"
+class="section level3">
+<h3>Simple Linear Regression for croissant and test the model using
+Cross Validation</h3>
+<pre class="r"><code>croissant_df = 
+  bakery_df %&gt;% 
+  filter(str_detect(product_name, &quot;CROISSANT&quot;)) %&gt;% 
+  mutate(
+    month = month(date),
+    qty_cp = (quantity &gt; 5) * (quantity - 5)
+    )
+
+ggplot(croissant_df, aes(x = quantity, y = rev)) +
+  geom_point()</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>croissant_reg = lm(rev ~ quantity, croissant_df)
+
+croissant_reg %&gt;% 
+  broom::tidy()</code></pre>
+<pre><code>## # A tibble: 2 × 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)   0.0863   0.00304      28.4 8.75e-172
+## 2 quantity      1.12     0.00100    1121.  0</code></pre>
+<p>Examine cross validation of this simple linear regression model</p>
+<pre class="r"><code>linear_mod = lm(rev ~ quantity, croissant_df)
+pwl_mod    = lm(rev ~ quantity + qty_cp, data = croissant_df)
+smooth_mod = gam(rev ~ s(quantity), data = croissant_df)</code></pre>
+<pre class="r"><code>croissant_df %&gt;% 
+  gather_predictions(linear_mod, pwl_mod, smooth_mod) %&gt;% 
+  mutate(model = fct_inorder(model)) %&gt;% 
+  ggplot(aes(x = quantity, y = rev)) + 
+  geom_point(alpha = .5) +
+  geom_line(aes(y = pred), color = &quot;red&quot;) + 
+  facet_grid(~model)</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+The three models are very similar.</p>
+<p>Re-sample the dataset by <code>crossv_mc</code> and let’s see the
+rmse of each model</p>
+<pre class="r"><code>set.seed(2022)
+cv_df =
+  crossv_mc(croissant_df, 100) %&gt;% 
+  mutate(
+    train = map(train, as_tibble),
+    test = map(test, as_tibble))
+
+cv_df = 
+  cv_df %&gt;% 
+  mutate(
+    linear_mod  = map(train, ~lm(rev ~ quantity, data = .x)),
+    pwl_mod     = map(train, ~lm(rev ~ quantity + qty_cp, data = .x)),
+    smooth_mod  = map(train, ~gam(rev ~ s(quantity), data = as_tibble(.x)))) %&gt;% 
+  mutate(
+    rmse_linear = map2_dbl(linear_mod, test, ~rmse(model = .x, data = .y)),
+    rmse_pwl    = map2_dbl(pwl_mod, test, ~rmse(model = .x, data = .y)),
+    rmse_smooth = map2_dbl(smooth_mod, test, ~rmse(model = .x, data = .y)))</code></pre>
+<p>Then plot the rmse graph</p>
+<pre class="r"><code>cv_df %&gt;% 
+  select(starts_with(&quot;rmse&quot;)) %&gt;% 
+  pivot_longer(
+    everything(),
+    names_to = &quot;model&quot;, 
+    values_to = &quot;rmse&quot;,
+    names_prefix = &quot;rmse_&quot;) %&gt;% 
+  mutate(model = fct_inorder(model)) %&gt;% 
+  ggplot(aes(x = model, y = rmse)) + geom_violin()</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+Based on the results, there is a slightly improvement using piecewise
+linear model as it has a lower tail of rmse on the top. Since there are
+no significant difference between the three model including the
+non-linear smooth model, we can conclude that the basic linear model is
+clear enough to be accounted for this relationship in the product of
+croissant.</p>
+</div>
+<div id="multiple-linear-regression-test-version"
+class="section level3">
+<h3>Multiple Linear Regression (test version)</h3>
+<p>We are interested in testing the relationship between the unit price
+of a product and its quantity being sold. Considering that the sales of
+bakery varies by month, so we included <code>month</code> in our model
+as a confounder to be controlled.</p>
+<p>Linear Regression check assumption Linear Regression for baguette</p>
+<pre class="r"><code>baguette_df = 
+  bakery_df %&gt;% 
+  filter(str_detect(product_name, &quot;BAGUETTE&quot;)) %&gt;% 
+  mutate(
+    month = month(date)
+  )
+baguette_reg = lm(rev ~ unit_price + quantity + month, baguette_df)
+
+# Use backward elimination based on AIC to find a mlr model 
+baguette_model_2 = step(baguette_reg, direction = &quot;backward&quot;)</code></pre>
+<pre><code>## Start:  AIC=-331778.6
+## rev ~ unit_price + quantity + month
+## 
+##              Df Sum of Sq    RSS     AIC
+## &lt;none&gt;                      2334 -331779
+## - month       1         1   2335 -331742
+## - unit_price  1      3987   6321 -241456
+## - quantity    1    174518 176852   60583</code></pre>
+<pre class="r"><code>summary(baguette_model_2) %&gt;% broom::tidy() %&gt;% knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.432</td>
+<td align="right">0.004</td>
+<td align="right">-374.606</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">unit_price</td>
+<td align="right">1.207</td>
+<td align="right">0.003</td>
+<td align="right">393.521</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">quantity</td>
+<td align="right">1.188</td>
+<td align="right">0.000</td>
+<td align="right">2603.542</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">month</td>
+<td align="right">0.001</td>
+<td align="right">0.000</td>
+<td align="right">6.200</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>anova(baguette_model_2, baguette_reg)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: rev ~ unit_price + quantity + month
+## Model 2: rev ~ unit_price + quantity + month
+##   Res.Df    RSS Df Sum of Sq F Pr(&gt;F)
+## 1  90660 2334.1                      
+## 2  90660 2334.1  0         0</code></pre>
+<pre class="r"><code>baguette_reg %&gt;% 
+  broom::tidy()</code></pre>
+<pre><code>## # A tibble: 4 × 5
+##   term        estimate std.error statistic  p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept) -1.43     0.00382    -375.   0       
+## 2 unit_price   1.21     0.00307     394.   0       
+## 3 quantity     1.19     0.000456   2604.   0       
+## 4 month        0.00119  0.000193      6.20 5.69e-10</code></pre>
+<p>Examine assumptions for the chosen Linear Regression model</p>
+<pre class="r"><code>par(mfrow = c(2, 2))
+plot(baguette_reg)</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="one-sample-t-test" class="section level3">
+<h3>One-sample T-test</h3>
+<div id="regular-baguette-two-sided" class="section level5">
+<h5>Regular Baguette (Two-sided)</h5>
+<p>We are interested in testing if the mean price of <strong>regular
+baguette</strong> in this bakery is significantly different from the
+average price for a baguette in Paris, which is 1.07 euros.</p>
+<p>Null hypothesis: The mean price of baguette in this bakery is the
+same as the average price of baguette in Paris.</p>
+<p>Alternative hypothesis: The mean price of baguette in this bakery is
+different from the average price of baguette in Paris.</p>
+<pre class="r"><code>bakery_df %&gt;% 
+  filter(product_name == &quot;TRADITIONAL BAGUETTE&quot;) %&gt;% 
+  group_by(date) %&gt;% 
+  summarize(total_sale = sum(quantity)) %&gt;% 
+  ggplot(aes(x = total_sale)) +
+  geom_histogram()</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>baguette_onet = 
+  bakery_df %&gt;% 
+  filter(product_name == &quot;BAGUETTE&quot;) %&gt;%
+  select(unit_price)
+
+baguette_t_results = 
+  t.test(baguette_onet, mu = 1.07 , alternative = &quot;two.sided&quot;) %&gt;% 
+  broom::tidy()</code></pre>
+<p>The p-value is much smaller than the alpha (0.05), so we would reject
+the null hypothesis. At 5% level of significance, we have sufficient
+evidence to conclude that the mean price of baguette in this bakery is
+significantly different from the average price of baguette in Paris.</p>
+</div>
+<div id="traditional-baguette-one-sided" class="section level5">
+<h5>Traditional Baguette (One-sided)</h5>
+<p>We noticed that the price of traditional baguette in this bakery is
+higher than the average price of traditional baguette in France. The
+price of the traditional French loaf is around 0.90 Euros in bakeries.
+Therefore, we would like to conduct a one-sided T-test to see if the
+price difference is significant.</p>
+<p>Null hypothesis: The mean price of traditional baguette in this
+bakery is the same as the average price of traditional baguette in
+France.</p>
+<p>Alternative hypothesis: The mean price of traditional baguette in
+this bakery is higher than the average price of traditional baguette in
+France.</p>
+<pre class="r"><code>bakery_df %&gt;% 
+  filter(product_name == &quot;TRADITIONAL BAGUETTE&quot;) %&gt;% 
+  count(unit_price)</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   unit_price     n
+##        &lt;dbl&gt; &lt;int&gt;
+## 1       1.2  39426
+## 2       1.25 13059
+## 3       1.3  15204</code></pre>
+<pre class="r"><code>trad_baguette_onet = 
+  bakery_df %&gt;% 
+  filter(product_name == &quot;TRADITIONAL BAGUETTE&quot;) %&gt;%
+  select(unit_price)
+
+trad_baguette_t_results = 
+  t.test(trad_baguette_onet, mu = 0.90, alternative = &quot;greater&quot;) %&gt;% 
+  broom::tidy()</code></pre>
+<p>The p-value is much smaller than the alpha (0.05), so we would reject
+the null hypothesis. At 5% level of significance, we have sufficient
+evidence to conclude that the mean price of traditional baguette in this
+bakery is significantly higher than the average price of baguette in
+Paris.</p>
+</div>
+</div>
+<div id="generalized-additive-model" class="section level3">
+<h3>Generalized Additive Model</h3>
+<p>Find the <em>rush hours</em> of a typical day:</p>
+<pre class="r"><code>bakery_df = 
+  bakery_df %&gt;% 
+  mutate(
+    Hour = hour(time),
+    Month = month(date))
+
+bakery_df %&gt;% 
+  group_by(Hour) %&gt;% 
+  count() %&gt;% 
+  ggplot(aes(x = Hour, y = n)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
+  scale_y_continuous(limit = c(0,50000)) +
+  labs(
+    title = &quot;Peak hours&quot;,
+    x = &quot;Hour (24-hour format)&quot;,
+    y = &quot;Number of times appeared&quot;)</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Overall, what hours has the most number of products sold?</p>
+<pre class="r"><code>bakery_df %&gt;% 
+  mutate(year = year(date)) %&gt;% 
+  filter(year == 2021) %&gt;% 
+  group_by(Hour) %&gt;% 
+  summarize(
+    n_sold = sum(quantity) / 365) %&gt;% 
+  ggplot(aes(x = Hour, y = n_sold)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
+  scale_y_continuous(limit = c(0,120)) +
+  labs(
+    title = &quot;Peak hours&quot;,
+    x = &quot;Hour (24-hour format)&quot;,
+    y = &quot;Number of products sold&quot;)</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code>smooth_mod = gam(quantity ~ s(Hour) + s(Month), data = bakery_df)
+
+smooth_mod %&gt;% broom::tidy()</code></pre>
+<pre><code>## # A tibble: 2 × 5
+##   term       edf ref.df statistic p.value
+##   &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 s(Hour)   6.89   7.78     347.        0
+## 2 s(Month)  8.89   9.00      46.6       0</code></pre>
+<pre class="r"><code>bakery_df %&gt;%
+  mutate(
+    month = month(date),
+    year = year(date)) %&gt;% 
+  filter(month == 2 &amp; year == 2021) %&gt;% 
+  group_by(product_name) %&gt;% 
+  summarize(total_sale = sum(quantity)) %&gt;% 
+  filter(total_sale &lt; 1000) %&gt;% 
+  ggplot(aes(x = total_sale)) +
+  geom_histogram(bins = 71)</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre class="r"><code>skew = 
+bakery_df %&gt;% 
+  group_by(date) %&gt;% 
+  summarize(total_sale = sum(quantity))
+
+# Skewness test
+print(skewness(skew))</code></pre>
+<pre><code>##        date  total_sale 
+## -0.01517941  1.20058066</code></pre>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

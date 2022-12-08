@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Time-series Forecast</title>
+
+<script src="site_libs/header-attrs-2.16/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/sandstone.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="mailto:&lt;you@youremail.com&gt;">
+    <span class="fa fa-solid fa-keyboard"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="http://github.com/cheekayc/">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Time-series Forecast</h1>
+
+</div>
+
+
+<pre class="r"><code>knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE,
+  fig.width = 14,
+  fig.height = 6,
+  out.width = &quot;90%&quot;)
+
+library(tidyverse)
+library(forecast)
+library(astsa)
+library(MLmetrics)
+library(lubridate)</code></pre>
+<p>Time series forecasting involves using historical, time-stamped data
+to make predictions of what might happen in the future.</p>
+<p>Load and clean dataset:</p>
+<pre class="r"><code>bakery_df = 
+  read_csv(&quot;./Data/Bakery_sales.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(
+    unit_price = str_replace(unit_price, &quot;€&quot;, &quot;&quot;),
+    unit_price = str_replace(unit_price, &quot;,&quot;, &quot;.&quot;),
+    unit_price = as.numeric(unit_price),
+    year = year(date),
+    month = month(date),
+    hour = hour(time),
+    product_name = article) %&gt;% 
+  filter(product_name != &quot;.&quot;) %&gt;% 
+  select(-article)</code></pre>
+<p>In 2021, how many products were sold each day?</p>
+<pre class="r"><code>sale_2021 = 
+  bakery_df %&gt;% 
+  filter(year == 2021) %&gt;% 
+  select(date, year, month, hour, product_name, quantity, unit_price) %&gt;% 
+  group_by(date) %&gt;% 
+  summarize(
+    total_sale = sum(quantity))</code></pre>
+<p>In 2021, the bakery opened for business for 339 days. The
+<code>sale_2021</code> dataset shows the number of products sold each
+day in 2021. To begin our forecasting task, we need to convert the
+dataframe into a <em>time series</em> or <em>ts</em> object.</p>
+<p>Plot data on a line graph</p>
+<pre class="r"><code>sale_2021 %&gt;% 
+  ggplot(aes(x = date, y = total_sale)) +
+  geom_line()</code></pre>
+<p><img src="forecast_files/figure-html/unnamed-chunk-3-1.png" width="90%" /></p>
+<div id="data-pre-processing" class="section level2">
+<h2>Data Pre-processing</h2>
+<pre class="r"><code>sales_all = 
+  bakery_df %&gt;% 
+  group_by(date) %&gt;% 
+  summarize(
+    total_sale = sum(quantity))</code></pre>
+<pre class="r"><code>train = 
+  sales_all %&gt;% 
+  filter(date &lt; &quot;2022-09-01&quot;)
+
+test = 
+  sales_all %&gt;% 
+  filter(year(date) == 2022 &amp; month(date) == 9)</code></pre>
+</div>
+<div id="seasonal-naive-model-baseline-forecast" class="section level2">
+<h2>Seasonal Naive Model = Baseline Forecast</h2>
+<p>Naive forecasting is a simple and cost-effective method in which the
+forecasts produced are equal to the last observed value. The seasonal
+naive approach is used when the time series exhibits seasonality, in
+which case, the forecasts are equivalent to the value from the last
+season. Naive methods are typically used as a benchmark against which
+more sophisticated forecasting techniques can be compared.</p>
+<p>For model evaluation, we will be relying on the Mean Absolute
+Percentage Error (MAPE) to measure the accuracy of our predictions.</p>
+<pre class="r"><code>seasonal_naive_model = snaive(train$total_sale, h = length(test$total_sale))
+
+MAPE(seasonal_naive_model$mean, test$total_sale) * 100</code></pre>
+<pre><code>## [1] 19.06633</code></pre>
+<pre class="r"><code>test_seasonal = 
+  test %&gt;% 
+  mutate(
+    pred_sale = seasonal_naive_model$mean)</code></pre>
+<pre class="r"><code>train %&gt;% 
+  ggplot(aes(x = date, y = total_sale)) +
+  geom_line(aes(color = &quot;Actual sale (2021)&quot;)) +
+  geom_line(data = test_seasonal, aes(x = date, y = total_sale, color = &quot;Actual sale (2022)&quot;)) + 
+  geom_line(data = test_seasonal, aes(x = date, y = pred_sale, color = &quot;Predicted sale&quot;), size = 1.5) +
+  labs(
+    x = &quot;Date&quot;,
+    y = &quot;Number of products sold&quot;,
+    title = &quot;Seasonal Naive Forecast for January, 2022&quot;)</code></pre>
+<p><img src="forecast_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
+<p>This is the most shit forecast model…</p>
+</div>
+<div id="double-seasonal-holt-winters-dshw" class="section level2">
+<h2>Double-Seasonal Holt-Winters (DSHW)</h2>
+<pre class="r"><code>double_seasonal_model = dshw(train$total_sale, period1 = 7, period2 = 14, h = length(test$total_sale))
+
+print(&quot;The error rate of this model is&quot;)</code></pre>
+<pre><code>## [1] &quot;The error rate of this model is&quot;</code></pre>
+<pre class="r"><code>MAPE(double_seasonal_model$mean, test$total_sale) * 100</code></pre>
+<pre><code>## [1] 49.7216</code></pre>
+<pre class="r"><code>test_double_seasonal = 
+  test %&gt;% 
+  mutate(
+    pred_sale = double_seasonal_model$mean)</code></pre>
+<pre class="r"><code>train %&gt;% 
+  ggplot(aes(x = date, y = total_sale)) +
+  geom_line(aes(color = &quot;Actual sale (2021)&quot;)) +
+  geom_line(data = test_double_seasonal, aes(x = date, y = total_sale, color = &quot;Actual sale (2022)&quot;)) + 
+  geom_line(data = test_double_seasonal, aes(x = date, y = pred_sale, color = &quot;Predicted sale&quot;)) +
+  labs(
+    x = &quot;Date&quot;,
+    y = &quot;Number of products sold&quot;,
+    title = &quot;Double-Seasonal Holt-Winters Forecast for January, 2022&quot;)</code></pre>
+<p><img src="forecast_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
+<p>This model should be better than the basic one because it is dynamic,
+but still shit because error is bigger than the basic one…</p>
+</div>
+<div id="tbats" class="section level2">
+<h2>TBATS</h2>
+<pre class="r"><code>TBATS_model = tbats(train$total_sale)
+
+tbats_df = forecast(TBATS_model, h = length(test$total_sale))
+
+print(&quot;The error rate of this model is&quot;)</code></pre>
+<pre><code>## [1] &quot;The error rate of this model is&quot;</code></pre>
+<pre class="r"><code>MAPE(tbats_df$mean, test$total_sale) * 100</code></pre>
+<pre><code>## [1] 42.06919</code></pre>
+<pre class="r"><code>test_tbats = 
+  test %&gt;% 
+  mutate(
+    pred_sale = tbats_df$mean)</code></pre>
+<pre class="r"><code>train %&gt;% 
+  ggplot(aes(x = date, y = total_sale)) +
+  geom_line(aes(color = &quot;Actual sale (2021)&quot;)) +
+  geom_line(data = test_tbats, aes(x = date, y = total_sale, color = &quot;Actual sale (2022)&quot;)) + 
+  geom_line(data = test_tbats, aes(x = date, y = pred_sale, color = &quot;Predicted sale&quot;), size = 0.8) +
+  labs(
+    x = &quot;Date&quot;,
+    y = &quot;Number of products sold&quot;,
+    title = &quot;TBATS Forecast for January, 2022&quot;)</code></pre>
+<p><img src="forecast_files/figure-html/unnamed-chunk-14-1.png" width="90%" /></p>
+<p>Our model’s accuracy is getting better, but it tends to over
+forecast. However, over forecasting can help the bakery to meet daily
+demand of products…</p>
+</div>
+<div id="neural-network" class="section level2">
+<h2>Neural Network</h2>
+<pre class="r"><code>nn_model = nnetar(train$total_sale)
+
+nn_forecast_df = forecast(nn_model, h = length(test$total_sale))
+
+print(&quot;The error rate of this model is&quot;)</code></pre>
+<pre><code>## [1] &quot;The error rate of this model is&quot;</code></pre>
+<pre class="r"><code>MAPE(nn_forecast_df$mean, test$total_sale) * 100</code></pre>
+<pre><code>## [1] 31.4218</code></pre>
+<pre class="r"><code>test_nn = 
+  test %&gt;% 
+  mutate(
+    pred_sale = nn_forecast_df$mean)</code></pre>
+<pre class="r"><code>train %&gt;% 
+  ggplot(aes(x = date, y = total_sale)) +
+  geom_line(aes(color = &quot;Actual sale (2021)&quot;)) +
+  geom_line(data = test_nn, aes(x = date, y = total_sale, color = &quot;Actual sale (2022)&quot;), alpha = 0.8) + 
+  geom_line(data = test_nn, aes(x = date, y = pred_sale, color = &quot;Predicted sale&quot;), size = 0.6, alpha = 0.8) +
+  labs(
+    x = &quot;Date&quot;,
+    y = &quot;Number of products sold&quot;,
+    title = &quot;Neural Network Forecast for September, 2022&quot;) +
+  theme_minimal() +
+  theme(legend.position = &quot;bottom&quot;)</code></pre>
+<p><img src="forecast_files/figure-html/unnamed-chunk-17-1.png" width="90%" /></p>
+</div>
+<div id="sales-forecast-for-oct---dec-2022" class="section level2">
+<h2>Sales Forecast for Oct - Dec 2022</h2>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Plots</title>
+
+<script src="site_libs/header-attrs-2.16/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/sandstone.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="mailto:&lt;you@youremail.com&gt;">
+    <span class="fa fa-solid fa-keyboard"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="http://github.com/cheekayc/">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Plots</h1>
+
+</div>
+
+
+<pre class="r"><code>knitr::opts_chunk$set(message = FALSE)
+
+library(tidyverse)
+library(lubridate)
+library(plotly)
+library(patchwork)</code></pre>
+<p>Data input and cleaning</p>
+<pre class="r"><code>bakery_df =
+  read_csv(&quot;./Data/Bakery_sales.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(
+    unit_price = str_replace(unit_price, &quot;€&quot;, &quot;&quot;),
+    unit_price = str_replace(unit_price, &quot;,&quot;, &quot;.&quot;),
+    unit_price = as.numeric(unit_price),
+    product_name = article) %&gt;% 
+  filter(product_name != &quot;.&quot;) %&gt;% 
+  select(-article)
+
+bakery_df</code></pre>
+<pre><code>## # A tibble: 234,000 × 7
+##       x1 date       time   ticket_number quantity unit_price product_name       
+##    &lt;dbl&gt; &lt;date&gt;     &lt;time&gt;         &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt;              
+##  1     0 2021-01-02 08:38         150040        1       0.9  BAGUETTE           
+##  2     1 2021-01-02 08:38         150040        3       1.2  PAIN AU CHOCOLAT   
+##  3     4 2021-01-02 09:14         150041        2       1.2  PAIN AU CHOCOLAT   
+##  4     5 2021-01-02 09:14         150041        1       1.15 PAIN               
+##  5     8 2021-01-02 09:25         150042        5       1.2  TRADITIONAL BAGUET…
+##  6    11 2021-01-02 09:25         150043        2       0.9  BAGUETTE           
+##  7    12 2021-01-02 09:25         150043        3       1.1  CROISSANT          
+##  8    15 2021-01-02 09:27         150044        1       1.05 BANETTE            
+##  9    18 2021-01-02 09:32         150045        3       1.2  TRADITIONAL BAGUET…
+## 10    19 2021-01-02 09:32         150045        6       1.1  CROISSANT          
+## # … with 233,990 more rows</code></pre>
+<div id="pie-charts" class="section level3">
+<h3>Pie Charts</h3>
+<p>A pie chart showing the percentage of each product’s sale count (top
+10)</p>
+<pre class="r"><code>plot_pie =
+  bakery_df %&gt;% 
+  group_by(product_name) %&gt;% 
+  summarize(n_obs = n()) %&gt;% 
+  arrange(desc(n_obs)) %&gt;% 
+  head(10) %&gt;% 
+  plot_ly(labels = ~product_name, values = ~n_obs, type = &#39;pie&#39;, colors = &quot;viridis&quot;) %&gt;% 
+  layout(title = &#39;Top 10 favoriate bakeries&#39;,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+plot_pie</code></pre>
+<div id="htmlwidget-327acb131c385aa20783" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-327acb131c385aa20783">{"x":{"visdat":{"18681c17299a":["function () ","plotlyVisDat"]},"cur_data":"18681c17299a","attrs":{"18681c17299a":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>A pie chart showing the percentage of each product’s sale count (top
+10) in 2021/2022</p>
+<pre class="r"><code>plot_pie =
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) 
+  
+plot_pie_2021 = 
+  plot_pie %&gt;% 
+  filter(year == 2021) %&gt;%
+  group_by(product_name) %&gt;% 
+  summarize(n_obs = n()) %&gt;% 
+  arrange(desc(n_obs)) %&gt;% 
+  head(10) %&gt;% 
+  plot_ly(labels = ~product_name, values = ~n_obs, type = &#39;pie&#39;, colors = &quot;viridis&quot;) %&gt;% 
+  layout(title = &#39;Top 10 favoriate bakeries in 2021&#39;,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+plot_pie_2022 = 
+  plot_pie %&gt;% 
+  filter(year == 2022) %&gt;%
+  group_by(product_name) %&gt;% 
+  summarize(n_obs = n()) %&gt;% 
+  arrange(desc(n_obs)) %&gt;% 
+  head(10) %&gt;% 
+  plot_ly(labels = ~product_name, values = ~n_obs, type = &#39;pie&#39;, colors = &quot;viridis&quot;) %&gt;% 
+  layout(title = &#39;Top 10 favoriate bakeries in 2022&#39;,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+plot_pie_2021</code></pre>
+<div id="htmlwidget-1e4079f2645415ec4609" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1e4079f2645415ec4609">{"x":{"visdat":{"18685e95081":["function () ","plotlyVisDat"]},"cur_data":"18685e95081","attrs":{"18685e95081":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2021","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","CEREAL BAGUETTE","SPECIAL BREAD","CAMPAGNE","BOULE 400G"],"values":[37399,11759,8713,8575,6291,5739,3070,2936,2289,2283],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>plot_pie_2022</code></pre>
+<div id="htmlwidget-515aff66033008cf5667" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-515aff66033008cf5667">{"x":{"visdat":{"1868119670d5":["function () ","plotlyVisDat"]},"cur_data":"1868119670d5","attrs":{"1868119670d5":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2022","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","FORMULE SANDWICH","CEREAL BAGUETTE","BOULE 400G"],"values":[30290,8711,6579,6555,5217,4839,2259,1976,1891,1816],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="line-plots" class="section level3">
+<h3>Line Plots</h3>
+<p>Top 10 favorite bread monthly sale counts in 2021</p>
+<pre class="r"><code>top_line =
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) %&gt;%
+  filter(year == 2021) %&gt;% 
+  select (year, month, product_name, quantity) %&gt;% 
+  group_by (year, month, product_name) %&gt;% 
+  mutate (total_counts = sum (quantity)) %&gt;% 
+  distinct(year, month, product_name,total_counts) 
+
+top_line1_2021 =
+  top_line %&gt;% 
+  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;)) %&gt;% 
+  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
+    geom_line() +
+    theme(legend.position = &quot;bottom&quot;) + 
+    labs(x = &quot;month&quot;,
+         y = &quot;counts of bread&quot;,
+         title = &quot;monthly sale counts of the most popular bread in 2021&quot;) +
+    scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
+
+top_line2_2021 =
+  top_line %&gt;% 
+    filter(product_name %in% c(&quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;CEREAL BAGUETTE&quot;, &quot;SPECIAL BREAD&quot;, &quot;CAMPAGNE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
+    geom_line() +
+    theme(legend.position = &quot;bottom&quot;) + 
+    labs(x = &quot;month&quot;,
+         y = &quot;counts of bread&quot;,
+         title = &quot;top 2-10 popular bread monthly sale counts in 2021&quot;) +
+    scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
+ 
+top_line1_2021+top_line2_2021</code></pre>
+<p><img src="plot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Top 10 favorite bread monthly sale counts in 2022</p>
+<pre class="r"><code>top_line =
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) %&gt;%
+  filter(year == 2022) %&gt;% 
+  select (year, month, product_name, quantity) %&gt;% 
+  group_by (year, month, product_name) %&gt;% 
+  mutate (total_counts = sum (quantity)) %&gt;% 
+  distinct(year, month, product_name,total_counts) 
+
+top_line1_2022 =
+  top_line %&gt;% 
+  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;)) %&gt;% 
+  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
+    geom_line() +
+    theme(legend.position = &quot;bottom&quot;) + 
+    labs(x = &quot;month&quot;,
+         y = &quot;counts of bread&quot;,
+         title = &quot;monthly sale counts of the most popular bread in 2022&quot;) +
+    scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
+
+top_line2_2022 =
+  top_line %&gt;% 
+    filter(product_name %in% c(&quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;SPECIAL BREAD&quot;, &quot;FORMULE SANDWICH&quot;,&quot;CEREAL BAGUETTE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
+    geom_line() +
+    theme(legend.position = &quot;bottom&quot;) + 
+    labs(x = &quot;month&quot;,
+         y = &quot;counts of bread&quot;,
+         title = &quot;top 2-10 popular bread monthly sale counts in 2022&quot;) +
+    scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
+ 
+top_line1_2022+top_line2_2022</code></pre>
+<p><img src="plot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>A line plot of trends showing total sale revenue by month (trend)</p>
+<pre class="r"><code>plot_line =
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) %&gt;% 
+  group_by(year, month) %&gt;% 
+  mutate(rev = quantity * unit_price) %&gt;% 
+  summarize(month_rev = sum(rev)) %&gt;% 
+  
+  plot_ly(x = ~month, y = ~month_rev, mode = &#39;lines+markers&#39;, alpha = 0.5)
+
+plot_line </code></pre>
+<div id="htmlwidget-3032e99387bd0b1961b1" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3032e99387bd0b1961b1">{"x":{"visdat":{"1868194d151a":["function () ","plotlyVisDat"]},"cur_data":"1868194d151a","attrs":{"1868194d151a":{"x":{},"y":{},"mode":"lines+markers","alpha":0.5,"alpha_stroke":1,"sizes":[10,100],"spans":[1,20]}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"month"},"yaxis":{"domain":[0,1],"automargin":true,"title":"month_rev"},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[1,2,3,4,5,6,7,8,9,10,11,12,null,1,2,3,4,5,6,7,8,9],"y":[15258.67,16827.15,20087.6,24649.75,29617.25,24610.25,42201.45,48680.35,22728.8,22704.35,18043.55,19051.15,null,15685.7,17627.5,19346.61,24671.95,29286.1,25286.3,46596.22,53857.65,21822.5],"mode":"lines+markers","type":"scatter","marker":{"color":"rgba(31,119,180,0.5)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,0.5)"},"error_x":{"color":"rgba(31,119,180,0.5)"},"line":{"color":"rgba(31,119,180,0.5)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="scatterplot" class="section level3">
+<h3>Scatterplot</h3>
+<p>Ranking of mean prices of different products</p>
+<pre class="r"><code>test =
+  bakery_df %&gt;% 
+  group_by(product_name) %&gt;% 
+  summarize(mean_price = mean(unit_price)) %&gt;% 
+  arrange(desc(mean_price)) %&gt;% 
+  mutate(product_name = fct_reorder(product_name, mean_price)) %&gt;% 
+  ggplot(aes(x =product_name, y = mean_price, color = product_name)) + 
+    geom_point() +
+    theme(axis.text.x = element_text(angle=90,hjust = 1)) + 
+    labs(x = &quot;name of products&quot;,
+         y = &quot;mean prices&quot;,
+         title = &quot;ranking of mean prices of different products&quot;) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = &quot;none&quot;)
+  
+test </code></pre>
+<p><img src="plot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div id="bar-graphs" class="section level3">
+<h3>Bar graphs</h3>
+<p>Ranking of total revenue of top 10 products in 2021/2022</p>
+<pre class="r"><code>total_rev_bar=
+  bakery_df %&gt;% 
+  group_by(product_name) %&gt;% 
+  mutate(rev = quantity * unit_price) %&gt;% 
+  summarize(prod_rev = sum(rev)) %&gt;% 
+  arrange(desc(prod_rev)) 
+  
+total_rev_bar_2021=
+  total_rev_bar %&gt;% 
+  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;CEREAL BAGUETTE&quot;, &quot;SPECIAL BREAD&quot;, &quot;CAMPAGNE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  mutate(product_name = fct_reorder(product_name, prod_rev)) %&gt;% 
+  ggplot(aes(x =product_name, y= prod_rev, fill=product_name)) + 
+    geom_bar(stat=&quot;identity&quot;, width=0.5) +
+    labs(x = &quot;name of products&quot;,
+         y = &quot;total revenue&quot;,
+         title = &quot;ranking in 2021&quot;) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = &quot;none&quot;)
+  
+total_rev_bar_2022=
+  total_rev_bar %&gt;% 
+  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;SPECIAL BREAD&quot;, &quot;FORMULE SANDWICH&quot;,&quot;CEREAL BAGUETTE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  mutate(product_name = fct_reorder(product_name, prod_rev)) %&gt;% 
+  ggplot(aes(x =product_name, y= prod_rev, fill=product_name)) + 
+    geom_bar(stat=&quot;identity&quot;, width=0.5) +
+    labs(x = &quot;name of products&quot;,
+         y = &quot;total revenue&quot;,
+         title = &quot;ranking in 2022&quot;) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = &quot;none&quot;)
+ 
+total_rev_bar_2021+total_rev_bar_2022</code></pre>
+<p><img src="plot_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Distribution of monthly revenue in 2021/2022</p>
+<pre class="r"><code>dis_rev_bar=
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) 
+
+dis_rev_bar_2021=
+  dis_rev_bar %&gt;%
+    filter(year == 2021,
+         product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;CEREAL BAGUETTE&quot;, &quot;SPECIAL BREAD&quot;, &quot;CAMPAGNE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  group_by(year, month, product_name) %&gt;% 
+  mutate(rev = quantity * unit_price) %&gt;% 
+  summarize(prod_dis_rev = sum(rev)) %&gt;% 
+  arrange(desc(prod_dis_rev)) %&gt;% 
+   mutate(product_name = fct_reorder(product_name, prod_dis_rev)) %&gt;% 
+    ggplot(aes(x =month, y= prod_dis_rev, fill=product_name)) + 
+    geom_bar(stat=&quot;identity&quot;, position=&quot;stack&quot;) +
+    labs(x = &quot;month&quot;,
+         y = &quot;total revenue&quot;,
+         title = &quot;distribution of monthly revenue in 2021&quot;) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = &quot;bottom&quot;) +
+  scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
+
+dis_rev_bar_2022=
+  dis_rev_bar %&gt;%
+    filter(year == 2022,
+         product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;SPECIAL BREAD&quot;, &quot;FORMULE SANDWICH&quot;,&quot;CEREAL BAGUETTE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  group_by(year, month, product_name) %&gt;% 
+  mutate(rev = quantity * unit_price) %&gt;% 
+  summarize(prod_dis_rev = sum(rev)) %&gt;% 
+  arrange(desc(prod_dis_rev)) %&gt;% 
+   mutate(product_name = fct_reorder(product_name, prod_dis_rev)) %&gt;% 
+    ggplot(aes(x =month, y= prod_dis_rev, fill=product_name)) + 
+    geom_bar(stat=&quot;identity&quot;, position=&quot;stack&quot;) +
+    labs(x = &quot;month&quot;,
+         y = &quot;total revenue&quot;,
+         title = &quot;distribution of monthly revenue in 2022&quot;) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = &quot;bottom&quot;) +
+  scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
+
+dis_rev_bar_2021+dis_rev_bar_2022</code></pre>
+<p><img src="plot_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
