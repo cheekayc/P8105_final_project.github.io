@@ -3,8 +3,12 @@ output_dir: "."
 navbar:
   title: "Home"
   left:
-      - text: "About"
+    - text: "About"
       href: about.html
+    - icon: fa-github fa-lg
+      href: https://github.com/cheekayc/P8105_final_project.github.io
+    - icon: fa-github fa-lg
+      href: 
   right:
     - text: "Statistical Analyses"
       href: statistical_analyses.html
@@ -14,10 +18,6 @@ navbar:
       href: forecast.html
     - text: "Final Report"
       href: final_report.html
-    - icon: fa-solid fa-keyboard
-      href: mailto:<you@youremail.com>
-    - icon: fa-github fa-lg
-      href: http://github.com/cheekayc/
 output:
   html_document:
     theme: sandstone
