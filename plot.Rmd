@@ -7,14 +7,19 @@ output:
     code_folding: hide
 ---
 
-```{r setup and data cleaning, message = FALSE}
+```{r setup, message = FALSE}
 knitr::opts_chunk$set(message = FALSE)
-
 library(tidyverse)
 library(lubridate)
 library(plotly)
 library(patchwork)
+```
 
+### Summary of the used packages and dependencies
+tidyverse, lubridate, plotly, patchwork
+
+
+```{r,data cleaning, message = FALSE}
 bakery_df =
   read_csv("./Data/Bakery_sales.csv") %>% 
   janitor::clean_names() %>% 
@@ -50,7 +55,7 @@ The dataset includes:
 It contains `r ncol(bakery_df)` variables and `r nrow(bakery_df)` observations.
 
 
- 
+
 ### Pie Charts
 
 A pie chart showing the percentage of each product’s sale count (top 10)

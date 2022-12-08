@@ -390,13 +390,15 @@ div.tocify {
 
 
 <pre class="r"><code>knitr::opts_chunk$set(message = FALSE)
-
 library(tidyverse)
 library(lubridate)
 library(plotly)
-library(patchwork)
-
-bakery_df =
+library(patchwork)</code></pre>
+<div id="summary-of-the-used-packages-and-dependencies"
+class="section level3">
+<h3>Summary of the used packages and dependencies</h3>
+<p>tidyverse, lubridate, plotly, patchwork</p>
+<pre class="r"><code>bakery_df =
   read_csv(&quot;./Data/Bakery_sales.csv&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
   mutate(
@@ -406,6 +408,7 @@ bakery_df =
     product_name = article) %&gt;% 
   filter(product_name != &quot;.&quot;) %&gt;% 
   select(-article)</code></pre>
+</div>
 <div id="introduction-background-of-data-sets" class="section level3">
 <h3>Introduction &amp; Background of data sets</h3>
 <p>We used updated version dataset of a French bakery from 2021-01-01 to
@@ -440,8 +443,8 @@ production planning</p>
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie</code></pre>
-<div id="htmlwidget-03bcf45206a06d6fdfc4" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-03bcf45206a06d6fdfc4">{"x":{"visdat":{"1ae76b81fd95":["function () ","plotlyVisDat"]},"cur_data":"1ae76b81fd95","attrs":{"1ae76b81fd95":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-14719487dff22d076d0e" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-14719487dff22d076d0e">{"x":{"visdat":{"1d0834135028":["function () ","plotlyVisDat"]},"cur_data":"1d0834135028","attrs":{"1d0834135028":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 
 
