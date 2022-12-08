@@ -83,36 +83,81 @@ summary(one.way)
 ```
 The ANOVA test p-value is 0.00505 which is less than alpha level of 0.05, so we reject the null hypothesis and conclude that the mean sales in peak months in 2021 is statistically significantly different from the mean sales of peak months in 2022.
  
-### Simple Linear Regression for croissant and test the model using Cross Validation
+ 
+### Generalized Additive Model 
+
+Find the *rush hours* of a typical day:
 ```{r}
-croissant_df = 
+bakery_df = 
   bakery_df %>% 
-  filter(str_detect(product_name, "CROISSANT")) %>% 
   mutate(
-    month = month(date),
-    qty_cp = (quantity > 5) * (quantity - 5)
+    Hour = hour(time),
+    Month = month(date))
+
+bakery_df %>% 
+  group_by(Hour) %>% 
+  count() %>% 
+  ggplot(aes(x = Hour, y = n)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
+  scale_y_continuous(limit = c(0,50000)) +
+  labs(
+    title = "Peak hours",
+    x = "Hour (24-hour format)",
+    y = "Number of times appeared")
+``` 
+Overall, what hours has the most number of products sold?
+```{r}
+bakery_df %>% 
+  mutate(year = year(date)) %>% 
+  filter(year == 2021) %>% 
+  group_by(Hour) %>% 
+  summarize(
+    n_sold = sum(quantity) / 365) %>% 
+  ggplot(aes(x = Hour, y = n_sold)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = seq(7, 11), limit = c(7, 11)) +
+  scale_y_continuous(limit = c(0,120)) +
+  labs(
+    title = "Peak hours",
+    x = "Hour (24-hour format)",
+    y = "Number of products sold")
+
+```
+
+
+
+### Simple Linear Regression for croissant's sale counts and when it's being sold (hour of the day) and test the model using Cross Validation
+```{r}
+slr_df = 
+  bakery_df  %>% 
+  mutate(
+    hour_cp = (Hour > 8) * (Hour - 8)
     )
 
-ggplot(croissant_df, aes(x = quantity, y = rev)) +
-  geom_point()
+ggplot(slr_df, aes(x = Hour, y = quantity)) +
+  geom_point() + scale_x_continuous(breaks = seq(7, 11), limit = c(7, 11)) +
+  scale_y_continuous(limit = c(0,50)) 
 
-croissant_reg = lm(rev ~ quantity, croissant_df)
+slr_reg = lm(quantity ~ Hour, slr_df)
 
-croissant_reg %>% 
+slr_reg %>% 
   broom::tidy()
 ```
 Examine cross validation of this simple linear regression model
 ```{r}
-linear_mod = lm(rev ~ quantity, croissant_df)
-pwl_mod    = lm(rev ~ quantity + qty_cp, data = croissant_df)
-smooth_mod = gam(rev ~ s(quantity), data = croissant_df)
+linear_mod = lm(quantity ~ Hour, slr_df)
+pwl_mod    = lm(quantity ~ Hour + hour_cp, data = slr_df)
+smooth_mod = gam(quantity ~ s(Hour), data = slr_df)
 ```
 
 ```{r}
-croissant_df %>% 
+slr_df %>% 
   gather_predictions(linear_mod, pwl_mod, smooth_mod) %>% 
   mutate(model = fct_inorder(model)) %>% 
-  ggplot(aes(x = quantity, y = rev)) + 
+  ggplot(aes(x = Hour, y = quantity)) + 
   geom_point(alpha = .5) +
   geom_line(aes(y = pred), color = "red") + 
   facet_grid(~model)
@@ -123,7 +168,7 @@ Re-sample the dataset by `crossv_mc` and let's see the rmse of each model
 ```{r}
 set.seed(2022)
 cv_df =
-  crossv_mc(croissant_df, 100) %>% 
+  crossv_mc(slr_df, 100) %>% 
   mutate(
     train = map(train, as_tibble),
     test = map(test, as_tibble))
@@ -131,9 +176,9 @@ cv_df =
 cv_df = 
   cv_df %>% 
   mutate(
-    linear_mod  = map(train, ~lm(rev ~ quantity, data = .x)),
-    pwl_mod     = map(train, ~lm(rev ~ quantity + qty_cp, data = .x)),
-    smooth_mod  = map(train, ~gam(rev ~ s(quantity), data = as_tibble(.x)))) %>% 
+    linear_mod  = map(train, ~lm(quantity ~ Hour, data = .x)),
+    pwl_mod     = map(train, ~lm(quantity ~ Hour + hour_cp, data = .x)),
+    smooth_mod  = map(train, ~gam(quantity ~ s(Hour), data = as_tibble(.x)))) %>% 
   mutate(
     rmse_linear = map2_dbl(linear_mod, test, ~rmse(model = .x, data = .y)),
     rmse_pwl    = map2_dbl(pwl_mod, test, ~rmse(model = .x, data = .y)),
@@ -152,7 +197,7 @@ cv_df %>%
   mutate(model = fct_inorder(model)) %>% 
   ggplot(aes(x = model, y = rmse)) + geom_violin()
 ```
-Based on the results, there is a slightly improvement using piecewise linear model as it has a lower tail of rmse on the top. Since there are no significant difference between the three model including the non-linear smooth model, we can conclude that the basic linear model is clear enough to be accounted for this relationship in the product of croissant.
+Based on the results, there is a slightly improvement using smooth model as it has a lower tail of rmse on the top. Since there are no significant difference between the three model including the non-linear smooth model, we can conclude that the basic linear model is clear enough to be accounted for this relationship in the product of croissant.
 
 ### Multiple Linear Regression (test version)
 
@@ -251,54 +296,9 @@ evidence to conclude that the mean price of traditional baguette in this bakery 
 in Paris.
 
 
-### Generalized Additive Model 
 
-Find the *rush hours* of a typical day:
-```{r}
-bakery_df = 
-  bakery_df %>% 
-  mutate(
-    Hour = hour(time),
-    Month = month(date))
 
-bakery_df %>% 
-  group_by(Hour) %>% 
-  count() %>% 
-  ggplot(aes(x = Hour, y = n)) +
-  geom_point() +
-  geom_line() +
-  scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
-  scale_y_continuous(limit = c(0,50000)) +
-  labs(
-    title = "Peak hours",
-    x = "Hour (24-hour format)",
-    y = "Number of times appeared")
-```
 
-Overall, what hours has the most number of products sold?
-```{r}
-bakery_df %>% 
-  mutate(year = year(date)) %>% 
-  filter(year == 2021) %>% 
-  group_by(Hour) %>% 
-  summarize(
-    n_sold = sum(quantity) / 365) %>% 
-  ggplot(aes(x = Hour, y = n_sold)) +
-  geom_point() +
-  geom_line() +
-  scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
-  scale_y_continuous(limit = c(0,120)) +
-  labs(
-    title = "Peak hours",
-    x = "Hour (24-hour format)",
-    y = "Number of products sold")
-```
-
-```{r}
-smooth_mod = gam(quantity ~ s(Hour) + s(Month), data = bakery_df)
-
-smooth_mod %>% broom::tidy()
-```
 
 
 ```{r}
