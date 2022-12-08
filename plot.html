@@ -13,7 +13,7 @@
 
 <title>Plots</title>
 
-<script src="site_libs/header-attrs-2.16/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/sandstone.min.css" rel="stylesheet" />
@@ -36,12 +36,12 @@
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <script src="site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
-<script src="site_libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="site_libs/plotly-binding-4.10.1/plotly.js"></script>
 <script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
-<link href="site_libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="site_libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -190,8 +190,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -199,16 +199,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -415,8 +408,8 @@ bakery_df</code></pre>
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie</code></pre>
-<div id="htmlwidget-327acb131c385aa20783" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-327acb131c385aa20783">{"x":{"visdat":{"18681c17299a":["function () ","plotlyVisDat"]},"cur_data":"18681c17299a","attrs":{"18681c17299a":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-fe72c10bb25b9ac99e34" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-fe72c10bb25b9ac99e34">{"x":{"visdat":{"698814136fce":["function () ","plotlyVisDat"]},"cur_data":"698814136fce","attrs":{"698814136fce":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>A pie chart showing the percentage of each product’s sale count (top
 10) in 2021/2022</p>
 <pre class="r"><code>plot_pie =
@@ -451,11 +444,11 @@ plot_pie_2022 =
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie_2021</code></pre>
-<div id="htmlwidget-1e4079f2645415ec4609" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1e4079f2645415ec4609">{"x":{"visdat":{"18685e95081":["function () ","plotlyVisDat"]},"cur_data":"18685e95081","attrs":{"18685e95081":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2021","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","CEREAL BAGUETTE","SPECIAL BREAD","CAMPAGNE","BOULE 400G"],"values":[37399,11759,8713,8575,6291,5739,3070,2936,2289,2283],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-26855acfd48a6ecc45bc" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-26855acfd48a6ecc45bc">{"x":{"visdat":{"69882678f4a5":["function () ","plotlyVisDat"]},"cur_data":"69882678f4a5","attrs":{"69882678f4a5":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2021","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","CEREAL BAGUETTE","SPECIAL BREAD","CAMPAGNE","BOULE 400G"],"values":[37399,11759,8713,8575,6291,5739,3070,2936,2289,2283],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>plot_pie_2022</code></pre>
-<div id="htmlwidget-515aff66033008cf5667" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-515aff66033008cf5667">{"x":{"visdat":{"1868119670d5":["function () ","plotlyVisDat"]},"cur_data":"1868119670d5","attrs":{"1868119670d5":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2022","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","FORMULE SANDWICH","CEREAL BAGUETTE","BOULE 400G"],"values":[30290,8711,6579,6555,5217,4839,2259,1976,1891,1816],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-10e134a86e9743faeac2" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-10e134a86e9743faeac2">{"x":{"visdat":{"69884f05905e":["function () ","plotlyVisDat"]},"cur_data":"69884f05905e","attrs":{"69884f05905e":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2022","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","FORMULE SANDWICH","CEREAL BAGUETTE","BOULE 400G"],"values":[30290,8711,6579,6555,5217,4839,2259,1976,1891,1816],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="line-plots" class="section level3">
 <h3>Line Plots</h3>
@@ -555,8 +548,8 @@ top_line1_2022+top_line2_2022</code></pre>
   plot_ly(x = ~month, y = ~month_rev, mode = &#39;lines+markers&#39;, alpha = 0.5)
 
 plot_line </code></pre>
-<div id="htmlwidget-3032e99387bd0b1961b1" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3032e99387bd0b1961b1">{"x":{"visdat":{"1868194d151a":["function () ","plotlyVisDat"]},"cur_data":"1868194d151a","attrs":{"1868194d151a":{"x":{},"y":{},"mode":"lines+markers","alpha":0.5,"alpha_stroke":1,"sizes":[10,100],"spans":[1,20]}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"month"},"yaxis":{"domain":[0,1],"automargin":true,"title":"month_rev"},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[1,2,3,4,5,6,7,8,9,10,11,12,null,1,2,3,4,5,6,7,8,9],"y":[15258.67,16827.15,20087.6,24649.75,29617.25,24610.25,42201.45,48680.35,22728.8,22704.35,18043.55,19051.15,null,15685.7,17627.5,19346.61,24671.95,29286.1,25286.3,46596.22,53857.65,21822.5],"mode":"lines+markers","type":"scatter","marker":{"color":"rgba(31,119,180,0.5)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,0.5)"},"error_x":{"color":"rgba(31,119,180,0.5)"},"line":{"color":"rgba(31,119,180,0.5)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-7a4254417c40c033dd77" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7a4254417c40c033dd77">{"x":{"visdat":{"69883c626237":["function () ","plotlyVisDat"]},"cur_data":"69883c626237","attrs":{"69883c626237":{"x":{},"y":{},"mode":"lines+markers","alpha":0.5,"alpha_stroke":1,"sizes":[10,100],"spans":[1,20]}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"month"},"yaxis":{"domain":[0,1],"automargin":true,"title":"month_rev"},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[1,2,3,4,5,6,7,8,9,10,11,12,null,1,2,3,4,5,6,7,8,9],"y":[15258.6699999998,16827.1499999998,20087.6000000005,24649.750000001,29617.2500000014,24610.2500000011,42201.4500000022,48680.3500000022,22728.8000000007,22704.3500000009,18043.5500000002,19051.15,null,15685.6999999999,17627.5000000001,19346.6100000002,24671.9500000003,29286.1000000004,25286.3000000002,46596.2200000012,53857.6500000022,21822.4999999997],"mode":"lines+markers","type":"scatter","marker":{"color":"rgba(31,119,180,0.5)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,0.5)"},"error_x":{"color":"rgba(31,119,180,0.5)"},"line":{"color":"rgba(31,119,180,0.5)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="scatterplot" class="section level3">
 <h3>Scatterplot</h3>
