@@ -13,7 +13,7 @@
 
 <title>Plots</title>
 
-<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.16/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/sandstone.min.css" rel="stylesheet" />
@@ -37,12 +37,12 @@
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <script src="site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
-<script src="site_libs/plotly-binding-4.10.1/plotly.js"></script>
+<script src="site_libs/plotly-binding-4.10.0/plotly.js"></script>
 <script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
 <script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
-<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -191,8 +191,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "\e259";
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -200,9 +200,16 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "\e258";
-  font-family: 'Glyphicons Halflings';
+  content: "&#xe258;";
   border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -388,7 +395,26 @@ library(tidyverse)
 library(lubridate)
 library(plotly)
 library(patchwork)</code></pre>
-<p>Data input and cleaning</p>
+<div id="introduction-background-of-data-sets" class="section level3">
+<h3>Introduction &amp; Background of data sets</h3>
+<p>We used updated version dataset of a French bakery from 2021-01-01 to
+2022-09-30. The dataset provides the daily transaction details of
+customers.</p>
+<p>The dataset includes:</p>
+<p><code>date</code>: date order</p>
+<p><code>time</code>: time order</p>
+<p><code>ticket number</code>: identifier for every single
+transaction</p>
+<p><code>article</code>: name of the product sold (in French)</p>
+<p><code>quantity</code>: quantity sold</p>
+<p><code>unit_price</code>: price per product (in Euro)</p>
+<p><code>objective</code>: forecast the sales in order to ease the
+production planning</p>
+</div>
+<div id="pie-charts" class="section level3">
+<h3>Pie Charts</h3>
+<p>A pie chart showing the percentage of each product’s sale count (top
+10)</p>
 <pre class="r"><code>bakery_df =
   read_csv(&quot;./Data/Bakery_sales.csv&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
@@ -400,26 +426,7 @@ library(patchwork)</code></pre>
   filter(product_name != &quot;.&quot;) %&gt;% 
   select(-article)
 
-bakery_df</code></pre>
-<pre><code>## # A tibble: 234,000 × 7
-##       x1 date       time   ticket_number quantity unit_price product_name       
-##    &lt;dbl&gt; &lt;date&gt;     &lt;time&gt;         &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt;              
-##  1     0 2021-01-02 08:38         150040        1       0.9  BAGUETTE           
-##  2     1 2021-01-02 08:38         150040        3       1.2  PAIN AU CHOCOLAT   
-##  3     4 2021-01-02 09:14         150041        2       1.2  PAIN AU CHOCOLAT   
-##  4     5 2021-01-02 09:14         150041        1       1.15 PAIN               
-##  5     8 2021-01-02 09:25         150042        5       1.2  TRADITIONAL BAGUET…
-##  6    11 2021-01-02 09:25         150043        2       0.9  BAGUETTE           
-##  7    12 2021-01-02 09:25         150043        3       1.1  CROISSANT          
-##  8    15 2021-01-02 09:27         150044        1       1.05 BANETTE            
-##  9    18 2021-01-02 09:32         150045        3       1.2  TRADITIONAL BAGUET…
-## 10    19 2021-01-02 09:32         150045        6       1.1  CROISSANT          
-## # … with 233,990 more rows</code></pre>
-<div id="pie-charts" class="section level3">
-<h3>Pie Charts</h3>
-<p>A pie chart showing the percentage of each product’s sale count (top
-10)</p>
-<pre class="r"><code>plot_pie =
+plot_pie =
   bakery_df %&gt;% 
   group_by(product_name) %&gt;% 
   summarize(n_obs = n()) %&gt;% 
@@ -431,251 +438,8 @@ bakery_df</code></pre>
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie</code></pre>
-<div id="htmlwidget-315faa55ff0335704df5" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-315faa55ff0335704df5">{"x":{"visdat":{"71eb7d62fdd0":["function () ","plotlyVisDat"]},"cur_data":"71eb7d62fdd0","attrs":{"71eb7d62fdd0":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
-<p>A pie chart showing the percentage of each product’s sale count (top
-10) in 2021/2022</p>
-<pre class="r"><code>plot_pie =
-  bakery_df %&gt;% 
-  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
-  mutate(year = as.numeric(year),
-         month = as.integer(month),
-         day = as.integer(day),) 
-  
-plot_pie_2021 = 
-  plot_pie %&gt;% 
-  filter(year == 2021) %&gt;%
-  group_by(product_name) %&gt;% 
-  summarize(n_obs = n()) %&gt;% 
-  arrange(desc(n_obs)) %&gt;% 
-  head(10) %&gt;% 
-  plot_ly(labels = ~product_name, values = ~n_obs, type = &#39;pie&#39;, colors = &quot;viridis&quot;) %&gt;% 
-  layout(title = &#39;Top 10 favoriate bakeries in 2021&#39;,
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-
-plot_pie_2022 = 
-  plot_pie %&gt;% 
-  filter(year == 2022) %&gt;%
-  group_by(product_name) %&gt;% 
-  summarize(n_obs = n()) %&gt;% 
-  arrange(desc(n_obs)) %&gt;% 
-  head(10) %&gt;% 
-  plot_ly(labels = ~product_name, values = ~n_obs, type = &#39;pie&#39;, colors = &quot;viridis&quot;) %&gt;% 
-  layout(title = &#39;Top 10 favoriate bakeries in 2022&#39;,
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-
-plot_pie_2021</code></pre>
-<div id="htmlwidget-e87a4124dd436f3c3d25" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e87a4124dd436f3c3d25">{"x":{"visdat":{"71eb34104bc7":["function () ","plotlyVisDat"]},"cur_data":"71eb34104bc7","attrs":{"71eb34104bc7":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2021","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","CEREAL BAGUETTE","SPECIAL BREAD","CAMPAGNE","BOULE 400G"],"values":[37399,11759,8713,8575,6291,5739,3070,2936,2289,2283],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
-<pre class="r"><code>plot_pie_2022</code></pre>
-<div id="htmlwidget-c13d87432e5912d515eb" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c13d87432e5912d515eb">{"x":{"visdat":{"71eb19df1085":["function () ","plotlyVisDat"]},"cur_data":"71eb19df1085","attrs":{"71eb19df1085":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2022","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","FORMULE SANDWICH","CEREAL BAGUETTE","BOULE 400G"],"values":[30290,8711,6579,6555,5217,4839,2259,1976,1891,1816],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
-</div>
-<div id="line-plots" class="section level3">
-<h3>Line Plots</h3>
-<p>Top 10 favorite bread monthly sale counts in 2021</p>
-<pre class="r"><code>top_line =
-  bakery_df %&gt;% 
-  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
-  mutate(year = as.numeric(year),
-         month = as.integer(month),
-         day = as.integer(day),) %&gt;%
-  filter(year == 2021) %&gt;% 
-  select (year, month, product_name, quantity) %&gt;% 
-  group_by (year, month, product_name) %&gt;% 
-  mutate (total_counts = sum (quantity)) %&gt;% 
-  distinct(year, month, product_name,total_counts) 
-
-top_line1_2021 =
-  top_line %&gt;% 
-  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;)) %&gt;% 
-  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
-    geom_line() +
-    theme(legend.position = &quot;bottom&quot;) + 
-    labs(x = &quot;month&quot;,
-         y = &quot;counts of bread&quot;,
-         title = &quot;monthly sale counts of the most popular bread in 2021&quot;) +
-    scale_x_continuous(
-    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
-    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
-
-top_line2_2021 =
-  top_line %&gt;% 
-    filter(product_name %in% c(&quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;CEREAL BAGUETTE&quot;, &quot;SPECIAL BREAD&quot;, &quot;CAMPAGNE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
-  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
-    geom_line() +
-    theme(legend.position = &quot;bottom&quot;) + 
-    labs(x = &quot;month&quot;,
-         y = &quot;counts of bread&quot;,
-         title = &quot;top 2-10 popular bread monthly sale counts in 2021&quot;) +
-    scale_x_continuous(
-    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
-    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
- 
-top_line1_2021+top_line2_2021</code></pre>
-<p><img src="plot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<p>Top 10 favorite bread monthly sale counts in 2022</p>
-<pre class="r"><code>top_line =
-  bakery_df %&gt;% 
-  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
-  mutate(year = as.numeric(year),
-         month = as.integer(month),
-         day = as.integer(day),) %&gt;%
-  filter(year == 2022) %&gt;% 
-  select (year, month, product_name, quantity) %&gt;% 
-  group_by (year, month, product_name) %&gt;% 
-  mutate (total_counts = sum (quantity)) %&gt;% 
-  distinct(year, month, product_name,total_counts) 
-
-top_line1_2022 =
-  top_line %&gt;% 
-  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;)) %&gt;% 
-  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
-    geom_line() +
-    theme(legend.position = &quot;bottom&quot;) + 
-    labs(x = &quot;month&quot;,
-         y = &quot;counts of bread&quot;,
-         title = &quot;monthly sale counts of the most popular bread in 2022&quot;) +
-    scale_x_continuous(
-    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
-    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
-
-top_line2_2022 =
-  top_line %&gt;% 
-    filter(product_name %in% c(&quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;SPECIAL BREAD&quot;, &quot;FORMULE SANDWICH&quot;,&quot;CEREAL BAGUETTE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
-  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
-    geom_line() +
-    theme(legend.position = &quot;bottom&quot;) + 
-    labs(x = &quot;month&quot;,
-         y = &quot;counts of bread&quot;,
-         title = &quot;top 2-10 popular bread monthly sale counts in 2022&quot;) +
-    scale_x_continuous(
-    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
-    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
- 
-top_line1_2022+top_line2_2022</code></pre>
-<p><img src="plot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<p>A line plot of trends showing total sale revenue by month (trend)</p>
-<pre class="r"><code>plot_line =
-  bakery_df %&gt;% 
-  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
-  mutate(year = as.numeric(year),
-         month = as.integer(month),
-         day = as.integer(day),) %&gt;% 
-  group_by(year, month) %&gt;% 
-  mutate(rev = quantity * unit_price) %&gt;% 
-  summarize(month_rev = sum(rev)) %&gt;% 
-  
-  plot_ly(x = ~month, y = ~month_rev, mode = &#39;lines+markers&#39;, alpha = 0.5)
-
-plot_line </code></pre>
-<div id="htmlwidget-bb02e11e326feba089cf" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-bb02e11e326feba089cf">{"x":{"visdat":{"71ebf459d31":["function () ","plotlyVisDat"]},"cur_data":"71ebf459d31","attrs":{"71ebf459d31":{"x":{},"y":{},"mode":"lines+markers","alpha":0.5,"alpha_stroke":1,"sizes":[10,100],"spans":[1,20]}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"month"},"yaxis":{"domain":[0,1],"automargin":true,"title":"month_rev"},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[1,2,3,4,5,6,7,8,9,10,11,12,null,1,2,3,4,5,6,7,8,9],"y":[15258.6699999998,16827.1499999998,20087.6000000005,24649.750000001,29617.2500000014,24610.2500000011,42201.4500000022,48680.3500000022,22728.8000000007,22704.3500000009,18043.5500000002,19051.15,null,15685.6999999999,17627.5000000001,19346.6100000002,24671.9500000003,29286.1000000004,25286.3000000002,46596.2200000012,53857.6500000022,21822.4999999997],"mode":"lines+markers","type":"scatter","marker":{"color":"rgba(31,119,180,0.5)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,0.5)"},"error_x":{"color":"rgba(31,119,180,0.5)"},"line":{"color":"rgba(31,119,180,0.5)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
-</div>
-<div id="scatterplot" class="section level3">
-<h3>Scatterplot</h3>
-<p>Ranking of mean prices of different products</p>
-<pre class="r"><code>test =
-  bakery_df %&gt;% 
-  group_by(product_name) %&gt;% 
-  summarize(mean_price = mean(unit_price)) %&gt;% 
-  arrange(desc(mean_price)) %&gt;% 
-  mutate(product_name = fct_reorder(product_name, mean_price)) %&gt;% 
-  ggplot(aes(x =product_name, y = mean_price, color = product_name)) + 
-    geom_point() +
-    theme(axis.text.x = element_text(angle=90,hjust = 1)) + 
-    labs(x = &quot;name of products&quot;,
-         y = &quot;mean prices&quot;,
-         title = &quot;ranking of mean prices of different products&quot;) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = &quot;none&quot;)
-  
-test </code></pre>
-<p><img src="plot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-</div>
-<div id="bar-graphs" class="section level3">
-<h3>Bar graphs</h3>
-<p>Ranking of total revenue of top 10 products in 2021/2022</p>
-<pre class="r"><code>total_rev_bar=
-  bakery_df %&gt;% 
-  group_by(product_name) %&gt;% 
-  mutate(rev = quantity * unit_price) %&gt;% 
-  summarize(prod_rev = sum(rev)) %&gt;% 
-  arrange(desc(prod_rev)) 
-  
-total_rev_bar_2021=
-  total_rev_bar %&gt;% 
-  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;CEREAL BAGUETTE&quot;, &quot;SPECIAL BREAD&quot;, &quot;CAMPAGNE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
-  mutate(product_name = fct_reorder(product_name, prod_rev)) %&gt;% 
-  ggplot(aes(x =product_name, y= prod_rev, fill=product_name)) + 
-    geom_bar(stat=&quot;identity&quot;, width=0.5) +
-    labs(x = &quot;name of products&quot;,
-         y = &quot;total revenue&quot;,
-         title = &quot;ranking in 2021&quot;) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = &quot;none&quot;)
-  
-total_rev_bar_2022=
-  total_rev_bar %&gt;% 
-  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;SPECIAL BREAD&quot;, &quot;FORMULE SANDWICH&quot;,&quot;CEREAL BAGUETTE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
-  mutate(product_name = fct_reorder(product_name, prod_rev)) %&gt;% 
-  ggplot(aes(x =product_name, y= prod_rev, fill=product_name)) + 
-    geom_bar(stat=&quot;identity&quot;, width=0.5) +
-    labs(x = &quot;name of products&quot;,
-         y = &quot;total revenue&quot;,
-         title = &quot;ranking in 2022&quot;) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = &quot;none&quot;)
- 
-total_rev_bar_2021+total_rev_bar_2022</code></pre>
-<p><img src="plot_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-<p>Distribution of monthly revenue in 2021/2022</p>
-<pre class="r"><code>dis_rev_bar=
-  bakery_df %&gt;% 
-  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
-  mutate(year = as.numeric(year),
-         month = as.integer(month),
-         day = as.integer(day),) 
-
-dis_rev_bar_2021=
-  dis_rev_bar %&gt;%
-    filter(year == 2021,
-         product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;CEREAL BAGUETTE&quot;, &quot;SPECIAL BREAD&quot;, &quot;CAMPAGNE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
-  group_by(year, month, product_name) %&gt;% 
-  mutate(rev = quantity * unit_price) %&gt;% 
-  summarize(prod_dis_rev = sum(rev)) %&gt;% 
-  arrange(desc(prod_dis_rev)) %&gt;% 
-   mutate(product_name = fct_reorder(product_name, prod_dis_rev)) %&gt;% 
-    ggplot(aes(x =month, y= prod_dis_rev, fill=product_name)) + 
-    geom_bar(stat=&quot;identity&quot;, position=&quot;stack&quot;) +
-    labs(x = &quot;month&quot;,
-         y = &quot;total revenue&quot;,
-         title = &quot;distribution of monthly revenue in 2021&quot;) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = &quot;bottom&quot;) +
-  scale_x_continuous(
-    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
-    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
-
-dis_rev_bar_2022=
-  dis_rev_bar %&gt;%
-    filter(year == 2022,
-         product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;SPECIAL BREAD&quot;, &quot;FORMULE SANDWICH&quot;,&quot;CEREAL BAGUETTE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
-  group_by(year, month, product_name) %&gt;% 
-  mutate(rev = quantity * unit_price) %&gt;% 
-  summarize(prod_dis_rev = sum(rev)) %&gt;% 
-  arrange(desc(prod_dis_rev)) %&gt;% 
-   mutate(product_name = fct_reorder(product_name, prod_dis_rev)) %&gt;% 
-    ggplot(aes(x =month, y= prod_dis_rev, fill=product_name)) + 
-    geom_bar(stat=&quot;identity&quot;, position=&quot;stack&quot;) +
-    labs(x = &quot;month&quot;,
-         y = &quot;total revenue&quot;,
-         title = &quot;distribution of monthly revenue in 2022&quot;) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = &quot;bottom&quot;) +
-  scale_x_continuous(
-    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
-    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
-
-dis_rev_bar_2021+dis_rev_bar_2022</code></pre>
-<p><img src="plot_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<div id="htmlwidget-d52ed1ed8389fd089df7" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d52ed1ed8389fd089df7">{"x":{"visdat":{"16e02e8332e9":["function () ","plotlyVisDat"]},"cur_data":"16e02e8332e9","attrs":{"16e02e8332e9":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 
 
