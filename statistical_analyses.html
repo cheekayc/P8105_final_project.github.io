@@ -13,7 +13,7 @@
 
 <title>Statistical Analyses</title>
 
-<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.16/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/sandstone.min.css" rel="stylesheet" />
@@ -184,8 +184,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "\e259";
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -193,9 +193,16 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "\e258";
-  font-family: 'Glyphicons Halflings';
+  content: "&#xe258;";
   border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -381,14 +388,13 @@ library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
 ## ✔ ggplot2 3.4.0      ✔ purrr   0.3.5 
 ## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
-## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
-## ✔ readr   2.1.3      ✔ forcats 0.5.2 
+## ✔ tidyr   1.2.0      ✔ stringr 1.4.1 
+## ✔ readr   2.1.2      ✔ forcats 0.5.2 
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(lubridate)</code></pre>
-<pre><code>## Loading required package: timechange
-## 
+<pre><code>## 
 ## Attaching package: &#39;lubridate&#39;
 ## 
 ## The following objects are masked from &#39;package:base&#39;:
@@ -418,7 +424,7 @@ library(tidyverse)</code></pre>
 ## 
 ##     collapse
 ## 
-## This is mgcv 1.8-41. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.</code></pre>
+## This is mgcv 1.8-40. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.</code></pre>
 <pre class="r"><code>library(moments)
 library(modelr)</code></pre>
 <p>Data input and cleaning</p>
@@ -453,11 +459,13 @@ bakery_df</code></pre>
 <div id="anova" class="section level3">
 <h3>ANOVA</h3>
 <p>ANOVA tests whether there is a difference in means of the groups at
-each level (each individual month) of the independent variable.</p>
-<p>One way anova test can test if the mean sales of quarter 1 (Jan -
-Mar) is different from the mean sales of quarter 3 (Jun - Aug).</p>
+each level (each individual month) of the independent variable of peak
+months (Jun - Sep).</p>
+<p>One way anova test can test if the mean sales of peak months (Jun -
+Sep) in 2021 is different from the mean sales of peak months (Jun - Sep)
+in 2022.</p>
 <p>The null hypothesis is that there is no difference in the mean sales
-of 1st quarter and 3rd quarter.<br />
+of peak months in 2021 and 2022.<br />
 The alternative hypothesis is that the means are different from one
 another.</p>
 <pre class="r"><code>anova_df =
@@ -468,47 +476,47 @@ another.</p>
     ) 
   
 
-third_sales = 
+one_sales = 
   anova_df %&gt;% 
-  filter((month == 6)|(month == 7)|(month == 8)) %&gt;% 
+  filter((month == 6)|(month == 7)|(month == 8)|(month == 9)) %&gt;% 
+  filter(year == 2021) %&gt;% 
   group_by(year, month) %&gt;% 
-  summarize(third_sales = n()) %&gt;% 
+  summarize(one_sales = n()) %&gt;% 
   group_by(year, month) %&gt;% 
   mutate(ID = cur_group_id())
   
-first_sales = 
+two_sales = 
   anova_df %&gt;% 
-  filter((month == 1) |(month == 2)|(month == 3)) %&gt;% 
+  filter((month == 6)|(month == 7)|(month == 8)|(month == 9)) %&gt;% 
+  filter(year == 2022) %&gt;% 
   group_by(year, month) %&gt;% 
-  summarize(first_sales = n()) %&gt;% 
+  summarize(two_sales = n()) %&gt;% 
   group_by(year, month) %&gt;% 
   mutate(ID = cur_group_id())
   
 anova_test_df = 
-  left_join(third_sales, first_sales, by = c(&quot;ID&quot;))
+  left_join(one_sales, two_sales, by = c(&quot;ID&quot;))
 
 anova_test_df</code></pre>
-<pre><code>## # A tibble: 6 × 7
-##   year.x month.x third_sales    ID year.y month.y first_sales
-##    &lt;dbl&gt;   &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;dbl&gt;       &lt;int&gt;
-## 1   2021       6       10856     1   2021       1        6562
-## 2   2021       7       17592     2   2021       2        7817
-## 3   2021       8       20344     3   2021       3        9233
-## 4   2022       6       10678     4   2022       1        6273
-## 5   2022       7       18242     5   2022       2        7795
-## 6   2022       8       20135     6   2022       3        8251</code></pre>
-<pre class="r"><code>one.way &lt;- aov(first_sales ~ third_sales, data = anova_test_df)
+<pre><code>## # A tibble: 4 × 7
+##   year.x month.x one_sales    ID year.y month.y two_sales
+##    &lt;dbl&gt;   &lt;dbl&gt;     &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;dbl&gt;     &lt;int&gt;
+## 1   2021       6     10856     1   2022       6     10678
+## 2   2021       7     17592     2   2022       7     18242
+## 3   2021       8     20344     3   2022       8     20135
+## 4   2021       9     10208     4   2022       9      9217</code></pre>
+<pre class="r"><code>one.way &lt;- aov(one_sales ~ two_sales, data = anova_test_df)
 
 summary(one.way)</code></pre>
-<pre><code>##             Df  Sum Sq Mean Sq F value  Pr(&gt;F)   
-## third_sales  1 5350152 5350152   33.15 0.00451 **
-## Residuals    4  645565  161391                   
+<pre><code>##             Df   Sum Sq  Mean Sq F value  Pr(&gt;F)   
+## two_sales    1 74405983 74405983   196.6 0.00505 **
+## Residuals    2   756817   378409                   
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>The ANOVA test p-value is 0.00451 which is less than alpha level of
+<p>The ANOVA test p-value is 0.00505 which is less than alpha level of
 0.05, so we reject the null hypothesis and conclude that the mean sales
-in quarter 1 is statistically significantly different from the mean
-sales of quarter 3.</p>
+in peak months in 2021 is statistically significantly different from the
+mean sales of peak months in 2022.</p>
 </div>
 <div
 id="simple-linear-regression-for-croissant-and-test-the-model-using-cross-validation"

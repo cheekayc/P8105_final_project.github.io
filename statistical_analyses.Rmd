@@ -38,11 +38,11 @@ bakery_df
 
 ### ANOVA
 
-ANOVA tests whether there is a difference in means of the groups at each level (each individual month) of the independent variable.
+ANOVA tests whether there is a difference in means of the groups at each level (each individual month) of the independent variable of peak months (Jun - Sep).
 
-One way anova test can test if the mean sales of quarter 1 (Jan - Mar) is different from the mean sales of quarter 3 (Jun - Aug).
+One way anova test can test if the mean sales of peak months (Jun - Sep) in 2021 is different from the mean sales of peak months (Jun - Sep) in 2022.
 
-The null hypothesis is that there is no difference in the mean sales of 1st quarter and 3rd quarter.                                        
+The null hypothesis is that there is no difference in the mean sales of peak months in 2021 and 2022.                                        
 The alternative hypothesis is that the means are different from one another.
 
 ```{r ANOVA}
@@ -54,32 +54,34 @@ anova_df =
     ) 
   
 
-third_sales = 
+one_sales = 
   anova_df %>% 
-  filter((month == 6)|(month == 7)|(month == 8)) %>% 
+  filter((month == 6)|(month == 7)|(month == 8)|(month == 9)) %>% 
+  filter(year == 2021) %>% 
   group_by(year, month) %>% 
-  summarize(third_sales = n()) %>% 
+  summarize(one_sales = n()) %>% 
   group_by(year, month) %>% 
   mutate(ID = cur_group_id())
   
-first_sales = 
+two_sales = 
   anova_df %>% 
-  filter((month == 1) |(month == 2)|(month == 3)) %>% 
+  filter((month == 6)|(month == 7)|(month == 8)|(month == 9)) %>% 
+  filter(year == 2022) %>% 
   group_by(year, month) %>% 
-  summarize(first_sales = n()) %>% 
+  summarize(two_sales = n()) %>% 
   group_by(year, month) %>% 
   mutate(ID = cur_group_id())
   
 anova_test_df = 
-  left_join(third_sales, first_sales, by = c("ID"))
+  left_join(one_sales, two_sales, by = c("ID"))
 
 anova_test_df
 
-one.way <- aov(first_sales ~ third_sales, data = anova_test_df)
+one.way <- aov(one_sales ~ two_sales, data = anova_test_df)
 
 summary(one.way)
 ```
-The ANOVA test p-value is 0.00451 which is less than alpha level of 0.05, so we reject the null hypothesis and conclude that the mean sales in quarter 1 is statistically significantly different from the mean sales of quarter 3.
+The ANOVA test p-value is 0.00505 which is less than alpha level of 0.05, so we reject the null hypothesis and conclude that the mean sales in peak months in 2021 is statistically significantly different from the mean sales of peak months in 2022.
  
 ### Simple Linear Regression for croissant and test the model using Cross Validation
 ```{r}
