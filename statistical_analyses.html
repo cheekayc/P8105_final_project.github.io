@@ -596,10 +596,10 @@ croissant.</p>
 <div id="multiple-linear-regression-test-version"
 class="section level3">
 <h3>Multiple Linear Regression (test version)</h3>
-<p>We are interested in testing the relationship between the unit price
-of a product and its quantity being sold. Considering that the sales of
-bakery varies by month, so we included <code>month</code> in our model
-as a confounder to be controlled.</p>
+<p>We are interested in testing the relationship between the revune and
+unit price of a product and its quantity being sold. Considering that
+the sales of bakery varies by month, so we included <code>month</code>
+in our model as a confounder to be controlled.</p>
 <p>Linear Regression check assumption Linear Regression for baguette</p>
 <pre class="r"><code>baguette_df = 
   bakery_df %&gt;% 
@@ -609,67 +609,8 @@ as a confounder to be controlled.</p>
   )
 baguette_reg = lm(rev ~ unit_price + quantity + month, baguette_df)
 
-# Use backward elimination based on AIC to find a mlr model 
-baguette_model_2 = step(baguette_reg, direction = &quot;backward&quot;)</code></pre>
-<pre><code>## Start:  AIC=-331778.6
-## rev ~ unit_price + quantity + month
-## 
-##              Df Sum of Sq    RSS     AIC
-## &lt;none&gt;                      2334 -331779
-## - month       1         1   2335 -331742
-## - unit_price  1      3987   6321 -241456
-## - quantity    1    174518 176852   60583</code></pre>
-<pre class="r"><code>summary(baguette_model_2) %&gt;% broom::tidy() %&gt;% knitr::kable(digits = 3)</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">term</th>
-<th align="right">estimate</th>
-<th align="right">std.error</th>
-<th align="right">statistic</th>
-<th align="right">p.value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">(Intercept)</td>
-<td align="right">-1.432</td>
-<td align="right">0.004</td>
-<td align="right">-374.606</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">unit_price</td>
-<td align="right">1.207</td>
-<td align="right">0.003</td>
-<td align="right">393.521</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">quantity</td>
-<td align="right">1.188</td>
-<td align="right">0.000</td>
-<td align="right">2603.542</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">month</td>
-<td align="right">0.001</td>
-<td align="right">0.000</td>
-<td align="right">6.200</td>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>anova(baguette_model_2, baguette_reg)</code></pre>
-<pre><code>## Analysis of Variance Table
-## 
-## Model 1: rev ~ unit_price + quantity + month
-## Model 2: rev ~ unit_price + quantity + month
-##   Res.Df    RSS Df Sum of Sq F Pr(&gt;F)
-## 1  90660 2334.1                      
-## 2  90660 2334.1  0         0</code></pre>
-<pre class="r"><code>baguette_reg %&gt;% 
+
+baguette_reg %&gt;% 
   broom::tidy()</code></pre>
 <pre><code>## # A tibble: 4 × 5
 ##   term        estimate std.error statistic  p.value
@@ -682,6 +623,13 @@ baguette_model_2 = step(baguette_reg, direction = &quot;backward&quot;)</code></
 <pre class="r"><code>par(mfrow = c(2, 2))
 plot(baguette_reg)</code></pre>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>According to the assumption check graph, the normal qq plot is
+approximately closed to the predicted line with residuals on both
+sides.</p>
+<p>The model for multiple linear regression of baguette’s revenue
+is<br />
+Revenue = -1.43 + 1.21 * unit_price + 1.19 * quantity + 0.001 *
+month</p>
 </div>
 <div id="one-sample-t-test" class="section level3">
 <h3>One-sample T-test</h3>

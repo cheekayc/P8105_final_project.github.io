@@ -156,7 +156,7 @@ Based on the results, there is a slightly improvement using piecewise linear mod
 
 ### Multiple Linear Regression (test version)
 
-We are interested in testing the relationship between the unit price of a product and its quantity being sold. Considering that 
+We are interested in testing the relationship between the revune and unit price of a product and its quantity being sold. Considering that 
 the sales of bakery varies by month, so we included `month` in our model as a confounder to be controlled.
 
 Linear Regression check assumption 
@@ -170,10 +170,6 @@ baguette_df =
   )
 baguette_reg = lm(rev ~ unit_price + quantity + month, baguette_df)
 
-# Use backward elimination based on AIC to find a mlr model 
-baguette_model_2 = step(baguette_reg, direction = "backward")
-summary(baguette_model_2) %>% broom::tidy() %>% knitr::kable(digits = 3)
-anova(baguette_model_2, baguette_reg)
 
 baguette_reg %>% 
   broom::tidy()
@@ -186,7 +182,10 @@ par(mfrow = c(2, 2))
 plot(baguette_reg)
 ```
 
+According to the assumption check graph, the normal qq plot is approximately closed to the predicted line with residuals on both sides.
 
+The model for multiple linear regression of baguette's revenue is  
+Revenue = -1.43 + 1.21 * unit_price + 1.19 * quantity + 0.001 * month
 
 
 ### One-sample T-test
