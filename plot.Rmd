@@ -4,6 +4,7 @@ output:
   html_document:
     toc: true
     toc_float: true
+    code_folding: hide
 ---
 
 ```{r setup, message = FALSE}
@@ -27,8 +28,6 @@ bakery_df =
     product_name = article) %>% 
   filter(product_name != ".") %>% 
   select(-article)
-
-bakery_df
 ```
 
 ### Pie Charts
