@@ -54,6 +54,7 @@ The dataset includes:
 
 It contains `r ncol(bakery_df)` variables and `r nrow(bakery_df)` observations.
 
+Firstly, we used `read_csv()` to import the dataset "Bakery_sales.csv", and applied `janitor::clean_names()` to change the variables' names into lower cases. Next, we tidied dataset by applying `mutate()` to remove the euro sign "€", change "," to ".", convert `unit_price` to numeric form, and renamed the `article` as `product_name`. Finally, we deleted the missing data via `filter()` and `article` via `select()`. 
 
 
 ### Pie Charts
@@ -73,4 +74,5 @@ plot_pie =
 
 plot_pie
 ```
+
 

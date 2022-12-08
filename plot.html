@@ -426,6 +426,14 @@ transaction</p>
 <p><code>objective</code>: forecast the sales in order to ease the
 production planning</p>
 <p>It contains 7 variables and 234000 observations.</p>
+<p>Firstly, we used <code>read_csv()</code> to import the dataset
+“Bakery_sales.csv”, and applied <code>janitor::clean_names()</code> to
+change the variables’ names into lower cases. Next, we tidied dataset by
+applying <code>mutate()</code> to remove the euro sign “€”, change “,”
+to “.”, convert <code>unit_price</code> to numeric form, and renamed the
+<code>article</code> as <code>product_name</code>. Finally, we deleted
+the missing data via <code>filter()</code> and <code>article</code> via
+<code>select()</code>.</p>
 </div>
 <div id="pie-charts" class="section level3">
 <h3>Pie Charts</h3>
@@ -443,8 +451,8 @@ production planning</p>
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie</code></pre>
-<div id="htmlwidget-14719487dff22d076d0e" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-14719487dff22d076d0e">{"x":{"visdat":{"1d0834135028":["function () ","plotlyVisDat"]},"cur_data":"1d0834135028","attrs":{"1d0834135028":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-ecf8b753f044ed102662" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ecf8b753f044ed102662">{"x":{"visdat":{"1e9b6b7be211":["function () ","plotlyVisDat"]},"cur_data":"1e9b6b7be211","attrs":{"1e9b6b7be211":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 
 
