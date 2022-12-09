@@ -16,7 +16,7 @@ library(patchwork)
 library(ggpubr)
 ```
 
-### Summary of the used packages and dependencies
+### Summary of packages
 tidyverse, lubridate, plotly, patchwork
 
 
@@ -33,7 +33,7 @@ bakery_df =
   select(-article)
 ```
 
-### Introduction & Background of data sets
+### Introduction & Background 
 
 We used updated version dataset of a French bakery from 2021-01-01 to 2022-09-30. The dataset provides the daily transaction details of customers. Since the dataset is still updating, we used downloaded version on 2022-12-03.
 
@@ -57,8 +57,7 @@ It contains `r ncol(bakery_df)` variables and `r nrow(bakery_df)` observations.
 
 Firstly, we used `read_csv()` to import the dataset "Bakery_sales.csv", and applied `janitor::clean_names()` to change the variables' names into lower cases. Next, we tidied dataset by applying `mutate()` to remove the euro sign "€", change "," to ".", convert `unit_price` to numeric form, and renamed the `article` as `product_name`. Finally, we deleted the missing data via `filter()` and `article` via `select()`. 
 
-
-
+<p>&nbsp;</p >
 ### Visualization
 
 #### Top 10 favorite bakery types
@@ -78,7 +77,7 @@ plot_pie
 
 The pie chart shows the total of sale counts of top 10 favorite bakery types from 2021-01-01 to 2022-09-30. As the plot shows that the `TRADITIONAL BAGUETTE` (67,689; 42.5%) is the most favorite bakery . The rest ranking from top 2 to top 10 favorite bakeries are  `COUPE` (20,470; 12.90%), `BAGUETTE` (15,292; 9.61%) `BANETTE` (15,130; 9.51%), `CROISSANT` (11,508; 7.23%), `PAIN AU CHOCOLAT` (10,578; 6.65%), `SPECIAL BREAD` (5195; 3.26%), `CEREAL BAGUETTE` (4961; 3.12%), `FORMULE SANDWITCH` (4202; 2.64%), and `BOULE 400G` (4099; 2.58%), respectively. 
 
-
+<p>&nbsp;</p >
 #### Top 10 favorite bakery types in 2021/2022
 ```{r}
 plot_pie =
@@ -124,8 +123,7 @@ The second donut chart shows the total of sale counts of top 10 favorite bakery 
 
 Compared donut charts of 2021 and 2022, the ranking of top 1-6 favorite bakeries does not change. `CAMPAGNE` dropped out of the top 10 list, and `FORMULE SANDWITCH` was added the top 10 favorite bakery types in 2022. Top 7-9 moved slightly from 2021 to 2022. Top 10 `BOULE 400G` stayed in the same position. 
 
-
-
+<p>&nbsp;</p >
 #### Top 10 favorite bread monthly sale counts in 2021
 ```{r}
 top_line =
@@ -169,8 +167,59 @@ top_line2_2021 =
 ggarrange(top_line2_2021, top_line1_2021, ncol=2, nrow=1, common.legend = TRUE, legend="bottom")
 ```
 
-In general, summer (from June to September) has higher monthly sale counts of top 10 favorite bread in 2021.
+In general, monthly sale counts in 2021 increased dramatically from June to August.
 
-For `TRADITIONAL BAGUETTE` (line plot on the right), total monthly sale counts in 2021 peaked at August (>10,000). However, total monthly sale counts decreased from May to June, August to September, and October to December in 2021. 
-For line plot on the left, total monthly sale counts in 2021 are less than 3,000 but greater than 500 in every month for top 2-6 (`COUPE`, `BAGUETTE`, `BANETTE`, `CROISSANT`, `PAIN AU CHOCOLAT`). For top 7-10 (`CEREAL BAGUETTE`, `SPECIAL BREAD`, `CAMPAGNE`, and `BOULE 400G`), total monthly sale counts in 2021 are less than 1,000 in every month. 
+For `TRADITIONAL BAGUETTE` (line plot on the right), total monthly sale counts in 2021 peaked at August (>11,250). However, total monthly sale counts decreased from May to June, August to September, and October to December in 2021. 
 
+For line plot on the left, total monthly sale counts in 2021 are less than 3,000 but greater than 500 in every month for top 2-6 (`COUPE`, `BAGUETTE`, `BANETTE`, `CROISSANT`, `PAIN AU CHOCOLAT`). For top 7-10 (`CEREAL BAGUETTE`, `SPECIAL BREAD`, `CAMPAGNE`, and `BOULE 400G`), total monthly sale counts in 2021 are less than 1,000. 
+
+<p>&nbsp;</p >
+#### Top 10 favorite bread monthly sale counts in 2022
+```{r}
+top_line =
+  bakery_df %>% 
+  separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) %>%
+  filter(year == 2022) %>% 
+  select (year, month, product_name, quantity) %>% 
+  group_by (year, month, product_name) %>% 
+  mutate (total_counts = sum (quantity)) %>% 
+  distinct(year, month, product_name,total_counts) 
+
+top_line1_2022 =
+  top_line %>% 
+  filter(product_name %in% c("TRADITIONAL BAGUETTE")) %>% 
+  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
+    geom_line() +
+    theme(legend.position = "none", axis.text.x = element_text(angle=90,hjust = 1)) + 
+    labs(x = "month",
+         y = "counts of TRADITIONAL BAGUETTE",
+         title = "Top 1") +
+    scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c("Jan","Feb","Mar","Apr","May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) 
+
+top_line2_2022 =
+  top_line %>% 
+    filter(product_name %in% c("COUPE", "BAGUETTE","BANETTE", "CROISSANT", "PAIN AU CHOCOLAT", "SPECIAL BREAD", "FORMULE SANDWICH","CEREAL BAGUETTE", "BOULE 400G")) %>% 
+  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
+    geom_line() +
+    theme(axis.text.x = element_text(angle=90,hjust = 1), legend.position = "none", legend.title = element_text(size=7), legend.text = element_text(size=7)) + 
+    labs(x = "month",
+         y = "counts of bread",
+         title = "Top 2-10") +
+    scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c("Jan","Feb","Mar","Apr","May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) 
+ 
+ggarrange(top_line2_2022, top_line1_2022, ncol=2, nrow=1, common.legend = TRUE, legend="bottom")
+
+```
+
+In general, monthly sale counts in 2022 show similar trend as in 2021, but monthly sale counts end at 2022-09-30 due to limited data. 
+
+For `TRADITIONAL BAGUETTE` (line plot on the right), total monthly sale counts in 2022 peaked at August (>12,500). However, total monthly sale counts decreased from May to June and August to September in 2022. Compared to 2021 (>11,250), total monthly sale counts of `TRADITIONAL BAGUETTE` is higher in 2022 (>12,500). 
+
+For line plot on the left, total monthly sale counts in 2022 are less than 3,500 but greater than 500 in every month for top 2-6 (`COUPE`, `BAGUETTE`, `BANETTE`, `CROISSANT`, `PAIN AU CHOCOLAT`). For top 7-10 (`SPECIAL BREAD`, `FORMULE SANDWICH`, `CEREAL BAGUETTE`, and `BOULE 400G`), total monthly sale counts in 2022 are less than 600. 
