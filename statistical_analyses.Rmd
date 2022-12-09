@@ -33,7 +33,6 @@ bakery_df =
   filter(product_name != ".") %>% 
   select(-article)
 
-bakery_df
 ```
 
 ### ANOVA
@@ -75,13 +74,12 @@ two_sales =
 anova_test_df = 
   left_join(one_sales, two_sales, by = c("ID"))
 
-anova_test_df
 
 one.way <- aov(one_sales ~ two_sales, data = anova_test_df)
 
 summary(one.way)
 ```
-The ANOVA test p-value is 0.00505 which is less than alpha level of 0.05, so we reject the null hypothesis and conclude that the mean sales in peak months in 2021 is statistically significantly different from the mean sales of peak months in 2022.
+The ANOVA test p-value is 0.00505 which is less than alpha level of 0.05, so we reject the null hypothesis and conclude that the mean sales of peak months in 2021 is statistically significantly different from the mean sales of peak months in 2022.
  
  
 ### Generalized Additive Model 
@@ -108,6 +106,8 @@ bakery_df %>%
     y = "Number of times appeared")
 ``` 
 Overall, what hours has the most number of products sold?
+
+Then we only take a look at the morning hours with a monotonic function
 ```{r}
 bakery_df %>% 
   mutate(year = year(date)) %>% 
@@ -127,7 +127,7 @@ bakery_df %>%
 
 ```
 
-
+It looks like a monotonic linear relationship that we can take a further look at using simple linear regression model.
 
 ### Simple Linear Regression for croissant's sale counts and when it's being sold (hour of the day) and test the model using Cross Validation
 ```{r}
@@ -146,6 +146,9 @@ slr_reg = lm(quantity ~ Hour, slr_df)
 slr_reg %>% 
   broom::tidy()
 ```
+The model is 
+Sale count = 1.99 - 0.04 * Hour
+
 Examine cross validation of this simple linear regression model
 ```{r}
 linear_mod = lm(quantity ~ Hour, slr_df)
@@ -162,6 +165,7 @@ slr_df %>%
   geom_line(aes(y = pred), color = "red") + 
   facet_grid(~model)
 ```
+
 The three models are very similar.
 
 Re-sample the dataset by `crossv_mc` and let's see the rmse of each model
@@ -197,6 +201,7 @@ cv_df %>%
   mutate(model = fct_inorder(model)) %>% 
   ggplot(aes(x = model, y = rmse)) + geom_violin()
 ```
+
 Based on the results, there is a slightly improvement using smooth model as it has a lower tail of rmse on the top. Since there are no significant difference between the three model including the non-linear smooth model, we can conclude that the basic linear model is clear enough to be accounted for this relationship in the product of croissant.
 
 ### Multiple Linear Regression (test version)
@@ -227,11 +232,12 @@ par(mfrow = c(2, 2))
 plot(baguette_reg)
 ```
 
-According to the assumption check graph, the normal qq plot is approximately closed to the predicted line with residuals on both sides.
+According to the assumption check graph, the normal qq plot is approximately closed to the predicted line with residuals on both sides, but the residual plots might violate the linear regression assumptions.
 
-The model for multiple linear regression of baguette's revenue is  
+The tentative model for multiple linear regression of baguette's revenue is  
 Revenue = -1.43 + 1.21 * unit_price + 1.19 * quantity + 0.001 * month
 
+We might not consider doing MLR for the sake of this research due to the unmet assumptions.
 
 ### One-sample T-test
 

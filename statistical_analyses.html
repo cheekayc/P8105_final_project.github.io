@@ -439,23 +439,7 @@ library(modelr)</code></pre>
     rev = quantity * unit_price
     ) %&gt;% 
   filter(product_name != &quot;.&quot;) %&gt;% 
-  select(-article)
-
-bakery_df</code></pre>
-<pre><code>## # A tibble: 234,000 × 8
-##       x1 date       time   ticket_number quantity unit_price product_name    rev
-##    &lt;dbl&gt; &lt;date&gt;     &lt;time&gt;         &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;
-##  1     0 2021-01-02 08:38         150040        1       0.9  BAGUETTE       0.9 
-##  2     1 2021-01-02 08:38         150040        3       1.2  PAIN AU CHOC…  3.6 
-##  3     4 2021-01-02 09:14         150041        2       1.2  PAIN AU CHOC…  2.4 
-##  4     5 2021-01-02 09:14         150041        1       1.15 PAIN           1.15
-##  5     8 2021-01-02 09:25         150042        5       1.2  TRADITIONAL …  6   
-##  6    11 2021-01-02 09:25         150043        2       0.9  BAGUETTE       1.8 
-##  7    12 2021-01-02 09:25         150043        3       1.1  CROISSANT      3.3 
-##  8    15 2021-01-02 09:27         150044        1       1.05 BANETTE        1.05
-##  9    18 2021-01-02 09:32         150045        3       1.2  TRADITIONAL …  3.6 
-## 10    19 2021-01-02 09:32         150045        6       1.1  CROISSANT      6.6 
-## # … with 233,990 more rows</code></pre>
+  select(-article)</code></pre>
 <div id="anova" class="section level3">
 <h3>ANOVA</h3>
 <p>ANOVA tests whether there is a difference in means of the groups at
@@ -497,15 +481,8 @@ two_sales =
 anova_test_df = 
   left_join(one_sales, two_sales, by = c(&quot;ID&quot;))
 
-anova_test_df</code></pre>
-<pre><code>## # A tibble: 4 × 7
-##   year.x month.x one_sales    ID year.y month.y two_sales
-##    &lt;dbl&gt;   &lt;dbl&gt;     &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;dbl&gt;     &lt;int&gt;
-## 1   2021       6     10856     1   2022       6     10678
-## 2   2021       7     17592     2   2022       7     18242
-## 3   2021       8     20344     3   2022       8     20135
-## 4   2021       9     10208     4   2022       9      9217</code></pre>
-<pre class="r"><code>one.way &lt;- aov(one_sales ~ two_sales, data = anova_test_df)
+
+one.way &lt;- aov(one_sales ~ two_sales, data = anova_test_df)
 
 summary(one.way)</code></pre>
 <pre><code>##             Df   Sum Sq  Mean Sq F value  Pr(&gt;F)   
@@ -515,7 +492,7 @@ summary(one.way)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The ANOVA test p-value is 0.00505 which is less than alpha level of
 0.05, so we reject the null hypothesis and conclude that the mean sales
-in peak months in 2021 is statistically significantly different from the
+of peak months in 2021 is statistically significantly different from the
 mean sales of peak months in 2022.</p>
 </div>
 <div id="generalized-additive-model" class="section level3">
@@ -541,6 +518,8 @@ bakery_df %&gt;%
     y = &quot;Number of times appeared&quot;)</code></pre>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-2-1.png" width="672" />
 Overall, what hours has the most number of products sold?</p>
+<p>Then we only take a look at the morning hours with a monotonic
+function</p>
 <pre class="r"><code>bakery_df %&gt;% 
   mutate(year = year(date)) %&gt;% 
   filter(year == 2021) %&gt;% 
@@ -559,6 +538,8 @@ Overall, what hours has the most number of products sold?</p>
 <pre><code>## Warning: Removed 9 rows containing missing values (`geom_point()`).</code></pre>
 <pre><code>## Warning: Removed 9 rows containing missing values (`geom_line()`).</code></pre>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>It looks like a monotonic linear relationship that we can take a
+further look at using simple linear regression model.</p>
 </div>
 <div
 id="simple-linear-regression-for-croissants-sale-counts-and-when-its-being-sold-hour-of-the-day-and-test-the-model-using-cross-validation"
@@ -586,6 +567,7 @@ slr_reg %&gt;%
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
 ## 1 (Intercept)   1.99    0.0109       182.        0
 ## 2 Hour         -0.0407  0.000957     -42.6       0</code></pre>
+<p>The model is Sale count = 1.99 - 0.04 * Hour</p>
 <p>Examine cross validation of this simple linear regression model</p>
 <pre class="r"><code>linear_mod = lm(quantity ~ Hour, slr_df)
 pwl_mod    = lm(quantity ~ Hour + hour_cp, data = slr_df)
@@ -597,8 +579,8 @@ smooth_mod = gam(quantity ~ s(Hour), data = slr_df)</code></pre>
   geom_point(alpha = .5) +
   geom_line(aes(y = pred), color = &quot;red&quot;) + 
   facet_grid(~model)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-6-1.png" width="672" />
-The three models are very similar.</p>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>The three models are very similar.</p>
 <p>Re-sample the dataset by <code>crossv_mc</code> and let’s see the
 rmse of each model</p>
 <pre class="r"><code>set.seed(2022)
@@ -628,9 +610,9 @@ cv_df =
     names_prefix = &quot;rmse_&quot;) %&gt;% 
   mutate(model = fct_inorder(model)) %&gt;% 
   ggplot(aes(x = model, y = rmse)) + geom_violin()</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-8-1.png" width="672" />
-Based on the results, there is a slightly improvement using smooth model
-as it has a lower tail of rmse on the top. Since there are no
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Based on the results, there is a slightly improvement using smooth
+model as it has a lower tail of rmse on the top. Since there are no
 significant difference between the three model including the non-linear
 smooth model, we can conclude that the basic linear model is clear
 enough to be accounted for this relationship in the product of
@@ -667,12 +649,15 @@ baguette_reg %&gt;%
 plot(baguette_reg)</code></pre>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p>According to the assumption check graph, the normal qq plot is
-approximately closed to the predicted line with residuals on both
-sides.</p>
-<p>The model for multiple linear regression of baguette’s revenue
-is<br />
+approximately closed to the predicted line with residuals on both sides,
+but the residual plots might violate the linear regression
+assumptions.</p>
+<p>The tentative model for multiple linear regression of baguette’s
+revenue is<br />
 Revenue = -1.43 + 1.21 * unit_price + 1.19 * quantity + 0.001 *
 month</p>
+<p>We might not consider doing MLR for the sake of this research due to
+the unmet assumptions.</p>
 </div>
 <div id="one-sample-t-test" class="section level3">
 <h3>One-sample T-test</h3>
