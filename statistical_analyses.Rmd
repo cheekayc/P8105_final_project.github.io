@@ -19,7 +19,7 @@ library(modelr)
 ```
 
 Data input and cleaning 
-```{r}
+```{r, warning = FALSE}
 bakery_df =
   read_csv("./Data/Bakery_sales.csv") %>% 
   janitor::clean_names() %>% 
@@ -44,7 +44,7 @@ One way anova test can test if the mean sales of peak months (Jun - Sep) in 2021
 The null hypothesis is that there is no difference in the mean sales of peak months in 2021 and 2022.                                        
 The alternative hypothesis is that the means are different from one another.
 
-```{r ANOVA}
+```{r ANOVA, warning = FALSE}
 anova_df =
   bakery_df %>% 
   mutate(
@@ -85,7 +85,7 @@ The ANOVA test p-value is 0.00505 which is less than alpha level of 0.05, so we 
 ### Generalized Additive Model 
 
 Find the *rush hours* of a typical day:
-```{r}
+```{r, warning = FALSE}
 bakery_df = 
   bakery_df %>% 
   mutate(
@@ -108,7 +108,7 @@ bakery_df %>%
 Overall, what hours has the most number of products sold?
 
 Then we only take a look at the morning hours with a monotonic function
-```{r}
+```{r, warning = FALSE}
 bakery_df %>% 
   mutate(year = year(date)) %>% 
   filter(year == 2021) %>% 
@@ -130,7 +130,7 @@ bakery_df %>%
 It looks like a monotonic linear relationship that we can take a further look at using simple linear regression model.
 
 ### Simple Linear Regression for croissant's sale counts and when it's being sold (hour of the day) and test the model using Cross Validation
-```{r}
+```{r, warning = FALSE}
 slr_df = 
   bakery_df  %>% 
   mutate(
@@ -150,13 +150,13 @@ The model is
 Sale count = 1.99 - 0.04 * Hour
 
 Examine cross validation of this simple linear regression model
-```{r}
+```{r, warning = FALSE}
 linear_mod = lm(quantity ~ Hour, slr_df)
 pwl_mod    = lm(quantity ~ Hour + hour_cp, data = slr_df)
 smooth_mod = gam(quantity ~ s(Hour), data = slr_df)
 ```
 
-```{r}
+```{r, warning = FALSE}
 slr_df %>% 
   gather_predictions(linear_mod, pwl_mod, smooth_mod) %>% 
   mutate(model = fct_inorder(model)) %>% 
@@ -169,7 +169,7 @@ slr_df %>%
 The three models are very similar.
 
 Re-sample the dataset by `crossv_mc` and let's see the rmse of each model
-```{r}
+```{r, warning = FALSE}
 set.seed(2022)
 cv_df =
   crossv_mc(slr_df, 100) %>% 
@@ -190,7 +190,7 @@ cv_df =
 
 ```
 Then plot the rmse graph
-```{r}
+```{r, warning = FALSE}
 cv_df %>% 
   select(starts_with("rmse")) %>% 
   pivot_longer(
@@ -211,7 +211,7 @@ the sales of bakery varies by month, so we included `month` in our model as a co
 
 Linear Regression check assumption 
 Linear Regression for baguette 
-```{r}
+```{r, warning = FALSE}
 baguette_df = 
   bakery_df %>% 
   filter(str_detect(product_name, "BAGUETTE")) %>% 
@@ -227,7 +227,7 @@ baguette_reg %>%
 
 Examine assumptions for the chosen Linear Regression model
 
-```{r}
+```{r, warning = FALSE}
 par(mfrow = c(2, 2))
 plot(baguette_reg)
 ```
@@ -250,7 +250,7 @@ Null hypothesis: The mean price of baguette in this bakery is the same as the av
 
 Alternative hypothesis: The mean price of baguette in this bakery is different from the average price of baguette in Paris.
 
-```{r}
+```{r, warning = FALSE}
 bakery_df %>% 
   filter(product_name == "TRADITIONAL BAGUETTE") %>% 
   group_by(date) %>% 
@@ -282,7 +282,7 @@ Null hypothesis: The mean price of traditional baguette in this bakery is the sa
 Alternative hypothesis: The mean price of traditional baguette in this bakery is higher than the average price of traditional baguette in
 France.
 
-```{r}
+```{r, warning = FALSE}
 bakery_df %>% 
   filter(product_name == "TRADITIONAL BAGUETTE") %>% 
   count(unit_price)
@@ -307,7 +307,7 @@ in Paris.
 
 
 
-```{r}
+```{r, warning = FALSE}
 bakery_df %>%
   mutate(
     month = month(date),

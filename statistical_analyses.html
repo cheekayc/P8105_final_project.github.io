@@ -535,8 +535,6 @@ function</p>
     title = &quot;Peak hours&quot;,
     x = &quot;Hour (24-hour format)&quot;,
     y = &quot;Number of products sold&quot;)</code></pre>
-<pre><code>## Warning: Removed 9 rows containing missing values (`geom_point()`).</code></pre>
-<pre><code>## Warning: Removed 9 rows containing missing values (`geom_line()`).</code></pre>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>It looks like a monotonic linear relationship that we can take a
 further look at using simple linear regression model.</p>
@@ -556,7 +554,6 @@ Validation</h3>
 ggplot(slr_df, aes(x = Hour, y = quantity)) +
   geom_point() + scale_x_continuous(breaks = seq(7, 11), limit = c(7, 11)) +
   scale_y_continuous(limit = c(0,50)) </code></pre>
-<pre><code>## Warning: Removed 75550 rows containing missing values (`geom_point()`).</code></pre>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <pre class="r"><code>slr_reg = lm(quantity ~ Hour, slr_df)
 
