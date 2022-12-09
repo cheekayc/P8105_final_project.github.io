@@ -1,9 +1,18 @@
 ---
-title: "Index Page"
 output: 
   html_document:
     toc: true
     toc_float: true
 ---
 
-Hi 
+<h1><b><center>A French Bakery’s Daily Sales in 2021-2022</center></b></h1>
+<p>&nbsp;</p>
+
+<center>Chee Kay Cheong, Yishan Chen, Jiayi Yang, Yuxin Liu</center>
+<p>&nbsp;</p>
+
+<img src="images/bakery_store.jpeg" style="width:100%">  
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
