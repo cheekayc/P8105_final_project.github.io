@@ -209,6 +209,10 @@ Based on the results, there is a slightly improvement using smooth model as it h
 We are interested in testing the relationship between the revune and unit price of a product and its quantity being sold. Considering that 
 the sales of bakery varies by month, so we included `month` in our model as a confounder to be controlled.
 
+<p>&nbsp;</p>
+<img src="images/baguette.gif" style="width:100%">
+<p>&nbsp;</p>
+
 Linear Regression check assumption 
 Linear Regression for baguette 
 ```{r, warning = FALSE}

@@ -384,20 +384,47 @@ div.tocify {
 
 <pre class="r"><code>knitr::opts_chunk$set(message = FALSE)
 
-library(tidyverse)
-library(lubridate)
-library(plotly)
-library(mgcv)</code></pre>
-<pre><code>## Loading required package: nlme</code></pre>
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.4.0      ✔ purrr   0.3.5 
+## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+## ✔ tidyr   1.2.0      ✔ stringr 1.4.1 
+## ✔ readr   2.1.2      ✔ forcats 0.5.2 
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(lubridate)</code></pre>
 <pre><code>## 
-## Attaching package: &#39;nlme&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:forecast&#39;:
+## Attaching package: &#39;lubridate&#39;
 ## 
-##     getResponse</code></pre>
-<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## The following objects are masked from &#39;package:base&#39;:
 ## 
-##     collapse</code></pre>
-<pre><code>## This is mgcv 1.8-40. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.</code></pre>
+##     date, intersect, setdiff, union</code></pre>
+<pre class="r"><code>library(plotly)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plotly&#39;
+## 
+## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     last_plot
+## 
+## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter
+## 
+## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout</code></pre>
+<pre class="r"><code>library(mgcv)</code></pre>
+<pre><code>## Loading required package: nlme
+## 
+## Attaching package: &#39;nlme&#39;
+## 
+## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     collapse
+## 
+## This is mgcv 1.8-40. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.</code></pre>
 <pre class="r"><code>library(moments)
 library(modelr)</code></pre>
 <p>Data input and cleaning</p>
@@ -595,6 +622,13 @@ class="section level3">
 unit price of a product and its quantity being sold. Considering that
 the sales of bakery varies by month, so we included <code>month</code>
 in our model as a confounder to be controlled.</p>
+<p>
+ 
+</p>
+<img src="images/baguette.gif" style="width:100%">
+<p>
+ 
+</p>
 <p>Linear Regression check assumption Linear Regression for baguette</p>
 <pre class="r"><code>baguette_df = 
   bakery_df %&gt;% 
