@@ -389,8 +389,8 @@ library(plotly)
 library(patchwork)
 library(ggpubr)
 library(ggplot2)</code></pre>
-<div id="summary-of-packages" class="section level3">
-<h3>Summary of packages</h3>
+<div id="summary-of-packages" class="section level2">
+<h2>Summary of packages</h2>
 <p>tidyverse, lubridate, plotly, patchwork, ggpubr</p>
 <pre class="r"><code>bakery_df =
   read_csv(&quot;./Data/Bakery_sales.csv&quot;) %&gt;% 
@@ -403,8 +403,8 @@ library(ggplot2)</code></pre>
   filter(product_name != &quot;.&quot;) %&gt;% 
   select(-article)</code></pre>
 </div>
-<div id="introduction-background" class="section level3">
-<h3>Introduction &amp; Background</h3>
+<div id="introduction-background" class="section level2">
+<h2>Introduction &amp; Background</h2>
 <p>We used updated version dataset of a French bakery from 2021-01-01 to
 2022-09-30. The dataset provides the daily transaction details of
 customers. Since the dataset is still updating, we used downloaded
@@ -432,10 +432,10 @@ the missing data via <code>filter()</code> and <code>article</code> via
  
 </p >
 </div>
-<div id="visualization" class="section level3">
-<h3>Visualization</h3>
-<div id="top-10-favorite-bakery-types" class="section level4">
-<h4>Top 10 favorite bakery types</h4>
+<div id="visualization" class="section level2">
+<h2>Visualization</h2>
+<div id="top-10-favorite-bakery-types" class="section level3">
+<h3>Top 10 favorite bakery types</h3>
 <pre class="r"><code>plot_pie =
   bakery_df %&gt;% 
   group_by(product_name) %&gt;% 
@@ -447,8 +447,8 @@ the missing data via <code>filter()</code> and <code>article</code> via
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie</code></pre>
-<div id="htmlwidget-403280e2575adcfea7c5" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-403280e2575adcfea7c5">{"x":{"visdat":{"c0b5bd3fd41":["function () ","plotlyVisDat"]},"cur_data":"c0b5bd3fd41","attrs":{"c0b5bd3fd41":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-77e64f6befd0b9ec2a61" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-77e64f6befd0b9ec2a61">{"x":{"visdat":{"c1fc7e8df1d8":["function () ","plotlyVisDat"]},"cur_data":"c1fc7e8df1d8","attrs":{"c1fc7e8df1d8":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>The pie chart shows the total of sale counts of top 10 favorite
 bakery types from 2021-01-01 to 2022-09-30. As the plot shows that the
 <code>TRADITIONAL BAGUETTE</code> (67,689; 42.5%) is the most favorite
@@ -464,8 +464,8 @@ bakery . The rest ranking from top 2 to top 10 favorite bakeries are
 </p >
 </div>
 <div id="top-10-favorite-bakery-types-in-20212022"
-class="section level4">
-<h4>Top 10 favorite bakery types in 2021/2022</h4>
+class="section level3">
+<h3>Top 10 favorite bakery types in 2021/2022</h3>
 <pre class="r"><code>plot_pie =
   bakery_df %&gt;% 
   separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
@@ -500,11 +500,11 @@ plot_pie_2022 =
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie_2021</code></pre>
-<div id="htmlwidget-d980ee2f6cf9c706c2d2" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-d980ee2f6cf9c706c2d2">{"x":{"visdat":{"c0b56fd66fb6":["function () ","plotlyVisDat"]},"cur_data":"c0b56fd66fb6","attrs":{"c0b56fd66fb6":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2021","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","CEREAL BAGUETTE","SPECIAL BREAD","CAMPAGNE","BOULE 400G"],"values":[37399,11759,8713,8575,6291,5739,3070,2936,2289,2283],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-751bd3d7c148e713b567" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-751bd3d7c148e713b567">{"x":{"visdat":{"c1fc7a12a2a":["function () ","plotlyVisDat"]},"cur_data":"c1fc7a12a2a","attrs":{"c1fc7a12a2a":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2021","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","CEREAL BAGUETTE","SPECIAL BREAD","CAMPAGNE","BOULE 400G"],"values":[37399,11759,8713,8575,6291,5739,3070,2936,2289,2283],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>plot_pie_2022</code></pre>
-<div id="htmlwidget-490ce593641964868467" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-490ce593641964868467">{"x":{"visdat":{"c0b567404f16":["function () ","plotlyVisDat"]},"cur_data":"c0b567404f16","attrs":{"c0b567404f16":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2022","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","FORMULE SANDWICH","CEREAL BAGUETTE","BOULE 400G"],"values":[30290,8711,6579,6555,5217,4839,2259,1976,1891,1816],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-6b876411c4c40b8d0388" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6b876411c4c40b8d0388">{"x":{"visdat":{"c1fc65d72f4f":["function () ","plotlyVisDat"]},"cur_data":"c1fc65d72f4f","attrs":{"c1fc65d72f4f":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favoriate bakeries in 2022","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","FORMULE SANDWICH","CEREAL BAGUETTE","BOULE 400G"],"values":[30290,8711,6579,6555,5217,4839,2259,1976,1891,1816],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>The first donut chart shows the total of sale counts of top 10
 favorite bakery types from 2021-01-01 to 2021-12-31. As the plot shows
 that the <code>TRADITIONAL BAGUETTE</code> (37,399; 42%) is the most
@@ -535,8 +535,8 @@ Top 10 <code>BOULE 400G</code> stayed in the same position.</p>
 </p >
 </div>
 <div id="top-10-favorite-bread-monthly-sale-counts-in-2021"
-class="section level4">
-<h4>Top 10 favorite bread monthly sale counts in 2021</h4>
+class="section level3">
+<h3>Top 10 favorite bread monthly sale counts in 2021</h3>
 <pre class="r"><code>top_line =
   bakery_df %&gt;% 
   separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
@@ -595,8 +595,8 @@ counts in 2021 are less than 1,000.</p>
 </p >
 </div>
 <div id="top-10-favorite-bread-monthly-sale-counts-in-2022"
-class="section level4">
-<h4>Top 10 favorite bread monthly sale counts in 2022</h4>
+class="section level3">
+<h3>Top 10 favorite bread monthly sale counts in 2022</h3>
 <pre class="r"><code>top_line =
   bakery_df %&gt;% 
   separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
@@ -657,8 +657,8 @@ monthly sale counts in 2022 are less than 600.</p>
 </p >
 </div>
 <div id="ranking-of-mean-prices-of-top-10-products-in-2021"
-class="section level4">
-<h4>Ranking of mean prices of top 10 products in 2021</h4>
+class="section level3">
+<h3>Ranking of mean prices of top 10 products in 2021</h3>
 <pre class="r"><code>mean_price_2021 =
   bakery_df %&gt;% 
   separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
@@ -693,8 +693,8 @@ are the same (1.2 €).</p>
 </p >
 </div>
 <div id="ranking-of-mean-prices-of-top-10-products-in-2022"
-class="section level4">
-<h4>Ranking of mean prices of top 10 products in 2022</h4>
+class="section level3">
+<h3>Ranking of mean prices of top 10 products in 2022</h3>
 <pre class="r"><code>mean_price_2022 =
   bakery_df %&gt;% 
   separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
@@ -733,8 +733,8 @@ from 1.2 € to 1.27 € when compared to the scatter plot in 2021.</p>
 </p >
 </div>
 <div id="ranking-of-total-revenue-of-top-10-products-in-2021-and-2022"
-class="section level4">
-<h4>Ranking of total revenue of top 10 products in 2021 and 2022</h4>
+class="section level3">
+<h3>Ranking of total revenue of top 10 products in 2021 and 2022</h3>
 <pre class="r"><code>total_rev_bar=
   bakery_df %&gt;% 
   separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
