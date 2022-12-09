@@ -239,14 +239,19 @@ mean_price_2021 =
   group_by(product_name) %>% 
   summarize(mean_price = mean(unit_price)) %>% 
   arrange(desc(mean_price)) %>% 
-  mutate(product_name = fct_reorder(product_name, mean_price)) %>% 
+  mutate(product_name = forcats::fct_relevel(product_name, c("TRADITIONAL BAGUETTE", "COUPE", "BAGUETTE","BANETTE", "CROISSANT", "PAIN AU CHOCOLAT", "CEREAL BAGUETTE", "SPECIAL BREAD", "CAMPAGNE", "BOULE 400G"))) %>% 
   ggplot(aes(x =product_name, y = mean_price, color = product_name)) + 
       geom_point() +
-    theme(axis.text.x = element_text(angle=45,hjust = 1), legend.position = "none") + 
+      geom_text(aes(label=mean_price), vjust = 0, nudge_y = 0.1) +
+      ylim(0,3) +
+    theme(axis.text.x = element_text(angle=60,hjust = 1), legend.position = "none") + 
     labs(x = "name of products",
-         y = "mean prices") 
+         y = "mean prices in euro") 
   
 mean_price_2021 
-
 ```
 
+The scatter plot shows the ranking of mean prices of top 10 favorite bakery types in 2021, with most popularity to least popularity (top1-10) from the left to the right on x-axis.
+
+`SPECIAL BREAD` has the highest mean price (2.4 €) while `COUPE` has the lowest mean price (0.15 €). The mean prices of `TRADITIONAL BAGUETTE` and 
+`PAIN AU CHOCOLAT` are the same (1.2 €).
