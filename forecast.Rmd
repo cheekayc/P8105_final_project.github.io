@@ -308,12 +308,12 @@ train %>%
 ```
 
 Comments: As shown in the plot, the predicted trendline (blue) looks similar to the actual trendline (red) and highly overlaps it. Although the prediction accuracy is not 100%,
-but this *Neural Network* model gives us the highest accuracy among all forecast models that has been tested.
+but this <mark >**Neural Network**</mark> model gives us the highest accuracy among all forecast models that has been tested.
 
 
 ## Sales Forecast for Oct - Dec 2022
 
-As we have identified that the *Neural Network* model gives us the highest accuracy (`r round(sum(NN_error = 100 - NN_error), digits = 2)`%), we will use this model to predict the future daily sales 
+As we have identified that the <mark >**Neural Network**</mark>  model gives us the **highest accuracy** (`r round(sum(NN_error = 100 - NN_error), digits = 2)`%), we will use this model to predict the future daily sales 
 from October to December in 2022.
 
 This time, we will use all the data from January 1, 2021 to September 30, 2022 to fit into the *Neural Network* forecasting model to predict the daily sales of October - December in 2022.
