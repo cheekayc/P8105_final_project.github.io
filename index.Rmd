@@ -2,7 +2,6 @@
 output: 
   html_document:
     toc: true
-    toc_float: true
 ---
 
 <h1><b><center>A French Bakery’s Daily Sales in 2021-2022</center></b></h1>

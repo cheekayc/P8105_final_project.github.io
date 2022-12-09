@@ -105,6 +105,7 @@ bakery_df %>%
     x = "Hour (24-hour format)",
     y = "Number of times appeared")
 ``` 
+
 Overall, what hours has the most number of products sold?
 
 Then we only take a look at the morning hours with a monotonic function
@@ -213,8 +214,7 @@ the sales of bakery varies by month, so we included `month` in our model as a co
 <img src="images/baguette.gif" style="width:100%">
 <p>&nbsp;</p>
 
-Linear Regression check assumption 
-Linear Regression for baguette 
+Linear Regression and check assumption for product baguette
 ```{r, warning = FALSE}
 baguette_df = 
   bakery_df %>% 

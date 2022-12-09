@@ -516,8 +516,8 @@ bakery_df %&gt;%
     title = &quot;Peak hours&quot;,
     x = &quot;Hour (24-hour format)&quot;,
     y = &quot;Number of times appeared&quot;)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-2-1.png" width="672" />
-Overall, what hours has the most number of products sold?</p>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Overall, what hours has the most number of products sold?</p>
 <p>Then we only take a look at the morning hours with a monotonic
 function</p>
 <pre class="r"><code>bakery_df %&gt;% 
@@ -629,7 +629,7 @@ in our model as a confounder to be controlled.</p>
 <p>
  
 </p>
-<p>Linear Regression check assumption Linear Regression for baguette</p>
+<p>Linear Regression and check assumption for product baguette</p>
 <pre class="r"><code>baguette_df = 
   bakery_df %&gt;% 
   filter(str_detect(product_name, &quot;BAGUETTE&quot;)) %&gt;% 
