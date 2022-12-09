@@ -382,50 +382,19 @@ div.tocify {
 </div>
 
 
-<pre class="r"><code>knitr::opts_chunk$set(message = FALSE)
+<pre class="r"><code>knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE,
+  fig.width = 14,
+  fig.height = 6,
+  out.width = &quot;90%&quot;,
+  set.seed(8))
 
-library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-## ✔ ggplot2 3.4.0      ✔ purrr   0.3.5 
-## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
-## ✔ tidyr   1.2.0      ✔ stringr 1.4.1 
-## ✔ readr   2.1.2      ✔ forcats 0.5.2 
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>library(lubridate)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;lubridate&#39;
-## 
-## The following objects are masked from &#39;package:base&#39;:
-## 
-##     date, intersect, setdiff, union</code></pre>
-<pre class="r"><code>library(plotly)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;plotly&#39;
-## 
-## The following object is masked from &#39;package:ggplot2&#39;:
-## 
-##     last_plot
-## 
-## The following object is masked from &#39;package:stats&#39;:
-## 
-##     filter
-## 
-## The following object is masked from &#39;package:graphics&#39;:
-## 
-##     layout</code></pre>
-<pre class="r"><code>library(mgcv)</code></pre>
-<pre><code>## Loading required package: nlme
-## 
-## Attaching package: &#39;nlme&#39;
-## 
-## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     collapse
-## 
-## This is mgcv 1.8-40. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.</code></pre>
-<pre class="r"><code>library(moments)
+library(tidyverse)
+library(lubridate)
+library(plotly)
+library(mgcv)
+library(moments)
 library(modelr)</code></pre>
 <p>Data input and cleaning</p>
 <pre class="r"><code>bakery_df =
@@ -516,10 +485,10 @@ bakery_df %&gt;%
     title = &quot;Peak hours&quot;,
     x = &quot;Hour (24-hour format)&quot;,
     y = &quot;Number of times appeared&quot;)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-2-1.png" width="90%" /></p>
 <p>Overall, what hours has the most number of products sold?</p>
 <p>Then we only take a look at the morning hours with a monotonic
-function</p>
+function from 7 AM to 11 AM.</p>
 <pre class="r"><code>bakery_df %&gt;% 
   mutate(year = year(date)) %&gt;% 
   filter(year == 2021) %&gt;% 
@@ -535,7 +504,7 @@ function</p>
     title = &quot;Peak hours&quot;,
     x = &quot;Hour (24-hour format)&quot;,
     y = &quot;Number of products sold&quot;)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-3-1.png" width="90%" /></p>
 <p>It looks like a monotonic linear relationship that we can take a
 further look at using simple linear regression model.</p>
 </div>
@@ -554,7 +523,7 @@ Validation</h3>
 ggplot(slr_df, aes(x = Hour, y = quantity)) +
   geom_point() + scale_x_continuous(breaks = seq(7, 11), limit = c(7, 11)) +
   scale_y_continuous(limit = c(0,50)) </code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
 <pre class="r"><code>slr_reg = lm(quantity ~ Hour, slr_df)
 
 slr_reg %&gt;% 
@@ -576,7 +545,7 @@ smooth_mod = gam(quantity ~ s(Hour), data = slr_df)</code></pre>
   geom_point(alpha = .5) +
   geom_line(aes(y = pred), color = &quot;red&quot;) + 
   facet_grid(~model)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-6-1.png" width="90%" /></p>
 <p>The three models are very similar.</p>
 <p>Re-sample the dataset by <code>crossv_mc</code> and let’s see the
 rmse of each model</p>
@@ -607,7 +576,7 @@ cv_df =
     names_prefix = &quot;rmse_&quot;) %&gt;% 
   mutate(model = fct_inorder(model)) %&gt;% 
   ggplot(aes(x = model, y = rmse)) + geom_violin()</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
 <p>Based on the results, there is a slightly improvement using smooth
 model as it has a lower tail of rmse on the top. Since there are no
 significant difference between the three model including the non-linear
@@ -651,7 +620,7 @@ baguette_reg %&gt;%
 <p>Examine assumptions for the chosen Linear Regression model</p>
 <pre class="r"><code>par(mfrow = c(2, 2))
 plot(baguette_reg)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-10-1.png" width="90%" /></p>
 <p>According to the assumption check graph, the normal qq plot is
 approximately closed to the predicted line with residuals on both sides,
 but the residual plots might violate the linear regression
@@ -674,13 +643,16 @@ average price for a baguette in Paris, which is 1.07 euros.</p>
 same as the average price of baguette in Paris.</p>
 <p>Alternative hypothesis: The mean price of baguette in this bakery is
 different from the average price of baguette in Paris.</p>
+<p>Our population follows a Poisson distribution as shown below, and we
+can assume the large sample size being normally distributed by central
+limit theorem.</p>
 <pre class="r"><code>bakery_df %&gt;% 
   filter(product_name == &quot;TRADITIONAL BAGUETTE&quot;) %&gt;% 
   group_by(date) %&gt;% 
   summarize(total_sale = sum(quantity)) %&gt;% 
   ggplot(aes(x = total_sale)) +
   geom_histogram()</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
 <pre class="r"><code>baguette_onet = 
   bakery_df %&gt;% 
   filter(product_name == &quot;BAGUETTE&quot;) %&gt;%
@@ -739,7 +711,7 @@ Paris.</p>
   filter(total_sale &lt; 1000) %&gt;% 
   ggplot(aes(x = total_sale)) +
   geom_histogram(bins = 71)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
 <pre class="r"><code>skew = 
 bakery_df %&gt;% 
   group_by(date) %&gt;% 

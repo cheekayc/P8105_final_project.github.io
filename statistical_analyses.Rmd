@@ -7,8 +7,14 @@ output:
     code_folding: hide
 ---
 
-```{r setup}
-knitr::opts_chunk$set(message = FALSE)
+```{r setup, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE,
+  fig.width = 14,
+  fig.height = 6,
+  out.width = "90%",
+  set.seed(8))
 
 library(tidyverse)
 library(lubridate)
@@ -108,7 +114,7 @@ bakery_df %>%
 
 Overall, what hours has the most number of products sold?
 
-Then we only take a look at the morning hours with a monotonic function
+Then we only take a look at the morning hours with a monotonic function from 7 AM to 11 AM.
 ```{r, warning = FALSE}
 bakery_df %>% 
   mutate(year = year(date)) %>% 
@@ -253,6 +259,8 @@ the average price for a baguette in Paris, which is 1.07 euros.
 Null hypothesis: The mean price of baguette in this bakery is the same as the average price of baguette in Paris.
 
 Alternative hypothesis: The mean price of baguette in this bakery is different from the average price of baguette in Paris.
+
+Our population follows a Poisson distribution as shown below, and we can assume the large sample size being normally distributed by central limit theorem. 
 
 ```{r, warning = FALSE}
 bakery_df %>% 
