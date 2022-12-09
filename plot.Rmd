@@ -255,3 +255,35 @@ The scatter plot shows the ranking of mean prices of top 10 favorite bakery type
 
 `SPECIAL BREAD` has the highest mean price (2.4 €) while `COUPE` has the lowest mean price (0.15 €). The mean prices of `TRADITIONAL BAGUETTE` and 
 `PAIN AU CHOCOLAT` are the same (1.2 €).
+
+<p>&nbsp;</p >
+#### Ranking of mean prices of top 10 products in 2022
+```{r, warning=FALSE}
+mean_price_2022 =
+  bakery_df %>% 
+  separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day)) %>%
+  filter(year == 2022) %>% 
+  filter(product_name %in% c("TRADITIONAL BAGUETTE", "COUPE", "BAGUETTE","BANETTE", "CROISSANT", "PAIN AU CHOCOLAT", "SPECIAL BREAD", "FORMULE SANDWICH","CEREAL BAGUETTE", "BOULE 400G")) %>% 
+  group_by(product_name) %>% 
+  summarize(mean_price = mean(unit_price)) %>%
+  mutate(across(where(is.numeric), ~ round(., digits = 2))) %>% 
+  arrange(desc(mean_price)) %>% 
+  mutate(product_name = forcats::fct_relevel(product_name, c("TRADITIONAL BAGUETTE", "COUPE", "BAGUETTE","BANETTE", "CROISSANT", "PAIN AU CHOCOLAT", "SPECIAL BREAD", "FORMULE SANDWICH","CEREAL BAGUETTE", "BOULE 400G"))) %>% 
+  ggplot(aes(x =product_name, y = mean_price, color = product_name)) + 
+      geom_point() +
+      geom_text(aes(label=mean_price), vjust = 0, nudge_y = 0.2) +
+      ylim(0,7.5) +
+    theme(axis.text.x = element_text(angle=60,hjust = 1), legend.position = "none") + 
+    labs(x = "name of products",
+         y = "mean prices in euro") 
+  
+mean_price_2022 
+```
+
+The scatter plot shows the ranking of mean prices of top 10 favorite bakery types in 2022, with most popularity to least popularity (top1-10) from the left to the right on x-axis. In general, the mean price of `COUPE` stayed the same from 2021 to 2022, but mean prices of other breads increased slightly.
+
+`FORMULE SANDWICH` has the highest mean price (6.94 €) while `COUPE` has the lowest mean price (0.15 €). The mean prices of `TRADITIONAL BAGUETTE` and 
+`PAIN AU CHOCOLAT` are the same (1.27 €)., but both increased from 1.2 € to 1.27 € when compared to the scatter plot in 2021. 
