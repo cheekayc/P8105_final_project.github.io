@@ -14,10 +14,11 @@ library(lubridate)
 library(plotly)
 library(patchwork)
 library(ggpubr)
+library(ggplot2)
 ```
 
 ### Summary of packages
-tidyverse, lubridate, plotly, patchwork
+tidyverse, lubridate, plotly, patchwork, ggpubr
 
 
 ```{r,data cleaning, message = FALSE}
@@ -223,3 +224,29 @@ In general, monthly sale counts in 2022 show similar trend as in 2021, but month
 For `TRADITIONAL BAGUETTE` (line plot on the right), total monthly sale counts in 2022 peaked at August (>12,500). However, total monthly sale counts decreased from May to June and August to September in 2022. Compared to 2021 (>11,250), total monthly sale counts of `TRADITIONAL BAGUETTE` is higher in 2022 (>12,500). 
 
 For line plot on the left, total monthly sale counts in 2022 are less than 3,500 but greater than 500 in every month for top 2-6 (`COUPE`, `BAGUETTE`, `BANETTE`, `CROISSANT`, `PAIN AU CHOCOLAT`). For top 7-10 (`SPECIAL BREAD`, `FORMULE SANDWICH`, `CEREAL BAGUETTE`, and `BOULE 400G`), total monthly sale counts in 2022 are less than 600. 
+
+<p>&nbsp;</p >
+#### Ranking of mean prices of top 10 products in 2021
+```{r}
+mean_price_2021 =
+  bakery_df %>% 
+  separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day)) %>%
+  filter(year == 2021) %>% 
+  filter(product_name %in% c("TRADITIONAL BAGUETTE", "COUPE", "BAGUETTE","BANETTE", "CROISSANT", "PAIN AU CHOCOLAT", "CEREAL BAGUETTE", "SPECIAL BREAD", "CAMPAGNE", "BOULE 400G")) %>% 
+  group_by(product_name) %>% 
+  summarize(mean_price = mean(unit_price)) %>% 
+  arrange(desc(mean_price)) %>% 
+  mutate(product_name = fct_reorder(product_name, mean_price)) %>% 
+  ggplot(aes(x =product_name, y = mean_price, color = product_name)) + 
+      geom_point() +
+    theme(axis.text.x = element_text(angle=45,hjust = 1), legend.position = "none") + 
+    labs(x = "name of products",
+         y = "mean prices") 
+  
+mean_price_2021 
+
+```
+
