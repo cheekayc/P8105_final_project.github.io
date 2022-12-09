@@ -145,7 +145,6 @@ top_line1_2021 =
   filter(product_name %in% c("TRADITIONAL BAGUETTE")) %>% 
   ggplot(aes(x =month, y = total_counts, color = product_name)) + 
     geom_line() +
-    theme(legend.position = "bottom") + 
     labs(x = "month",
          y = "counts of bread",
          title = "Top 1 monthly sale counts") +
@@ -164,10 +163,14 @@ top_line2_2021 =
          title = "Top 2-10 monthly sale counts") +
     scale_x_continuous(
     breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
-    labels = c("Jan","Feb","Mar","Apr","May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) 
+    labels = c("Jan","Feb","Mar","Apr","May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+  
  
 top_line1_2021+top_line2_2021
 ```
 
+In general, summer (from June to September) has higher monthly sale counts.
+
+, peaking at August. 
 
 
