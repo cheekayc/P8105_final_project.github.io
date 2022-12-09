@@ -287,3 +287,53 @@ The scatter plot shows the ranking of mean prices of top 10 favorite bakery type
 
 `FORMULE SANDWICH` has the highest mean price (6.94 €) while `COUPE` has the lowest mean price (0.15 €). The mean prices of `TRADITIONAL BAGUETTE` and 
 `PAIN AU CHOCOLAT` are the same (1.27 €)., but both increased from 1.2 € to 1.27 € when compared to the scatter plot in 2021. 
+
+<p>&nbsp;</p >
+#### Ranking of total revenue of top 10 products in 2021 and 2022
+```{r}
+total_rev_bar=
+  bakery_df %>% 
+  separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day)) %>%
+  group_by(year, product_name) %>% 
+  mutate(rev = quantity * unit_price) %>% 
+  summarize(prod_rev = sum(rev)) %>% 
+  arrange(desc(prod_rev)) 
+  
+total_rev_bar_2021=
+  total_rev_bar %>% 
+  filter(year == 2021) %>% 
+  filter(product_name %in% c("TRADITIONAL BAGUETTE", "COUPE", "BAGUETTE","BANETTE", "CROISSANT", "PAIN AU CHOCOLAT", "CEREAL BAGUETTE", "SPECIAL BREAD", "CAMPAGNE", "BOULE 400G")) %>% 
+  mutate(product_name = fct_reorder(product_name, prod_rev)) %>% 
+  mutate(across(where(is.numeric), ~ round(., digits = 2))) %>% 
+  ggplot(aes(x =product_name, y= prod_rev, fill=product_name)) + 
+    geom_bar(stat="identity", width=0.5) +
+    geom_text(aes(label=prod_rev), vjust = 0, nudge_y = 100, size=3) +
+    ylim(0,80000) +
+    labs(x = "name of products",
+         y = "total revenue in euro",
+         title = "ranking in 2021") +
+  theme(axis.text.x = element_text(angle = 15, hjust = 1), legend.position = "none")
+  
+total_rev_bar_2022=
+  total_rev_bar %>% 
+  filter(year == 2022) %>% 
+  filter(product_name %in% c("TRADITIONAL BAGUETTE", "COUPE", "BAGUETTE","BANETTE", "CROISSANT", "PAIN AU CHOCOLAT", "SPECIAL BREAD", "FORMULE SANDWICH","CEREAL BAGUETTE", "BOULE 400G")) %>% 
+  mutate(product_name = fct_reorder(product_name, prod_rev)) %>%
+  mutate(across(where(is.numeric), ~ round(., digits = 2))) %>% 
+  ggplot(aes(x =product_name, y= prod_rev, fill=product_name)) + 
+    geom_bar(stat="identity", width=0.5) +
+    geom_text(aes(label=prod_rev), vjust = 0, nudge_y = 100, size=3) +
+    ylim(0,80000) +
+    labs(x = "name of products",
+         y = "total revenue in euro",
+         title = "ranking in 2022") +
+  theme(axis.text.x = element_text(angle = 15, hjust = 1), legend.position = "none")
+ 
+ggarrange(total_rev_bar_2021, total_rev_bar_2022,  heights = c(5, 5),
+          ncol = 1, nrow = 2)
+```
+
+The bar chart shows the ranking of total revenue of top 10 products in 2021 and 2022. The total revenues of `TRADITIONAL BAGUETTE` are the highest (78742.8 € in 2021; 66013.25 € in 2022) while the total revenues of `COUPE` are the lowest (2049.9 € in 2021; 1475.85 € in 2022) in the two years respectively. The total revenues of `TRADITIONAL BAGUETTE` is approximately 38 times the total revenues of `COUPE` in 2021 and 45 times of that in 2022.
