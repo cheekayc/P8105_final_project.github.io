@@ -13,7 +13,7 @@ library(tidyverse)
 library(lubridate)
 library(plotly)
 library(patchwork)
-library(viridis)
+library(ggpubr)
 ```
 
 ### Summary of the used packages and dependencies
@@ -145,9 +145,10 @@ top_line1_2021 =
   filter(product_name %in% c("TRADITIONAL BAGUETTE")) %>% 
   ggplot(aes(x =month, y = total_counts, color = product_name)) + 
     geom_line() +
+    theme(axis.text.x = element_text(angle=90,hjust = 1), legend.position = "none") +
     labs(x = "month",
-         y = "counts of bread",
-         title = "Top 1 monthly sale counts") +
+         y = "counts of TRADITIONAL BAGUETTE",
+         title = "Top 1") +
     scale_x_continuous(
     breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
     labels = c("Jan","Feb","Mar","Apr","May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) 
@@ -157,20 +158,19 @@ top_line2_2021 =
     filter(product_name %in% c("COUPE", "BAGUETTE","BANETTE", "CROISSANT", "PAIN AU CHOCOLAT", "CEREAL BAGUETTE", "SPECIAL BREAD", "CAMPAGNE", "BOULE 400G")) %>% 
   ggplot(aes(x =month, y = total_counts, color = product_name)) + 
     geom_line() +
-    theme(legend.position = "bottom") + 
+    theme(axis.text.x = element_text(angle=90,hjust = 1), legend.position = "none", legend.title = element_text(size=7), legend.text = element_text(size=7)) + 
     labs(x = "month",
          y = "counts of bread",
-         title = "Top 2-10 monthly sale counts") +
+         title = "Top 2-10") +
     scale_x_continuous(
     breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
     labels = c("Jan","Feb","Mar","Apr","May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
-  
- 
-top_line1_2021+top_line2_2021
+
+ggarrange(top_line2_2021, top_line1_2021, ncol=2, nrow=1, common.legend = TRUE, legend="bottom")
 ```
 
-In general, summer (from June to September) has higher monthly sale counts.
+In general, summer (from June to September) has higher monthly sale counts of top 10 favorite bread in 2021.
 
-, peaking at August. 
-
+For `TRADITIONAL BAGUETTE` (line plot on the right), total monthly sale counts in 2021 peaked at August (>10,000). However, total monthly sale counts decreased from May to June, August to September, and October to December in 2021. 
+For line plot on the left, total monthly sale counts in 2021 are less than 3,000 but greater than 500 in every month for top 2-6 (`COUPE`, `BAGUETTE`, `BANETTE`, `CROISSANT`, `PAIN AU CHOCOLAT`). For top 7-10 (`CEREAL BAGUETTE`, `SPECIAL BREAD`, `CAMPAGNE`, and `BOULE 400G`), total monthly sale counts in 2021 are less than 1,000 in every month. 
 
