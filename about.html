@@ -13,7 +13,7 @@
 
 <title>About Us</title>
 
-<script src="site_libs/header-attrs-2.16/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/sandstone.min.css" rel="stylesheet" />
@@ -183,8 +183,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -192,16 +192,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -370,43 +363,44 @@ div.tocify {
 </div>
 
 
-<p>This final project is a collective efforts of 4 MPH students from
-Columbia University Mailman School of Public Health.</p>
-<div id="team-member-1" class="section level1">
-<h1>Team member 1</h1>
-<div id="chee-kay-cheong" class="section level3">
-<h3>Chee Kay Cheong</h3>
+This final project is a collective efforts of 4 MPH students from
+Columbia University Mailman School of Public Health.
+<p>
+ 
+</p >
+<div id="chee-kay-cheong" class="section level2">
+<h2>Chee Kay Cheong</h2>
 <p>email: <a href="mailto:cc4778@cumc.columbia.edu"
 class="email">cc4778@cumc.columbia.edu</a></p>
-<p>Department of Epidemiology, Infectious Diseases certificate</p>
+Department of Epidemiology, Infectious Diseases certificate
+<p>
+ 
+</p >
 </div>
-</div>
-<div id="team-member-2" class="section level1">
-<h1>Team member 2</h1>
-<div id="yishan-chen" class="section level3">
-<h3>Yishan Chen</h3>
+<div id="yishan-chen" class="section level2">
+<h2>Yishan Chen</h2>
 <p>email: <a href="mailto:yc4016@cumc.columbia.edu"
 class="email">yc4016@cumc.columbia.edu</a></p>
-<p>Department of Biostatistics, Chronic Diseases certificate</p>
+Department of Biostatistics, Chronic Diseases certificate<br />
+
+<p>
+ 
+</p >
 </div>
-</div>
-<div id="team-member-3" class="section level1">
-<h1>Team member 3</h1>
-<div id="jiayi-yang" class="section level3">
-<h3>Jiayi Yang</h3>
+<div id="jiayi-yang" class="section level2">
+<h2>Jiayi Yang</h2>
 <p>email: <a href="mailto:jy3186@cumc.columbia.edu"
 class="email">jy3186@cumc.columbia.edu</a></p>
-<p>Department of Epidemiology, Biostatistics certificate</p>
+Department of Epidemiology, Biostatistics certificate
+<p>
+ 
+</p >
 </div>
-</div>
-<div id="team-member-4" class="section level1">
-<h1>Team member 4</h1>
-<div id="yuxin-liu" class="section level3">
-<h3>Yuxin Liu</h3>
+<div id="yuxin-liu" class="section level2">
+<h2>Yuxin Liu</h2>
 <p>email: <a href="mailto:yl4610@cumc.columbia.edu"
 class="email">yl4610@cumc.columbia.edu</a></p>
 <p>Department of Epidemiology, Chronic Diseases certificate</p>
-</div>
 </div>
 
 

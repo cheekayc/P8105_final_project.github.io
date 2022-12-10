@@ -7,34 +7,26 @@ output:
 ---
 
 This final project is a collective efforts of 4 MPH students from Columbia University Mailman School of Public Health.
-
-# Team member 1 
-
-### Chee Kay Cheong 
+<p>&nbsp;</p >
+## Chee Kay Cheong 
 
 email: cc4778@cumc.columbia.edu
 
 Department of Epidemiology, Infectious Diseases certificate 
-
-# Team member 2 
-
-### Yishan Chen 
+<p>&nbsp;</p >
+## Yishan Chen 
 
 email: yc4016@cumc.columbia.edu
 
 Department of Biostatistics, Chronic Diseases certificate  
-
-# Team member 3
-
-### Jiayi Yang
+<p>&nbsp;</p >
+## Jiayi Yang
 
 email: jy3186@cumc.columbia.edu
 
 Department of Epidemiology, Biostatistics certificate 
-
-# Team member 4 
-
-### Yuxin Liu 
+<p>&nbsp;</p >
+## Yuxin Liu 
 
 email: yl4610@cumc.columbia.edu
 
