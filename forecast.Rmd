@@ -53,7 +53,9 @@ sale_2021 =
   summarize(
     total_sale = sum(quantity))
 
-sale_2021
+sale_2021 %>% 
+  head(10) %>% 
+  knitr::kable(digits = 2)
 ```
 
 The `sale_2021` dataset shows the number of products sold each day in 2021. In 2021, the bakery opened for business for 339 days. 
@@ -76,7 +78,7 @@ sale_2021 %>%
 
 We will see this trend again as we verify the accuracy of different forecast models in the next few sections.
 
-
+<p>&nbsp;</p>
 ## Data Pre-processing
 
 We need to create a simple and clean dataframe derived from the original dataset `bakery_df` that can be used by the forecast models. This new dataframe only needs two columns:                          
@@ -106,14 +108,14 @@ test =
   filter(year(date) == 2022 & month(date) == 9)
 ```
 
-
+<p>&nbsp;</p>
 ### Mean Absolute Percentage Error (MAPE)
 
 For model evaluation, we will be relying on the ***Mean Absolute Percentage Error (MAPE)*** to measure the accuracy of our predictions.
 
 The accuracy of the model can be calculated as $100 - MAPE$. For example, an *MAPE* value of 70 indicates the model has an accuracy of 30%.
 
-
+<p>&nbsp;</p>
 ## Seasonal Naive Model
 
 First, we begin with the most basic forecast model - the **Seasonal Naive Model**.
@@ -163,8 +165,8 @@ train %>%
 Comments: Although the *Seasonal Naive Model* gives high accuracy, the prediction line is a horizontal straight line, which means this model predicted that 
 the amount of products sold is the same for each day. Therefore, we think that the predictions from this model are not the best.
 
-
-## Double-Seasonal Holt-Winters (DSHW)
+<p>&nbsp;</p>
+## Double-Seasonal Holt-Winters (DSHW) Model
 
 The **Double-seasonal Holt-Winters** method uses additive trend and multiplicative seasonality, where there are two seasonal components which are multiplied together. 
 The length of the two seasonalities must be multiples of one another (2 and 4, 4 and 12, etc.). In our case, we will specify the length of the first seasonality as 7 and the second as 14.
@@ -211,8 +213,8 @@ train %>%
 Comments: Although the *DSHW* model has a worse accuracy than the basic model (*Seasonal Naive*), but visually it is better than the basic model because it shows dynamic trend.
 This would make more sense than the predictions given by the *Seasonal Naive* model as we can see that it is no longer predicting that the daily sales are the same for each day.
 
-
-## TBATS
+<p>&nbsp;</p>
+## TBATS Model
 
 **TBATS** is an acronym derived from the **Trigonometric seasonality, Box-Cox transformation, ARMA errors, Trend, and Seasonal components** of this approach. It takes its roots 
 from exponential smoothing methods and is capable of modeling time series with multiple seasonalities.
@@ -259,8 +261,8 @@ train %>%
 
 Comments: As we can see from the plot, the prediction line (blue) demonstrates dynamic pattern as the *DSHW* model, but the accuracy of the *TBATS* model is slightly better than the *DSHW* model.
 
-
-## Neural Network
+<p>&nbsp;</p>
+## Neural Network Model
 
 A neural network is a series of algorithms that identifies patterns and relationships in data, similar to the way the brain operates. 
 
@@ -310,7 +312,7 @@ train %>%
 Comments: As shown in the plot, the predicted trendline (blue) looks similar to the actual trendline (red) and highly overlaps it. Although the prediction accuracy is not 100%,
 but this <mark >**Neural Network**</mark> model gives us the highest accuracy among all forecast models that has been tested.
 
-
+<p>&nbsp;</p>
 ## Sales Forecast for Oct - Dec 2022
 
 As we have identified that the <mark >**Neural Network**</mark>  model gives us the **highest accuracy** (`r round(sum(NN_error = 100 - NN_error), digits = 2)`%), we will use this model to predict the future daily sales 
