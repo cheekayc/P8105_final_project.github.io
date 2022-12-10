@@ -5,30 +5,41 @@ output:
     toc: true
     toc_float: true
 ---
+<center><img src="images/disney.jpg" style="width:70%"><center>
+<p>&nbsp;</p>
 
 This final project is a collective efforts of 4 MPH students from Columbia University Mailman School of Public Health.
+
+
 <p>&nbsp;</p >
 ## Chee Kay Cheong 
 
-email: cc4778@cumc.columbia.edu
+Email: cc4778@cumc.columbia.edu
 
 Department of Epidemiology, Infectious Diseases certificate 
+
+
 <p>&nbsp;</p >
 ## Yishan Chen 
 
-email: yc4016@cumc.columbia.edu
+Email: yc4016@cumc.columbia.edu
 
 Department of Biostatistics, Chronic Diseases certificate  
+
+Professional networks: [Linkedin](https://www.linkedin.com/in/yishan-chen/)
+
 <p>&nbsp;</p >
 ## Jiayi Yang
 
-email: jy3186@cumc.columbia.edu
+Email: jy3186@cumc.columbia.edu
 
 Department of Epidemiology, Biostatistics certificate 
+
+
 <p>&nbsp;</p >
 ## Yuxin Liu 
 
-email: yl4610@cumc.columbia.edu
+Email: yl4610@cumc.columbia.edu
 
 Department of Epidemiology, Chronic Diseases certificate
 
