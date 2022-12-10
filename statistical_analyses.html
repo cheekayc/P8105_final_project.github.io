@@ -578,9 +578,8 @@ slr_reg %&gt;%
 <p>
  
 </p >
-<div id="cross-validation-of-simple-linear-regression-model"
-class="section level3">
-<h3>Cross validation of simple linear regression model</h3>
+<div id="cross-validation" class="section level3">
+<h3>Cross validation</h3>
 <pre class="r"><code># created 3 models: linear, piecewise, and smooth models 
 linear_mod = lm(quantity ~ Hour, slr_df)
 pwl_mod    = lm(quantity ~ Hour + hour_cp, data = slr_df)
@@ -614,8 +613,42 @@ cv_df =
   mutate(
     rmse_linear = map2_dbl(linear_mod, test, ~rmse(model = .x, data = .y)),
     rmse_pwl    = map2_dbl(pwl_mod, test, ~rmse(model = .x, data = .y)),
-    rmse_smooth = map2_dbl(smooth_mod, test, ~rmse(model = .x, data = .y))) %&gt;% 
-  select(rmse_linear, rmse_pwl, rmse_smooth)</code></pre>
+    rmse_smooth = map2_dbl(smooth_mod, test, ~rmse(model = .x, data = .y))) 
+
+  cv_df %&gt;% 
+  select(rmse_linear, rmse_pwl, rmse_smooth) %&gt;% 
+  pivot_longer(
+    everything(),
+    names_to = &quot;model&quot;, 
+    values_to = &quot;rmse&quot;,
+    names_prefix = &quot;rmse_&quot;) %&gt;% 
+  group_by(model) %&gt;% 
+  summarize(mean(rmse)) %&gt;% 
+  mutate(mean_rmse = `mean(rmse)`) %&gt;% 
+  select(-`mean(rmse)`) %&gt;% 
+  knitr::kable(digits = 4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">model</th>
+<th align="right">mean_rmse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">linear</td>
+<td align="right">1.2719</td>
+</tr>
+<tr class="even">
+<td align="left">pwl</td>
+<td align="right">1.2715</td>
+</tr>
+<tr class="odd">
+<td align="left">smooth</td>
+<td align="right">1.2688</td>
+</tr>
+</tbody>
+</table>
 <p>Then plot the rmse graph</p>
 <pre class="r"><code>cv_df %&gt;% 
   select(starts_with(&quot;rmse&quot;)) %&gt;% 
@@ -633,14 +666,18 @@ significant difference between the three model including the non-linear
 smooth model, we can conclude that the basic linear model is clear
 enough to be accounted for this relationship in the product of
 croissant.</p>
+<p>
+ 
+</p >
 </div>
-<div id="multiple-linear-regression-test-version"
-class="section level3">
-<h3>Multiple Linear Regression (test version)</h3>
-<p>We are interested in testing the relationship between the revune and
-unit price of a product and its quantity being sold. Considering that
-the sales of bakery varies by month, so we included <code>month</code>
-in our model as a confounder to be controlled.</p>
+</div>
+<div id="multiple-linear-regression" class="section level2">
+<h2>Multiple Linear Regression</h2>
+<p>We are interested in testing the relationship between the revenue
+(outcome variable) and 2 main predictors, which are unit price of a
+product and its quantity being sold. Considering that the sales of
+bakery varies by month, we included <code>month</code> in our model as a
+confounder to be controlled.</p>
 <p>
  
 </p>
@@ -648,7 +685,7 @@ in our model as a confounder to be controlled.</p>
 <p>
  
 </p>
-<p>Linear Regression and check assumption for product baguette</p>
+<p>Multivariable linear regression model</p>
 <pre class="r"><code>baguette_df = 
   bakery_df %&gt;% 
   filter(str_detect(product_name, &quot;BAGUETTE&quot;)) %&gt;% 
@@ -659,35 +696,73 @@ baguette_reg = lm(rev ~ unit_price + quantity + month, baguette_df)
 
 
 baguette_reg %&gt;% 
-  broom::tidy()</code></pre>
-<pre><code>## # A tibble: 4 × 5
-##   term        estimate std.error statistic  p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept) -1.43     0.00382    -375.   0       
-## 2 unit_price   1.21     0.00307     394.   0       
-## 3 quantity     1.19     0.000456   2604.   0       
-## 4 month        0.00119  0.000193      6.20 5.69e-10</code></pre>
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.4321</td>
+<td align="right">0.0038</td>
+<td align="right">-374.6061</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">unit_price</td>
+<td align="right">1.2071</td>
+<td align="right">0.0031</td>
+<td align="right">393.5209</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">quantity</td>
+<td align="right">1.1881</td>
+<td align="right">0.0005</td>
+<td align="right">2603.5416</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">month</td>
+<td align="right">0.0012</td>
+<td align="right">0.0002</td>
+<td align="right">6.1995</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
 <p>Examine assumptions for the chosen Linear Regression model</p>
 <pre class="r"><code>par(mfrow = c(2, 2))
 plot(baguette_reg)</code></pre>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-10-1.png" width="90%" /></p>
 <p>According to the assumption check graph, the normal qq plot is
 approximately closed to the predicted line with residuals on both sides,
-but the residual plots might violate the linear regression
-assumptions.</p>
+but the residual plots might violate some of the linear regression
+assumptions (homoscedasticity).</p>
 <p>The tentative model for multiple linear regression of baguette’s
 revenue is<br />
 Revenue = -1.43 + 1.21 * unit_price + 1.19 * quantity + 0.001 *
 month</p>
 <p>We might not consider doing MLR for the sake of this research due to
 the unmet assumptions.</p>
+<p>
+ 
+</p >
 </div>
-<div id="one-sample-t-test" class="section level3">
-<h3>One-sample T-test</h3>
-<div id="regular-baguette-two-sided" class="section level5">
-<h5>Regular Baguette (Two-sided)</h5>
-<p>We are interested in testing if the mean price of <strong>regular
-baguette</strong> in this bakery is significantly different from the
+<div id="one-sample-t-test" class="section level2">
+<h2>One-sample T-test</h2>
+<div id="regular-baguette-two-sided" class="section level3">
+<h3>Regular Baguette (Two-sided)</h3>
+<p>We are interested in testing if the mean price of
+<code>BAGUETTE</code> in this bakery is significantly different from the
 average price for a baguette in Paris, which is 1.07 euros.</p>
 <p>Null hypothesis: The mean price of baguette in this bakery is the
 same as the average price of baguette in Paris.</p>
@@ -710,14 +785,56 @@ limit theorem.</p>
 
 baguette_t_results = 
   t.test(baguette_onet, mu = 1.07 , alternative = &quot;two.sided&quot;) %&gt;% 
-  broom::tidy()</code></pre>
+  broom::tidy() 
+
+baguette_t_results %&gt;% 
+  knitr::kable(digits = 4)</code></pre>
+<table>
+<colgroup>
+<col width="10%" />
+<col width="11%" />
+<col width="9%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="20%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">estimate</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">parameter</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="left">method</th>
+<th align="left">alternative</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.9291</td>
+<td align="right">-442.2184</td>
+<td align="right">0</td>
+<td align="right">15291</td>
+<td align="right">0.9285</td>
+<td align="right">0.9297</td>
+<td align="left">One Sample t-test</td>
+<td align="left">two.sided</td>
+</tr>
+</tbody>
+</table>
 <p>The p-value is much smaller than the alpha (0.05), so we would reject
 the null hypothesis. At 5% level of significance, we have sufficient
 evidence to conclude that the mean price of baguette in this bakery is
 significantly different from the average price of baguette in Paris.</p>
+<p>
+ 
+</p >
 </div>
-<div id="traditional-baguette-one-sided" class="section level5">
-<h5>Traditional Baguette (One-sided)</h5>
+<div id="traditional-baguette-one-sided" class="section level3">
+<h3>Traditional Baguette (One-sided)</h3>
 <p>We noticed that the price of traditional baguette in this bakery is
 higher than the average price of traditional baguette in France. The
 price of the traditional French loaf is around 0.90 Euros in bakeries.
@@ -731,13 +848,30 @@ this bakery is higher than the average price of traditional baguette in
 France.</p>
 <pre class="r"><code>bakery_df %&gt;% 
   filter(product_name == &quot;TRADITIONAL BAGUETTE&quot;) %&gt;% 
-  count(unit_price)</code></pre>
-<pre><code>## # A tibble: 3 × 2
-##   unit_price     n
-##        &lt;dbl&gt; &lt;int&gt;
-## 1       1.2  39426
-## 2       1.25 13059
-## 3       1.3  15204</code></pre>
+  count(unit_price) %&gt;% 
+   knitr::kable(digits = 4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">unit_price</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1.20</td>
+<td align="right">39426</td>
+</tr>
+<tr class="even">
+<td align="right">1.25</td>
+<td align="right">13059</td>
+</tr>
+<tr class="odd">
+<td align="right">1.30</td>
+<td align="right">15204</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>trad_baguette_onet = 
   bakery_df %&gt;% 
   filter(product_name == &quot;TRADITIONAL BAGUETTE&quot;) %&gt;%
@@ -745,33 +879,51 @@ France.</p>
 
 trad_baguette_t_results = 
   t.test(trad_baguette_onet, mu = 0.90, alternative = &quot;greater&quot;) %&gt;% 
-  broom::tidy()</code></pre>
+  broom::tidy() 
+
+trad_baguette_t_results %&gt;% 
+   knitr::kable(digits = 4)</code></pre>
+<table>
+<colgroup>
+<col width="10%" />
+<col width="11%" />
+<col width="9%" />
+<col width="11%" />
+<col width="10%" />
+<col width="11%" />
+<col width="20%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">estimate</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">parameter</th>
+<th align="right">conf.low</th>
+<th align="right">conf.high</th>
+<th align="left">method</th>
+<th align="left">alternative</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1.2321</td>
+<td align="right">2097.119</td>
+<td align="right">0</td>
+<td align="right">67688</td>
+<td align="right">1.2318</td>
+<td align="right">Inf</td>
+<td align="left">One Sample t-test</td>
+<td align="left">greater</td>
+</tr>
+</tbody>
+</table>
 <p>The p-value is much smaller than the alpha (0.05), so we would reject
 the null hypothesis. At 5% level of significance, we have sufficient
 evidence to conclude that the mean price of traditional baguette in this
 bakery is significantly higher than the average price of baguette in
 Paris.</p>
-<pre class="r"><code>bakery_df %&gt;%
-  mutate(
-    month = month(date),
-    year = year(date)) %&gt;% 
-  filter(month == 2 &amp; year == 2021) %&gt;% 
-  group_by(product_name) %&gt;% 
-  summarize(total_sale = sum(quantity)) %&gt;% 
-  filter(total_sale &lt; 1000) %&gt;% 
-  ggplot(aes(x = total_sale)) +
-  geom_histogram(bins = 71)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
-<pre class="r"><code>skew = 
-bakery_df %&gt;% 
-  group_by(date) %&gt;% 
-  summarize(total_sale = sum(quantity))
-
-# Skewness test
-print(skewness(skew))</code></pre>
-<pre><code>##        date  total_sale 
-## -0.01517941  1.20058066</code></pre>
-</div>
 </div>
 </div>
 

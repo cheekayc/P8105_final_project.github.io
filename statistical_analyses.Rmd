@@ -158,7 +158,7 @@ The model is
 Sale count = 1.99 - 0.04 * Hour
 
 <p>&nbsp;</p >
-### Cross validation of simple linear regression model
+### Cross validation 
 ```{r, warning = FALSE}
 # created 3 models: linear, piecewise, and smooth models 
 linear_mod = lm(quantity ~ Hour, slr_df)
@@ -198,9 +198,20 @@ cv_df =
   mutate(
     rmse_linear = map2_dbl(linear_mod, test, ~rmse(model = .x, data = .y)),
     rmse_pwl    = map2_dbl(pwl_mod, test, ~rmse(model = .x, data = .y)),
-    rmse_smooth = map2_dbl(smooth_mod, test, ~rmse(model = .x, data = .y))) %>% 
-  select(rmse_linear, rmse_pwl, rmse_smooth)
+    rmse_smooth = map2_dbl(smooth_mod, test, ~rmse(model = .x, data = .y))) 
 
+  cv_df %>% 
+  select(rmse_linear, rmse_pwl, rmse_smooth) %>% 
+  pivot_longer(
+    everything(),
+    names_to = "model", 
+    values_to = "rmse",
+    names_prefix = "rmse_") %>% 
+  group_by(model) %>% 
+  summarize(mean(rmse)) %>% 
+  mutate(mean_rmse = `mean(rmse)`) %>% 
+  select(-`mean(rmse)`) %>% 
+  knitr::kable(digits = 4)
 ```
 Then plot the rmse graph
 ```{r, warning = FALSE}
@@ -217,16 +228,16 @@ cv_df %>%
 
 Based on the results, there is a slightly improvement using smooth model as it has a lower tail of rmse on the top. Since there are no significant difference between the three model including the non-linear smooth model, we can conclude that the basic linear model is clear enough to be accounted for this relationship in the product of croissant.
 
-### Multiple Linear Regression (test version)
+<p>&nbsp;</p >
+## Multiple Linear Regression
 
-We are interested in testing the relationship between the revune and unit price of a product and its quantity being sold. Considering that 
-the sales of bakery varies by month, so we included `month` in our model as a confounder to be controlled.
+We are interested in testing the relationship between the revenue (outcome variable) and 2 main predictors, which are unit price of a product and its quantity being sold. Considering that the sales of bakery varies by month, we included `month` in our model as a confounder to be controlled.
 
 <p>&nbsp;</p>
 <img src="images/baguette.gif" style="width:100%">
 <p>&nbsp;</p>
 
-Linear Regression and check assumption for product baguette
+Multivariable linear regression model 
 ```{r, warning = FALSE}
 baguette_df = 
   bakery_df %>% 
@@ -238,7 +249,8 @@ baguette_reg = lm(rev ~ unit_price + quantity + month, baguette_df)
 
 
 baguette_reg %>% 
-  broom::tidy()
+  broom::tidy() %>% 
+  knitr::kable(digits = 4)
 ```
 
 Examine assumptions for the chosen Linear Regression model
@@ -248,18 +260,19 @@ par(mfrow = c(2, 2))
 plot(baguette_reg)
 ```
 
-According to the assumption check graph, the normal qq plot is approximately closed to the predicted line with residuals on both sides, but the residual plots might violate the linear regression assumptions.
+According to the assumption check graph, the normal qq plot is approximately closed to the predicted line with residuals on both sides, but the residual plots might violate some of the linear regression assumptions (homoscedasticity). 
 
 The tentative model for multiple linear regression of baguette's revenue is  
 Revenue = -1.43 + 1.21 * unit_price + 1.19 * quantity + 0.001 * month
 
 We might not consider doing MLR for the sake of this research due to the unmet assumptions.
 
-### One-sample T-test
+<p>&nbsp;</p >
+## One-sample T-test
 
-##### Regular Baguette (Two-sided)
+### Regular Baguette (Two-sided)
 
-We are interested in testing if the mean price of **regular baguette** in this bakery is significantly different from 
+We are interested in testing if the mean price of `BAGUETTE` in this bakery is significantly different from 
 the average price for a baguette in Paris, which is 1.07 euros. 
 
 Null hypothesis: The mean price of baguette in this bakery is the same as the average price of baguette in Paris.
@@ -268,7 +281,7 @@ Alternative hypothesis: The mean price of baguette in this bakery is different f
 
 Our population follows a Poisson distribution as shown below, and we can assume the large sample size being normally distributed by central limit theorem. 
 
-```{r, warning = FALSE}
+```{r, warning = FALSE, message = FALSE}
 bakery_df %>% 
   filter(product_name == "TRADITIONAL BAGUETTE") %>% 
   group_by(date) %>% 
@@ -283,14 +296,17 @@ baguette_onet =
 
 baguette_t_results = 
   t.test(baguette_onet, mu = 1.07 , alternative = "two.sided") %>% 
-  broom::tidy()
+  broom::tidy() 
+
+baguette_t_results %>% 
+  knitr::kable(digits = 4)
 ```
 
 The p-value is much smaller than the alpha (0.05), so we would reject the null hypothesis. At 5% level of significance, we have sufficient 
 evidence to conclude that the mean price of baguette in this bakery is significantly different from the average price of baguette in Paris.
 
-
-##### Traditional Baguette (One-sided)
+<p>&nbsp;</p >
+### Traditional Baguette (One-sided)
 
 We noticed that the price of traditional baguette in this bakery is higher than the average price of traditional baguette in France. The
 price of the traditional French loaf is around 0.90 Euros in bakeries. Therefore, we would like to conduct a one-sided T-test to see if the price difference is significant. 
@@ -303,7 +319,8 @@ France.
 ```{r, warning = FALSE}
 bakery_df %>% 
   filter(product_name == "TRADITIONAL BAGUETTE") %>% 
-  count(unit_price)
+  count(unit_price) %>% 
+   knitr::kable(digits = 4)
   
 trad_baguette_onet = 
   bakery_df %>% 
@@ -312,37 +329,12 @@ trad_baguette_onet =
 
 trad_baguette_t_results = 
   t.test(trad_baguette_onet, mu = 0.90, alternative = "greater") %>% 
-  broom::tidy()
+  broom::tidy() 
+
+trad_baguette_t_results %>% 
+   knitr::kable(digits = 4)
 ```
 
 The p-value is much smaller than the alpha (0.05), so we would reject the null hypothesis. At 5% level of significance, we have sufficient 
 evidence to conclude that the mean price of traditional baguette in this bakery is significantly higher than the average price of baguette 
 in Paris.
-
-
-
-
-
-
-
-```{r, warning = FALSE}
-bakery_df %>%
-  mutate(
-    month = month(date),
-    year = year(date)) %>% 
-  filter(month == 2 & year == 2021) %>% 
-  group_by(product_name) %>% 
-  summarize(total_sale = sum(quantity)) %>% 
-  filter(total_sale < 1000) %>% 
-  ggplot(aes(x = total_sale)) +
-  geom_histogram(bins = 71)
-
-skew = 
-bakery_df %>% 
-  group_by(date) %>% 
-  summarize(total_sale = sum(quantity))
-
-# Skewness test
-print(skewness(skew))
-```
-
