@@ -543,7 +543,15 @@ limit theorem.</p>
   group_by(date) %&gt;% 
   summarize(total_sale = sum(quantity)) %&gt;% 
   ggplot(aes(x = total_sale)) +
-  geom_histogram()</code></pre>
+  geom_histogram() +
+  labs(
+    x = &quot;Total sale quantity per day&quot;, 
+    y = &quot;Count&quot;,
+    title = &quot;Distribution of sale quantity&quot;) +
+  theme(
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14, face = &quot;bold&quot;),
+    plot.title = element_text(hjust = 0.4, face = &quot;bold&quot;))</code></pre>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-2-1.png" width="90%" /></p>
 <pre class="r"><code>baguette_onet = 
   bakery_df %&gt;% 
@@ -702,7 +710,8 @@ Paris.</p>
 sale counts and when it’s being sold (hour of the day) and test the
 model using <code>Cross Validation</code>.</p>
 <p><img src="images/croissant.gif" style="width:100%"></p>
-<p>Find the <em>rush hours</em> of a typical day:</p>
+<p>The plot below shows the average amount of products sold in each hour
+during the business hour.</p>
 <pre class="r"><code>bakery_df = 
   bakery_df %&gt;% 
   mutate(
@@ -711,20 +720,26 @@ model using <code>Cross Validation</code>.</p>
 
 bakery_df %&gt;% 
   group_by(Hour) %&gt;% 
-  count() %&gt;% 
-  ggplot(aes(x = Hour, y = n)) +
+  count() %&gt;%
+  mutate(
+    average_count = n / 600) %&gt;% 
+  ggplot(aes(x = Hour, y = average_count)) +
   geom_point() +
   geom_line() +
   scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
-  scale_y_continuous(limit = c(0,50000)) +
+  scale_y_continuous(limit = c(0, 80)) +
   labs(
-    title = &quot;Peak hours&quot;,
+    title = &quot;Average amount of products sold in every hour per day&quot;,
     x = &quot;Hour (24-hour format)&quot;,
-    y = &quot;Number of times appeared&quot;)</code></pre>
+    y = &quot;Number of products sold&quot;) +
+  theme(
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14, face = &quot;bold&quot;),
+    plot.title = element_text(hjust = 0.4, face = &quot;bold&quot;))</code></pre>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
-<p>Overall, what hours has the most number of products sold?</p>
-<p>Then we only take a look at the morning hours with a monotonic
-function from 7 AM to 11 AM.</p>
+<p>From the graph above, it seems like there is a linear trend from 7 AM
+to 11 AM. Hence, we should take a look at the morning hours with a
+monotonic function from 7 AM to 11 AM.</p>
 <pre class="r"><code>bakery_df %&gt;% 
   mutate(year = year(date)) %&gt;% 
   filter(year == 2021) %&gt;% 
@@ -735,11 +750,15 @@ function from 7 AM to 11 AM.</p>
   geom_point() +
   geom_line() +
   scale_x_continuous(breaks = seq(7, 11), limit = c(7, 11)) +
-  scale_y_continuous(limit = c(0,120)) +
+  scale_y_continuous(limit = c(0, 120)) +
   labs(
-    title = &quot;Peak hours&quot;,
+    title = &quot;Average amount of products sold from 7am - 11am&quot;,
     x = &quot;Hour (24-hour format)&quot;,
-    y = &quot;Number of products sold&quot;)</code></pre>
+    y = &quot;Number of products sold&quot;) +
+  theme(
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14, face = &quot;bold&quot;),
+    plot.title = element_text(hjust = 0.4, face = &quot;bold&quot;))</code></pre>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
 <p>It looks like a monotonic linear relationship that we can take a
 further look at using simple linear regression model.</p>

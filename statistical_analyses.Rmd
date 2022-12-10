@@ -119,7 +119,15 @@ bakery_df %>%
   group_by(date) %>% 
   summarize(total_sale = sum(quantity)) %>% 
   ggplot(aes(x = total_sale)) +
-  geom_histogram()
+  geom_histogram() +
+  labs(
+    x = "Total sale quantity per day", 
+    y = "Count",
+    title = "Distribution of sale quantity") +
+  theme(
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14, face = "bold"),
+    plot.title = element_text(hjust = 0.4, face = "bold"))
 
 baguette_onet = 
   bakery_df %>% 
@@ -176,7 +184,7 @@ We conduct a simple linear regression for `CROISSANT`'s sale counts and when it'
 
 <img src="images/croissant.gif" style="width:100%">
 
-Find the *rush hours* of a typical day:
+The plot below shows the average amount of products sold in each hour during the business hour.
 ```{r, warning = FALSE}
 bakery_df = 
   bakery_df %>% 
@@ -186,21 +194,25 @@ bakery_df =
 
 bakery_df %>% 
   group_by(Hour) %>% 
-  count() %>% 
-  ggplot(aes(x = Hour, y = n)) +
+  count() %>%
+  mutate(
+    average_count = n / 600) %>% 
+  ggplot(aes(x = Hour, y = average_count)) +
   geom_point() +
   geom_line() +
   scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
-  scale_y_continuous(limit = c(0,50000)) +
+  scale_y_continuous(limit = c(0, 80)) +
   labs(
-    title = "Peak hours",
+    title = "Average amount of products sold in every hour per day",
     x = "Hour (24-hour format)",
-    y = "Number of times appeared")
+    y = "Number of products sold") +
+  theme(
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14, face = "bold"),
+    plot.title = element_text(hjust = 0.4, face = "bold"))
 ``` 
 
-Overall, what hours has the most number of products sold?
-
-Then we only take a look at the morning hours with a monotonic function from 7 AM to 11 AM.
+From the graph above, it seems like there is a linear trend from 7 AM to 11 AM. Hence, we should take a look at the morning hours with a monotonic function from 7 AM to 11 AM.
 ```{r, warning = FALSE}
 bakery_df %>% 
   mutate(year = year(date)) %>% 
@@ -212,12 +224,15 @@ bakery_df %>%
   geom_point() +
   geom_line() +
   scale_x_continuous(breaks = seq(7, 11), limit = c(7, 11)) +
-  scale_y_continuous(limit = c(0,120)) +
+  scale_y_continuous(limit = c(0, 120)) +
   labs(
-    title = "Peak hours",
+    title = "Average amount of products sold from 7am - 11am",
     x = "Hour (24-hour format)",
-    y = "Number of products sold")
-
+    y = "Number of products sold") +
+  theme(
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14, face = "bold"),
+    plot.title = element_text(hjust = 0.4, face = "bold"))
 ```
 
 It looks like a monotonic linear relationship that we can take a further look at using simple linear regression model.
