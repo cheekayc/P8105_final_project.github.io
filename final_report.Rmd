@@ -11,8 +11,6 @@ output:
 knitr::opts_chunk$set(
   message = FALSE, 
   warning = FALSE,
-  fig.width = 18,
-  fig.height = 8,
   out.width = "90%",
   set.seed(8))
 
@@ -30,10 +28,9 @@ library(ggpubr)
 library(ggplot2)
 ```
 
-## Project title
-A French Bakery’s Daily Sales in 2021-2022
+## A French Bakery’s Daily Sales in 2021-2022
+Chee Kay Cheong (cc4778), Jiayi Yang (jy3186), Yishan chen (yc4016), Yuxin Liu (yl4610)
 <p>&nbsp;</p >
-
 
 ## Data collection and cleaning
 [kaggle](https://www.kaggle.com/datasets/matthieugimbert/french-bakery-daily-sales)
@@ -104,14 +101,34 @@ how is the sale distributed and so much more…
 
 
 ## Related work
+We went to Paris Baguette and wanted to buy a French Baguette. However, we surprisingly found that the price exceeded our expectations ($3.29 + TAX). Since baguette is a traditional French bread, we are curious about the market of baguette in France. 
+
+<center><img src="images/baguette_price" style="width:70%"><center>
+
+As economics smoothly recover after the COVID-19 outbreak worldwide, competing forces of different retail stores grow as people return back to their normal lives. Since the demand of customers becomes volatile, we would like to use data analysis to help this French bakery identify the KPIs, boost the revenue, and expand the size of the bakery. Specifically, we would like to help the store owner to break down the specifics of how to accomplish their goals by analyzing factors influencing revenues via statistical models and hypotheses, predicting future sales via time-series forecast analyses, and looking at the top 10 popular bread out of all products.
 <p>&nbsp;</p >
 
 ## Initial questions
+* What products are most popular in a French bakery?
+* How does this French bakery market perform year by year?
+* Is there any difference in the mean price of baguette in this French bakery comparing to the average price in France?
+* Since our data ends at 2022-09-30, how would the sales trend look like for the remaining of 2022?
+* Which month in a year/time in a day has the highest sales?
 <p>&nbsp;</p >
+
+
+## Descriptions of approaches
+
+In Exploratory Analyses, we focused on product count, unit price, revenue, and time trend by using pie, doughnut, bar, line, and scatter plots. We mainly analyzed the top 10 favorite bakery products to increase annual sales and profit, hit revenue targets, and gain more clients.
+
+In Statistical Analyses, we will perform several statistical analysis in this bakery including ANOVA to check the mean difference of peak sale months between 2021 and 2022, One-Sample t-test to check the mean price of baguette with average price in the nation, simple linear regression to test the linear relationship between quantity of sale and hours in the day, and finally multiple linear regression. 
+
+In Forecast Analyses, we will be testing four forecast models and identify the best model to help us predict the daily sale for this French bakery. 
+<p>&nbsp;</p >
+
 
 ## Exploratory analyses
 <p>&nbsp;</p >
-## Visualization
 
 ### 24hr Time trends
 ```{r}
@@ -472,379 +489,6 @@ ggarrange(dis_rev_bar_2021, dis_rev_bar_2022,  heights = c(5, 5),
 The bar plots show distributions of monthly revenue in 2021 and 2022. `TRADITIONAL BAGUETTE` has the largest proportion of monthly revenues (around 50%) in 2021 and 2022. Moreover, the revenue trend from Jan to Dec is similar in 2021 and 2022. Since the bakery sold more products in summer than winter, and reached peak in August, we could expect higher revenue in summer than winter, and the highest revenue in August.
 <p>&nbsp;</p >
 
-## Forecast modeling
-<p>&nbsp;</p >
-We will be testing four forecast models and identify the best model to help us predict the daily sale for this French bakery. 
-
-<p>&nbsp;</p >
-Sales forecast is important because it can be used as a daily production reference and help the bakery to operate smoothly and reduce wasting of resources, 
-which in turn can reduce costs and increase profit.
-
-<p>&nbsp;</p >
-Time series forecasting involves using historical, time-stamped data to make predictions of what might happen in the future.
-
-<p>&nbsp;</p >
-In 2021, how many products were sold each day?
-```{r 2021 daily sales df}
-sale_2021 = 
-  bakery_df %>% 
-  filter(year == 2021) %>% 
-  select(date, year, month, hour, product_name, quantity, unit_price) %>% 
-  group_by(date) %>% 
-  summarize(
-    total_sale = sum(quantity))
-
-sale_2021 %>% 
-  head(10) %>% 
-  knitr::kable(digits = 2)
-```
-
-The `sale_2021` dataset shows the number of products sold each day in 2021. In 2021, the bakery opened for business for 339 days. 
-
-The line plot below shows the total number of products sold each day in 2021.
-
-```{r 2021 daily sales line plot}
-sale_2021 %>% 
-  ggplot(aes(x = date, y = total_sale)) +
-  geom_line(aes(color = "Orange")) +
-  scale_x_date(date_labels = "%b %Y", date_breaks  = "1 month") +
-  labs(
-    x = "Date",
-    y = "Number of products sold",
-    title = "Bakery's Daily Sales (2021)") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  theme(
-    axis.text = element_text(size = 15),
-    axis.title = element_text(size = 17, face = "bold"),
-    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"))
-```
-
-We will see this trend again as we verify the accuracy of different forecast models in the next few sections.
-
-<p>&nbsp;</p>
-### Data Pre-processing
-
-We need to create a simple and clean dataframe derived from the original dataset `bakery_df` that can be used by the forecast models. This new dataframe only needs two columns:                          
-* `date` : date order in which the bakery opened for business                                                                                                                                               
-* `total_sale` : sum of products sold 
-
-The `sales_all` dataframe consists of 600 rows, in which the dates begin with *January 2, 2021* and end with *September 30, 2022*. 
-
-```{r simplify df}
-sales_all = 
-  bakery_df %>% 
-  group_by(date) %>% 
-  summarize(
-    total_sale = sum(quantity))
-```
-
-Then, we need to create a `train` and a `test` data frames so that we can test the accuracy of our forecast models. We will be using all data prior to *September 1, 2022* as our `train` dataset 
-to predict the amount of products sold daily for September, 2022. The remaining data from *September 1, 2022* to *September 30, 2022* will be our `test` dataset.
-
-```{r train test df}
-train = 
-  sales_all %>% 
-  filter(date < "2022-09-01")
-
-test = 
-  sales_all %>% 
-  filter(year(date) == 2022 & month(date) == 9)
-```
-
-<p>&nbsp;</p>
-#### Mean Absolute Percentage Error (MAPE)
-
-For model evaluation, we will be relying on the ***Mean Absolute Percentage Error (MAPE)*** to measure the accuracy of our predictions. *MAPE* is a numeric value which ranges between 0 to 1.
-
-The accuracy of the model can be calculated as $(1 - MAPE) * 100%$. For example, an *MAPE* value of 0.7 indicates the model has an accuracy of 30%.
-
-We will report each model's accuracy using inline R code.
-
-<p>&nbsp;</p>
-### Seasonal Naive Model
-
-First, we begin with the most basic forecast model - the **Seasonal Naive Model**.
-
-Naive forecasting is a simple and cost-effective method in which the forecasts produced are equal to the last observed value. The seasonal naive approach is used 
-when the time series exhibits seasonality, in which case, the forecasts are equivalent to the value from the last season. Naive methods are typically used as a 
-benchmark against which more sophisticated forecasting techniques can be compared. 
-
-```{r SNM}
-# Fit the model
-seasonal_naive_model = snaive(train$total_sale, h = length(test$total_sale))
-
-# Compute error of the model
-SNM_error = MAPE(seasonal_naive_model$mean, test$total_sale) * 100
-```
-
-**The accuracy of the *Seasonal Naive* model is `r round(sum(SNM_error = 100 - SNM_error), digits = 2)`%.**
-
-The *Seasonal Naive* model will output a list of mean values, and they are the predicted values of daily sales from September 1, 2022 to September 30, 2022.
-We need to extract the list of mean values from the model and put them into the `test` dataframe so that we can produce a time-series forecast plot.
-
-```{r SNM predict}
-test_seasonal = 
-  test %>% 
-  mutate(
-    pred_sale = seasonal_naive_model$mean)
-```
-
-Finally, we can plot a time-series forecasting graph to show the results of our *Seasonal Naive* model.
-
-```{r plot SNM prediction}
-train %>% 
-  ggplot(aes(x = date, y = total_sale)) +
-  geom_line(aes(color = "Actual sale (Prior to 2022-09-01)")) +
-  geom_line(data = test_seasonal, aes(x = date, y = total_sale, color = "Actual sale (2022-09-01 to 2022-09-30)")) + 
-  geom_line(data = test_seasonal, aes(x = date, y = pred_sale, color = "Predicted sale (2022-09-01 to 2022-09-30)"), size = 1.5) +
-  scale_x_date(date_labels = "%b %Y", date_breaks  = "2 month") +
-  labs(
-    x = "Date",
-    y = "Number of products sold",
-    title = "Seasonal Naive Forecast of Daily Sales for September (2022)") +
-  theme_minimal() +
-  theme(legend.position = "bottom") +
-  theme(
-    axis.text = element_text(size = 15),
-    axis.title = element_text(size = 17, face = "bold"),
-    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
-    legend.text = element_text(size = 17),
-    legend.title = element_text(size = 17))
-```
-
-<p>&nbsp;</p>
-Comments: Although the *Seasonal Naive Model* gives high accuracy, the prediction line is a horizontal straight line, which means this model predicted that 
-the amount of products sold is the same for each day. Therefore, we think that the predictions from this model are not the best.
-
-<p>&nbsp;</p>
-### Double-Seasonal Holt-Winters (DSHW) Model
-
-The **Double-seasonal Holt-Winters** method uses additive trend and multiplicative seasonality, where there are two seasonal components which are multiplied together. 
-The length of the two seasonalities must be multiples of one another (2 and 4, 4 and 12, etc.). In our case, we will specify the length of the first seasonality as 7 and the second as 14.
-
-```{r DSHWM}
-# Fit the model
-double_seasonal_model = dshw(train$total_sale, period1 = 7, period2 = 14, h = length(test$total_sale))
-
-# Compute the model's error
-DSHW_error = MAPE(double_seasonal_model$mean, test$total_sale) * 100
-```
-
-**The accuracy of the *Double-seasonal Holt-Winters* model is `r round(sum(DSHW_error = 100 - DSHW_error), digits = 2)`%.**
-
-The *DSHW* model will output a list of mean values, and they are the predicted values of daily sales from September 1, 2022 to September 30, 2022.
-We need to extract the list of mean values from the model and put them into the `test` dataframe so that we can produce a time-series forecast plot.
-
-```{r DSHW predict}
-test_double_seasonal = 
-  test %>% 
-  mutate(
-    pred_sale = double_seasonal_model$mean)
-```
-
-Finally, we can plot a time-series forecasting graph to see the results of our *DSHW* model.
-
-```{r DSHW prediction plot}
-train %>%
-  filter(date > "2022-01-01") %>% 
-  ggplot(aes(x = date, y = total_sale)) +
-  geom_line(aes(color = "Actual sale (Prior to 2022-09-01)")) +
-  geom_line(data = test_double_seasonal, aes(x = date, y = total_sale, color = "Actual sale (2022-09-01 to 2022-09-30)")) + 
-  geom_line(data = test_double_seasonal, aes(x = date, y = pred_sale, color = "Predicted sale (2022-09-01 to 2022-09-30")) +
-  scale_x_date(date_labels = "%b %Y", date_breaks  = "2 month") +
-  labs(
-    x = "Date",
-    y = "Number of products sold",
-    title = "Double-Seasonal Holt-Winters Forecast of Daily Sales for September (2022)") +
-  theme_minimal() +
-  theme(legend.position = "bottom") +
-  theme(
-    axis.text = element_text(size = 15),
-    axis.title = element_text(size = 17, face = "bold"),
-    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
-    legend.text = element_text(size = 17),
-    legend.title = element_text(size = 17))
-```
-
-<p>&nbsp;</p>
-Comments: Although the *DSHW* model has a worse accuracy than the basic model (*Seasonal Naive*), but visually it is better than the basic model because it shows dynamic trend.
-This would make more sense than the predictions given by the *Seasonal Naive* model as we can see that it is no longer predicting that the daily sales are the same for each day.
-
-<p>&nbsp;</p>
-### TBATS Model
-
-**TBATS** is an acronym derived from the **Trigonometric seasonality, Box-Cox transformation, ARMA errors, Trend, and Seasonal components** of this approach. It takes its roots 
-from exponential smoothing methods and is capable of modeling time series with multiple seasonalities.
-
-```{r tbats model}
-# Train a TBATS model
-TBATS_model = tbats(train$total_sale)
-
-# Generate forecast with the model
-tbats_df = forecast(TBATS_model, h = length(test$total_sale))
-
-# Check the error for the model
-TBATS_error = MAPE(tbats_df$mean, test$total_sale) * 100
-```
-
-**The accuracy of the *TBATS* model is `r round(sum(TBATS_error = 100 - TBATS_error), digits = 2)`%.**
-
-The *TBATS* model will output a list of mean values, and they are the predicted values of daily sales from September 1, 2022 to September 30, 2022.
-We need to extract the list of mean values from the model and put them into the `test` dataframe so that we can produce a time-series forecast plot.
-
-```{r TBATS predict}
-test_tbats = 
-  test %>% 
-  mutate(
-    pred_sale = tbats_df$mean)
-```
-
-```{r TBATS plot}
-train %>% 
-  filter(date > "2022-01-01") %>% 
-  ggplot(aes(x = date, y = total_sale)) +
-  geom_line(aes(color = "Actual sale (Prior to 2022-09-01)")) +
-  geom_line(data = test_tbats, aes(x = date, y = total_sale, color = "Actual sale (2022-09-01 to 2022-09-30)")) + 
-  geom_line(data = test_tbats, aes(x = date, y = pred_sale, color = "Predicted sale (2022-09-01 to 2022-09-30"), size = 0.8) +
-  scale_x_date(date_labels = "%b %Y", date_breaks  = "2 month") +
-  labs(
-    x = "Date",
-    y = "Number of products sold",
-    title = "TBATS Forecast of Daily Sales for September (2022)") +
-  theme_minimal() +
-  theme(legend.position = "bottom") +
-  theme(
-    axis.text = element_text(size = 15),
-    axis.title = element_text(size = 17, face = "bold"),
-    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
-    legend.text = element_text(size = 17),
-    legend.title = element_text(size = 17))
-```
-
-<p>&nbsp;</p>
-Comments: As we can see from the plot, the prediction line (blue) demonstrates dynamic pattern as the *DSHW* model, but the accuracy of the *TBATS* model is slightly better than the *DSHW* model.
-
-<p>&nbsp;</p>
-### Neural Network Model
-
-A neural network is a series of algorithms that identifies patterns and relationships in data, similar to the way the brain operates. 
-
-The `forecast` library comes with the option of a feed-forward neural network with a single hidden layer and lagged inputs for univariate time series forecasting.
-
-```{r neural network model}
-# Train a neural network model
-nn_model = nnetar(train$total_sale)
-
-# Generate forecast with the model
-nn_forecast_df = forecast(nn_model, h = length(test$total_sale))
-
-# Check the MAPE
-NN_error = MAPE(nn_forecast_df$mean, test$total_sale) * 100
-```
-
-**The accuracy of the *Neural Network* model is `r round(sum(NN_error = 100 - NN_error), digits = 2)`%.**
-
-The *Neural Network* model will output a list of mean values, and they are the predicted values of daily sales from September 1, 2022 to September 30, 2022.
-We need to extract the list of mean values from the model and put them into the `test` dataframe so that we can produce a time-series forecast plot.
-
-```{r NN prediction}
-test_nn = 
-  test %>% 
-  mutate(
-    pred_sale = nn_forecast_df$mean)
-```
-
-```{r NN plot}
-train %>% 
-# To show the prediction line more clearly, we are only showing the trends of daily sales after May 1, 2022.
-  filter(date > "2022-05-01") %>% 
-  ggplot(aes(x = date, y = total_sale)) +
-  geom_line(aes(color = "Actual sale (Prior to 2022-09-01)")) +
-  geom_line(data = test_nn, aes(x = date, y = total_sale, color = "Actual sale (2022-09-01 to 2022-09-30)"), alpha = 0.8) + 
-  geom_line(data = test_nn, aes(x = date, y = pred_sale, color = "Predicted sale (2022-09-01 to 2022-09-30)"), size = 0.7, alpha = 0.8) +
-  scale_x_date(date_labels = "%b %Y", date_breaks  = "1 month") +
-  labs(
-    x = "Date",
-    y = "Number of products sold",
-    title = "Neural Network Forecast of Daily Sales for September (2022)") +
-  theme_minimal() +
-  theme(legend.position = "bottom") +
-  theme(
-    axis.text = element_text(size = 15),
-    axis.title = element_text(size = 17, face = "bold"),
-    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
-    legend.text = element_text(size = 17),
-    legend.title = element_text(size = 17))
-```
-
-<p>&nbsp;</p>
-Comments: As shown in the plot, the predicted trendline (blue) looks similar to the actual trendline (red) and highly overlaps it. Although the prediction accuracy is not 100%,
-but this <mark >**Neural Network**</mark> model gives us the highest accuracy among all forecast models that has been tested.
-
-<p>&nbsp;</p>
-### Sales Forecast for Oct - Dec 2022
-
-As we have identified that the <mark >**Neural Network**</mark>  model gives us the **highest accuracy** (`r round(sum(NN_error = 100 - NN_error), digits = 2)`%), we will use this model to predict the future daily sales 
-from October to December in 2022.
-
-This time, we will use all the data from January 1, 2021 to September 30, 2022 to fit into the *Neural Network* forecasting model to predict the daily sales of October - December in 2022.
-
-```{r future prediction}
-# Train the model
-nn_future = nnetar(sales_all$total_sale)
-
-# Generate the forecast
-nn_future_df = forecast(nn_future, h = 92)
-```
-
-Since predicted values given by the model do not comes with dates, we need to create a dataframe with specific range of date to combine with the predicted values.
-
-```{r date df}
-dates = seq(as.Date('2022-10-01'), as.Date('2022-12-31'), by = 'days')
-
-date_df =
-  tibble(
-    A = letters[sample(1:26, 92, TRUE)])
-
-date_df = 
-  tibble(
-    date = rep(dates, length.out = nrow(date_df)))
-
-date_df =
-  date_df %>% 
-  mutate(
-    pred_sale = nn_future_df$mean)
-```
-
-Then, we can plot a graph to show the predicted daily sales of the bakery from October to December in 2022. 
-
-```{r predicted future sales}
-date_df %>% 
-  ggplot(aes(x = date)) +
-  geom_line(aes(y = pred_sale, color = "Red")) +
-  scale_x_date(date_labels = "%b %d", date_breaks  = "10 day") +
-  labs(
-    x = "Date (Month Day)",
-    y = "Number of products sold each day",
-    title = "Predicted Daily Sales from October to December (2022)") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  theme(
-    axis.text = element_text(size = 15),
-    axis.title = element_text(size = 17, face = "bold"),
-    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
-    legend.text = element_text(size = 17),
-    legend.title = element_text(size = 17))
-```
-
-<p>&nbsp;</p >
-## Descriptions of approaches
-
-In Exploratory Analyses, we focused on product count, unit price, revenue, and time trend by using pie, doughnut, bar, line, and scatter plots. We mainly analyzed the top 10 favorite bakery products to increase annual sales and profit, hit revenue targets, and gain more clients.
-
-In Statistical Analyses, we will perform several statistical analysis in this bakery including ANOVA to check the mean difference of peak sale months between 2021 and 2022, One-Sample t-test to check the mean price of baguette with average price in the nation, simple linear regression to test the linear relationship between quantity of sale and hours in the day, and finally multiple linear regression. 
-
 
 ## Discussion of results
 <p>&nbsp;</p >
@@ -1174,9 +818,405 @@ Revenue = -1.43 + 1.21 * unit_price + 1.19 * quantity + 0.001 * month
 We might not consider doing MLR for the sake of this research due to the unmet assumptions.
 
 <p>&nbsp;</p >
-## Strengths and Limitations
+## Forecast modeling
+<p>&nbsp;</p >
+We will be testing four forecast models and identify the best model to help us predict the daily sale for this French bakery. 
+
+<p>&nbsp;</p >
+Sales forecast is important because it can be used as a daily production reference and help the bakery to operate smoothly and reduce wasting of resources, 
+which in turn can reduce costs and increase profit.
+
+<p>&nbsp;</p >
+Time series forecasting involves using historical, time-stamped data to make predictions of what might happen in the future.
+
+<p>&nbsp;</p >
+In 2021, how many products were sold each day?
+```{r 2021 daily sales df}
+bakery_df = 
+  read_csv("./Data/Bakery_sales.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    unit_price = str_replace(unit_price, "€", ""),
+    unit_price = str_replace(unit_price, ",", "."),
+    unit_price = as.numeric(unit_price),
+    year = year(date),
+    month = month(date),
+    hour = hour(time),
+    product_name = article) %>% 
+  filter(product_name != ".") %>% 
+  select(-article)
+
+sale_2021 = 
+  bakery_df %>% 
+  filter(year == 2021) %>% 
+  select(date, year, month, hour, product_name, quantity, unit_price) %>% 
+  group_by(date) %>% 
+  summarize(
+    total_sale = sum(quantity))
+
+sale_2021 %>% 
+  head(10) %>% 
+  knitr::kable(digits = 2)
+```
+
+The `sale_2021` dataset shows the number of products sold each day in 2021. In 2021, the bakery opened for business for 339 days. 
+
+The line plot below shows the total number of products sold each day in 2021.
+
+```{r 2021 daily sales line plot, fig.width = 18, fig.height = 8}
+
+sale_2021 %>% 
+  ggplot(aes(x = date, y = total_sale)) +
+  geom_line(aes(color = "Orange")) +
+  scale_x_date(date_labels = "%b %Y", date_breaks  = "1 month") +
+  labs(
+    x = "Date",
+    y = "Number of products sold",
+    title = "Bakery's Daily Sales (2021)") +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"))
+```
+
+We will see this trend again as we verify the accuracy of different forecast models in the next few sections.
+
+<p>&nbsp;</p>
+### Data Pre-processing
+
+We need to create a simple and clean dataframe derived from the original dataset `bakery_df` that can be used by the forecast models. This new dataframe only needs two columns:                          
+* `date` : date order in which the bakery opened for business                                                                                                                                               
+* `total_sale` : sum of products sold 
+
+The `sales_all` dataframe consists of 600 rows, in which the dates begin with *January 2, 2021* and end with *September 30, 2022*. 
+
+```{r simplify df}
+sales_all = 
+  bakery_df %>% 
+  group_by(date) %>% 
+  summarize(
+    total_sale = sum(quantity))
+```
+
+Then, we need to create a `train` and a `test` data frames so that we can test the accuracy of our forecast models. We will be using all data prior to *September 1, 2022* as our `train` dataset 
+to predict the amount of products sold daily for September, 2022. The remaining data from *September 1, 2022* to *September 30, 2022* will be our `test` dataset.
+
+```{r train test df}
+train = 
+  sales_all %>% 
+  filter(date < "2022-09-01")
+
+test = 
+  sales_all %>% 
+  filter(year(date) == 2022 & month(date) == 9)
+```
+
+<p>&nbsp;</p>
+#### Mean Absolute Percentage Error (MAPE)
+
+For model evaluation, we will be relying on the ***Mean Absolute Percentage Error (MAPE)*** to measure the accuracy of our predictions. *MAPE* is a numeric value which ranges between 0 to 1.
+
+The accuracy of the model can be calculated as $(1 - MAPE) * 100%$. For example, an *MAPE* value of 0.7 indicates the model has an accuracy of 30%.
+
+We will report each model's accuracy using inline R code.
+
+<p>&nbsp;</p>
+### Seasonal Naive Model
+
+First, we begin with the most basic forecast model - the **Seasonal Naive Model**.
+
+Naive forecasting is a simple and cost-effective method in which the forecasts produced are equal to the last observed value. The seasonal naive approach is used 
+when the time series exhibits seasonality, in which case, the forecasts are equivalent to the value from the last season. Naive methods are typically used as a 
+benchmark against which more sophisticated forecasting techniques can be compared. 
+
+```{r SNM}
+# Fit the model
+seasonal_naive_model = snaive(train$total_sale, h = length(test$total_sale))
+
+# Compute error of the model
+SNM_error = MAPE(seasonal_naive_model$mean, test$total_sale) * 100
+```
+
+**The accuracy of the *Seasonal Naive* model is `r round(sum(SNM_error = 100 - SNM_error), digits = 2)`%.**
+
+The *Seasonal Naive* model will output a list of mean values, and they are the predicted values of daily sales from September 1, 2022 to September 30, 2022.
+We need to extract the list of mean values from the model and put them into the `test` dataframe so that we can produce a time-series forecast plot.
+
+```{r SNM predict}
+test_seasonal = 
+  test %>% 
+  mutate(
+    pred_sale = seasonal_naive_model$mean)
+```
+
+Finally, we can plot a time-series forecasting graph to show the results of our *Seasonal Naive* model.
+
+```{r plot SNM prediction, fig.width = 18, fig.height = 8}
+train %>% 
+  ggplot(aes(x = date, y = total_sale)) +
+  geom_line(aes(color = "Actual sale (Prior to 2022-09-01)")) +
+  geom_line(data = test_seasonal, aes(x = date, y = total_sale, color = "Actual sale (2022-09-01 to 2022-09-30)")) + 
+  geom_line(data = test_seasonal, aes(x = date, y = pred_sale, color = "Predicted sale (2022-09-01 to 2022-09-30)"), size = 1.5) +
+  scale_x_date(date_labels = "%b %Y", date_breaks  = "2 month") +
+  labs(
+    x = "Date",
+    y = "Number of products sold",
+    title = "Seasonal Naive Forecast of Daily Sales for September (2022)") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))
+```
+
+<p>&nbsp;</p>
+Comments: Although the *Seasonal Naive Model* gives high accuracy, the prediction line is a horizontal straight line, which means this model predicted that 
+the amount of products sold is the same for each day. Therefore, we think that the predictions from this model are not the best.
+
+<p>&nbsp;</p>
+### Double-Seasonal Holt-Winters (DSHW) Model
+
+The **Double-seasonal Holt-Winters** method uses additive trend and multiplicative seasonality, where there are two seasonal components which are multiplied together. 
+The length of the two seasonalities must be multiples of one another (2 and 4, 4 and 12, etc.). In our case, we will specify the length of the first seasonality as 7 and the second as 14.
+
+```{r DSHWM}
+# Fit the model
+double_seasonal_model = dshw(train$total_sale, period1 = 7, period2 = 14, h = length(test$total_sale))
+
+# Compute the model's error
+DSHW_error = MAPE(double_seasonal_model$mean, test$total_sale) * 100
+```
+
+**The accuracy of the *Double-seasonal Holt-Winters* model is `r round(sum(DSHW_error = 100 - DSHW_error), digits = 2)`%.**
+
+The *DSHW* model will output a list of mean values, and they are the predicted values of daily sales from September 1, 2022 to September 30, 2022.
+We need to extract the list of mean values from the model and put them into the `test` dataframe so that we can produce a time-series forecast plot.
+
+```{r DSHW predict}
+test_double_seasonal = 
+  test %>% 
+  mutate(
+    pred_sale = double_seasonal_model$mean)
+```
+
+Finally, we can plot a time-series forecasting graph to see the results of our *DSHW* model.
+
+```{r DSHW prediction plot, fig.width = 18, fig.height = 8}
+train %>%
+  filter(date > "2022-01-01") %>% 
+  ggplot(aes(x = date, y = total_sale)) +
+  geom_line(aes(color = "Actual sale (Prior to 2022-09-01)")) +
+  geom_line(data = test_double_seasonal, aes(x = date, y = total_sale, color = "Actual sale (2022-09-01 to 2022-09-30)")) + 
+  geom_line(data = test_double_seasonal, aes(x = date, y = pred_sale, color = "Predicted sale (2022-09-01 to 2022-09-30")) +
+  scale_x_date(date_labels = "%b %Y", date_breaks  = "2 month") +
+  labs(
+    x = "Date",
+    y = "Number of products sold",
+    title = "Double-Seasonal Holt-Winters Forecast of Daily Sales for September (2022)") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))
+```
+
+<p>&nbsp;</p>
+Comments: Although the *DSHW* model has a worse accuracy than the basic model (*Seasonal Naive*), but visually it is better than the basic model because it shows dynamic trend.
+This would make more sense than the predictions given by the *Seasonal Naive* model as we can see that it is no longer predicting that the daily sales are the same for each day.
+
+<p>&nbsp;</p>
+### TBATS Model
+
+**TBATS** is an acronym derived from the **Trigonometric seasonality, Box-Cox transformation, ARMA errors, Trend, and Seasonal components** of this approach. It takes its roots 
+from exponential smoothing methods and is capable of modeling time series with multiple seasonalities.
+
+```{r tbats model}
+# Train a TBATS model
+TBATS_model = tbats(train$total_sale)
+
+# Generate forecast with the model
+tbats_df = forecast(TBATS_model, h = length(test$total_sale))
+
+# Check the error for the model
+TBATS_error = MAPE(tbats_df$mean, test$total_sale) * 100
+```
+
+**The accuracy of the *TBATS* model is `r round(sum(TBATS_error = 100 - TBATS_error), digits = 2)`%.**
+
+The *TBATS* model will output a list of mean values, and they are the predicted values of daily sales from September 1, 2022 to September 30, 2022.
+We need to extract the list of mean values from the model and put them into the `test` dataframe so that we can produce a time-series forecast plot.
+
+```{r TBATS predict}
+test_tbats = 
+  test %>% 
+  mutate(
+    pred_sale = tbats_df$mean)
+```
+
+```{r TBATS plot, fig.width = 18, fig.height = 8}
+train %>% 
+  filter(date > "2022-01-01") %>% 
+  ggplot(aes(x = date, y = total_sale)) +
+  geom_line(aes(color = "Actual sale (Prior to 2022-09-01)")) +
+  geom_line(data = test_tbats, aes(x = date, y = total_sale, color = "Actual sale (2022-09-01 to 2022-09-30)")) + 
+  geom_line(data = test_tbats, aes(x = date, y = pred_sale, color = "Predicted sale (2022-09-01 to 2022-09-30"), size = 0.8) +
+  scale_x_date(date_labels = "%b %Y", date_breaks  = "2 month") +
+  labs(
+    x = "Date",
+    y = "Number of products sold",
+    title = "TBATS Forecast of Daily Sales for September (2022)") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))
+```
+
+<p>&nbsp;</p>
+Comments: As we can see from the plot, the prediction line (blue) demonstrates dynamic pattern as the *DSHW* model, but the accuracy of the *TBATS* model is slightly better than the *DSHW* model.
+
+<p>&nbsp;</p>
+### Neural Network Model
+
+A neural network is a series of algorithms that identifies patterns and relationships in data, similar to the way the brain operates. 
+
+The `forecast` library comes with the option of a feed-forward neural network with a single hidden layer and lagged inputs for univariate time series forecasting.
+
+```{r neural network model}
+# Train a neural network model
+nn_model = nnetar(train$total_sale)
+
+# Generate forecast with the model
+nn_forecast_df = forecast(nn_model, h = length(test$total_sale))
+
+# Check the MAPE
+NN_error = MAPE(nn_forecast_df$mean, test$total_sale) * 100
+```
+
+**The accuracy of the *Neural Network* model is `r round(sum(NN_error = 100 - NN_error), digits = 2)`%.**
+
+The *Neural Network* model will output a list of mean values, and they are the predicted values of daily sales from September 1, 2022 to September 30, 2022.
+We need to extract the list of mean values from the model and put them into the `test` dataframe so that we can produce a time-series forecast plot.
+
+```{r NN prediction}
+test_nn = 
+  test %>% 
+  mutate(
+    pred_sale = nn_forecast_df$mean)
+```
+
+```{r NN plot, fig.width = 18, fig.height = 8}
+train %>% 
+# To show the prediction line more clearly, we are only showing the trends of daily sales after May 1, 2022.
+  filter(date > "2022-05-01") %>% 
+  ggplot(aes(x = date, y = total_sale)) +
+  geom_line(aes(color = "Actual sale (Prior to 2022-09-01)")) +
+  geom_line(data = test_nn, aes(x = date, y = total_sale, color = "Actual sale (2022-09-01 to 2022-09-30)"), alpha = 0.8) + 
+  geom_line(data = test_nn, aes(x = date, y = pred_sale, color = "Predicted sale (2022-09-01 to 2022-09-30)"), size = 0.7, alpha = 0.8) +
+  scale_x_date(date_labels = "%b %Y", date_breaks  = "1 month") +
+  labs(
+    x = "Date",
+    y = "Number of products sold",
+    title = "Neural Network Forecast of Daily Sales for September (2022)") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))
+```
+
+<p>&nbsp;</p>
+Comments: As shown in the plot, the predicted trendline (blue) looks similar to the actual trendline (red) and highly overlaps it. Although the prediction accuracy is not 100%,
+but this <mark >**Neural Network**</mark> model gives us the highest accuracy among all forecast models that has been tested.
+
+<p>&nbsp;</p>
+### Sales Forecast for Oct - Dec 2022
+
+As we have identified that the <mark >**Neural Network**</mark>  model gives us the **highest accuracy** (`r round(sum(NN_error = 100 - NN_error), digits = 2)`%), we will use this model to predict the future daily sales 
+from October to December in 2022.
+
+This time, we will use all the data from January 1, 2021 to September 30, 2022 to fit into the *Neural Network* forecasting model to predict the daily sales of October - December in 2022.
+
+```{r future prediction}
+# Train the model
+nn_future = nnetar(sales_all$total_sale)
+
+# Generate the forecast
+nn_future_df = forecast(nn_future, h = 92)
+```
+
+Since predicted values given by the model do not comes with dates, we need to create a dataframe with specific range of date to combine with the predicted values.
+
+```{r date df}
+dates = seq(as.Date('2022-10-01'), as.Date('2022-12-31'), by = 'days')
+
+date_df =
+  tibble(
+    A = letters[sample(1:26, 92, TRUE)])
+
+date_df = 
+  tibble(
+    date = rep(dates, length.out = nrow(date_df)))
+
+date_df =
+  date_df %>% 
+  mutate(
+    pred_sale = nn_future_df$mean)
+```
+
+Then, we can plot a graph to show the predicted daily sales of the bakery from October to December in 2022. 
+
+```{r predicted future sales, fig.width = 18, fig.height = 8}
+date_df %>% 
+  ggplot(aes(x = date)) +
+  geom_line(aes(y = pred_sale, color = "Red")) +
+  scale_x_date(date_labels = "%b %d", date_breaks  = "10 day") +
+  labs(
+    x = "Date (Month Day)",
+    y = "Number of products sold each day",
+    title = "Predicted Daily Sales from October to December (2022)") +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))
+```
+
+
+<p>&nbsp;</p >
+## Limitations
+* The data of sale counts and unit price is not normally distributed, which might slightly violate the assumption of tests. However, since the size of the data set is large enough, we assume normal distribution by Central Limit Theorem. 
+* In multiple linear regression, the assumption of homoscedasticity is violated, we are not able to conduct MLR. 
+* In the pie chart and donut plots, due to the large variety of products (>100), we limit out analyses to top 10 products. 
+* In the dataset, two products called `DIVERS PATTISSERIE` and `DIVERS SANDWICHS` have various unit prices (0 < unit price < 70). There are limitations to plot these products. 
+* We found this French Bakery only opens six days a week. Due to this gap, the accuracy of forecast model is impacted, because forecast model fail to take into consideration of those days that are not open for business. 
 <p>&nbsp;</p >
 
-## Finding, Summary, and Expectation
+
+## Recomendations
+* Since summer had higher sales than winter, we would recommend this French bakery to develop new products to attract more potential clients during summer, and reduce customer churn rate by offering promotions of the most popular bread during winter. 
+* Since traditional baguette is the best seller, we would recommend to keep the quality of this product to maintain the loyal customers. In short term, according to our t-test, the unit price of traditional baguette is higher than the average price of traditional baguette in France, we do not recommend raising prices of traditional baguette. 
+
 <p>&nbsp;</p >
+
+
+
+
 

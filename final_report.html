@@ -36,6 +36,13 @@
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -385,8 +392,6 @@ div.tocify {
 <pre class="r"><code>knitr::opts_chunk$set(
   message = FALSE, 
   warning = FALSE,
-  fig.width = 18,
-  fig.height = 8,
   out.width = &quot;90%&quot;,
   set.seed(8))
 
@@ -398,10 +403,13 @@ library(lubridate)
 library(plotly)
 library(mgcv)
 library(moments)
-library(modelr)</code></pre>
-<div id="project-title" class="section level2">
-<h2>Project title</h2>
-A French Bakery’s Daily Sales in 2021-2022
+library(modelr)
+library(patchwork)
+library(ggpubr)
+library(ggplot2)</code></pre>
+<div id="a-french-bakerys-daily-sales-in-2021-2022"
+class="section level2">
+<h2>A French Bakery’s Daily Sales in 2021-2022</h2>
 <p>
  
 </p >
@@ -413,6 +421,11 @@ href="https://www.kaggle.com/datasets/matthieugimbert/french-bakery-daily-sales"
 <a
 href="https://www.france-hotel-guide.com/en/blog/cost-baguette-paris/">price
 comparison</a>
+<p>
+ 
+</p >
+Package used: tidyverse, forecast, astsa, MLmetrics, lubridate, plotly,
+mgcv, moments, modelr, patchwork, ggpubr, ggplot2
 <p>
  
 </p >
@@ -446,6 +459,24 @@ the missing data via <code>filter()</code> and <code>article</code> via
 <p>
  
 </p >
+<pre class="r"><code># Load and clean dataset:
+
+bakery_df = 
+  read_csv(&quot;./Data/Bakery_sales.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(
+    unit_price = str_replace(unit_price, &quot;€&quot;, &quot;&quot;),
+    unit_price = str_replace(unit_price, &quot;,&quot;, &quot;.&quot;),
+    unit_price = as.numeric(unit_price),
+    year = year(date),
+    month = month(date),
+    hour = hour(time),
+    product_name = article) %&gt;% 
+  filter(product_name != &quot;.&quot;) %&gt;% 
+  select(-article)</code></pre>
+<p>
+ 
+</p >
 </div>
 <div id="motivation" class="section level2">
 <h2>Motivation</h2>
@@ -471,21 +502,501 @@ how is the sale distributed and so much more…
 </div>
 <div id="related-work" class="section level2">
 <h2>Related work</h2>
+<p>We went to Paris Baguette and wanted to buy a French Baguette.
+However, we surprisingly found that the price exceeded our expectations
+($3.29 + TAX). Since baguette is a traditional French bread, we are
+curious about the market of baguette in France.</p>
+<center>
+<img src="images/baguette_price" style="width:70%">
+<center>
+As economics smoothly recover after the COVID-19 outbreak worldwide,
+competing forces of different retail stores grow as people return back
+to their normal lives. Since the demand of customers becomes volatile,
+we would like to use data analysis to help this French bakery identify
+the KPIs, boost the revenue, and expand the size of the bakery.
+Specifically, we would like to help the store owner to break down the
+specifics of how to accomplish their goals by analyzing factors
+influencing revenues via statistical models and hypotheses, predicting
+future sales via time-series forecast analyses, and looking at the top
+10 popular bread out of all products.
 <p>
  
 </p >
 </div>
 <div id="initial-questions" class="section level2">
 <h2>Initial questions</h2>
+<ul>
+<li>What products are most popular in a French bakery?</li>
+<li>How does this French bakery market perform year by year?</li>
+<li>Is there any difference in the mean price of baguette in this French
+bakery comparing to the average price in France?</li>
+<li>Since our data ends at 2022-09-30, how would the sales trend look
+like for the remaining of 2022?</li>
+<li>Which month in a year/time in a day has the highest sales?
 <p>
  
-</p >
+</p ></li>
+</ul>
 </div>
 <div id="exploratory-analyses" class="section level2">
 <h2>Exploratory analyses</h2>
 <p>
  
 </p >
+<div id="hr-time-trends" class="section level3">
+<h3>24hr Time trends</h3>
+<pre class="r"><code>bakery_df = 
+  bakery_df %&gt;% 
+  mutate(
+    Hour = hour(time),
+    Month = month(date))
+
+bakery_df %&gt;% 
+  group_by(Hour) %&gt;% 
+  count() %&gt;% 
+  ggplot(aes(x = Hour, y = n)) +
+  geom_point() +
+  geom_line() +
+  geom_text(aes(label=n), vjust = 0, nudge_y = 0.2) +
+  scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
+  scale_y_continuous(limit = c(0,50000)) +
+  labs(title = &quot;Peak hours&quot;,
+       x = &quot;Hour (24-hour format)&quot;,
+       y = &quot;Total number of transactions&quot;)</code></pre>
+<p><img src="final_report_files/figure-html/unnamed-chunk-1-1.png" width="90%" /></p>
+<p>The line plot shows the bakery is open at 7 AM and closed at 20 PM.
+The total number of transactions increase dramatically once the bakery
+is open from 7 AM to 11 AM and from 15 PM to 17 PM. It reaches peak at
+11 AM (47116). In addition, the total number of transactions starts
+decreasing steeply from 11 AM to 15 PM and from 17 PM to 20 PM.
+Therefore, there are two rush hours as we expected, since people usually
+eat breads as breakfast, brunch, and afternoon tea dessert.</p>
+<p>
+ 
+</p >
+</div>
+<div id="top-10-favorite-bakery-products" class="section level3">
+<h3>Top 10 favorite bakery products</h3>
+<pre class="r"><code>plot_pie =
+  bakery_df %&gt;% 
+  group_by(product_name) %&gt;% 
+  summarize(n_obs = n()) %&gt;% 
+  arrange(desc(n_obs)) %&gt;% 
+  head(10) %&gt;% 
+  plot_ly(labels = ~product_name, values = ~n_obs, type = &#39;pie&#39;, colors = &quot;viridis&quot;) %&gt;% 
+  layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+plot_pie</code></pre>
+<div id="htmlwidget-5f33b6e14e0b76a9e6fd" style="width:90%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5f33b6e14e0b76a9e6fd">{"x":{"visdat":{"8f8b5079c673":["function () ","plotlyVisDat"]},"cur_data":"8f8b5079c673","attrs":{"8f8b5079c673":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>The pie chart shows the total of sale counts of top 10 favorite
+bakery products from 2021-01-01 to 2022-09-30. As the plot shows that
+the <code>TRADITIONAL BAGUETTE</code> (67,689; 42.5%) is the most
+favorite bakery product. The rest ranking from top 2 to top 10 favorite
+bakeries are <code>COUPE</code> (20,470; 12.90%), <code>BAGUETTE</code>
+(15,292; 9.61%) <code>BANETTE</code> (15,130; 9.51%),
+<code>CROISSANT</code> (11,508; 7.23%), <code>PAIN AU CHOCOLAT</code>
+(10,578; 6.65%), <code>SPECIAL BREAD</code> (5195; 3.26%),
+<code>CEREAL BAGUETTE</code> (4961; 3.12%),
+<code>FORMULE SANDWITCH</code> (4202; 2.64%), and
+<code>BOULE 400G</code> (4099; 2.58%), respectively.</p>
+<p>
+ 
+</p >
+</div>
+<div id="top-10-favorite-bakery-products-in-20212022"
+class="section level3">
+<h3>Top 10 favorite bakery products in 2021/2022</h3>
+<pre class="r"><code>plot_pie =
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) 
+  
+plot_pie_2021 = 
+  plot_pie %&gt;% 
+  filter(year == 2021) %&gt;%
+  group_by(product_name) %&gt;% 
+  summarize(n_obs = n()) %&gt;% 
+  arrange(desc(n_obs)) %&gt;% 
+  head(10) %&gt;% 
+  plot_ly(labels = ~product_name, values = ~n_obs) %&gt;% 
+  add_pie(hole = 0.6) %&gt;% 
+  layout(title = &#39;Top 10 favorite bakery products in 2021&#39;,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+plot_pie_2022 = 
+  plot_pie %&gt;% 
+  filter(year == 2022) %&gt;%
+  group_by(product_name) %&gt;% 
+  summarize(n_obs = n()) %&gt;% 
+  arrange(desc(n_obs)) %&gt;% 
+  head(10) %&gt;% 
+  plot_ly(labels = ~product_name, values = ~n_obs) %&gt;% 
+  add_pie(hole = 0.6) %&gt;% 
+  layout(title = &#39;Top 10 favorite bakery products in 2022&#39;,
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+plot_pie_2021</code></pre>
+<div id="htmlwidget-00dcb182628555b3ca67" style="width:90%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-00dcb182628555b3ca67">{"x":{"visdat":{"8f8b7851c9b7":["function () ","plotlyVisDat"]},"cur_data":"8f8b7851c9b7","attrs":{"8f8b7851c9b7":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favorite bakery products in 2021","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","CEREAL BAGUETTE","SPECIAL BREAD","CAMPAGNE","BOULE 400G"],"values":[37399,11759,8713,8575,6291,5739,3070,2936,2289,2283],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>plot_pie_2022</code></pre>
+<div id="htmlwidget-436d6808cb3d06a7123e" style="width:90%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-436d6808cb3d06a7123e">{"x":{"visdat":{"8f8b41924b17":["function () ","plotlyVisDat"]},"cur_data":"8f8b41924b17","attrs":{"8f8b41924b17":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favorite bakery products in 2022","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","FORMULE SANDWICH","CEREAL BAGUETTE","BOULE 400G"],"values":[30290,8711,6579,6555,5217,4839,2259,1976,1891,1816],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>The first doughnut chart shows the total of sale counts of top 10
+favorite bakery products from 2021-01-01 to 2021-12-31. As the plot
+shows that the <code>TRADITIONAL BAGUETTE</code> (37,399; 42%) is the
+most favorite bakery . The rest ranking from top 2 to top 10 favorite
+bakeries are <code>COUPE</code> (11,759; 13.2%), <code>BAGUETTE</code>
+(8713; 9.78%) <code>BANETTE</code> (8575; 9.63%), <code>CROISSANT</code>
+(6291; 7.06%), <code>PAIN AU CHOCOLAT</code> (5739; 6.44%),
+<code>CEREAL BAGUETTE</code> (3070; 3.45%), <code>SPECIAL BREAD</code>
+(2936; 3.3%), <code>CAMPAGNE</code> (2289; 2.57%), and
+<code>BOULE 400G</code> (2283; 2.56%), respectively.</p>
+<p>The second doughnut chart shows the total of sale counts of top 10
+favorite bakery products from 2022-01-01 to 2022-09-30. As the plot
+shows that the <code>TRADITIONAL BAGUETTE</code> (30,290; 43.2%) is the
+most favorite bakery . The rest ranking from top 2 to top 10 favorite
+bakeries are <code>COUPE</code> (8711; 12.4%), <code>BAGUETTE</code>
+(6579; 9.38%) <code>BANETTE</code> (6555; 9.35%), <code>CROISSANT</code>
+(5217; 7.44%), <code>PAIN AU CHOCOLAT</code> (4839; 6.9%),
+<code>SPECIAL BREAD</code> (2259; 3.22%), <code>FORMULE SANDWITCH</code>
+(1976; 2.82%), <code>CEREAL BAGUETTE</code> (1891; 2.7%), and
+<code>BOULE 400G</code> (1816; 2.59%), respectively.</p>
+<p>Compared donut charts of 2021 and 2022, the ranking of top 1-6
+favorite bakeries does not change. <code>CAMPAGNE</code> dropped out of
+the top 10 list, and <code>FORMULE SANDWITCH</code> was added the top 10
+favorite bakery products in 2022. Top 7-9 moved slightly from 2021 to
+2022. Top 10 <code>BOULE 400G</code> stayed in the same position.</p>
+<p>
+ 
+</p >
+</div>
+<div id="top-10-favorite-bread-monthly-sale-counts-in-2021"
+class="section level3">
+<h3>Top 10 favorite bread monthly sale counts in 2021</h3>
+<pre class="r"><code>top_line =
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) %&gt;%
+  filter(year == 2021) %&gt;% 
+  select (year, month, product_name, quantity) %&gt;% 
+  group_by (year, month, product_name) %&gt;% 
+  mutate (total_counts = sum (quantity)) %&gt;% 
+  distinct(year, month, product_name,total_counts) 
+
+top_line1_2021 =
+  top_line %&gt;% 
+  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;)) %&gt;% 
+  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
+    geom_line() +
+    theme(axis.text.x = element_text(angle=90,hjust = 1), legend.position = &quot;none&quot;) +
+    labs(x = &quot;month&quot;,
+         y = &quot;counts of TRADITIONAL BAGUETTE&quot;,
+         title = &quot;Top 1&quot;) +
+    scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
+
+top_line2_2021 =
+  top_line %&gt;% 
+    filter(product_name %in% c(&quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;CEREAL BAGUETTE&quot;, &quot;SPECIAL BREAD&quot;, &quot;CAMPAGNE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
+    geom_line() +
+    theme(axis.text.x = element_text(angle=90,hjust = 1), legend.position = &quot;none&quot;, legend.title = element_text(size=7), legend.text = element_text(size=7)) + 
+    labs(x = &quot;month&quot;,
+         y = &quot;counts of bread&quot;,
+         title = &quot;Top 2-10&quot;) +
+    scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;))
+
+ggarrange(top_line2_2021, top_line1_2021, ncol=2, nrow=1, common.legend = TRUE, legend=&quot;bottom&quot;)</code></pre>
+<p><img src="final_report_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
+<p>In general, monthly sale counts in 2021 increased dramatically from
+June to August.</p>
+<p>For <code>TRADITIONAL BAGUETTE</code> (line plot on the right), total
+monthly sale counts in 2021 peaked at August (&gt;11,250). However,
+total monthly sale counts decreased from May to June, August to
+September, and October to December in 2021.</p>
+<p>For line plot on the left, total monthly sale counts in 2021 are less
+than 3,000 but greater than 500 in every month for top 2-6
+(<code>COUPE</code>, <code>BAGUETTE</code>, <code>BANETTE</code>,
+<code>CROISSANT</code>, <code>PAIN AU CHOCOLAT</code>). For top 7-10
+(<code>CEREAL BAGUETTE</code>, <code>SPECIAL BREAD</code>,
+<code>CAMPAGNE</code>, and <code>BOULE 400G</code>), total monthly sale
+counts in 2021 are less than 1,000.</p>
+<p>
+ 
+</p >
+</div>
+<div id="top-10-favorite-bread-monthly-sale-counts-in-2022"
+class="section level3">
+<h3>Top 10 favorite bread monthly sale counts in 2022</h3>
+<pre class="r"><code>top_line =
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) %&gt;%
+  filter(year == 2022) %&gt;% 
+  select (year, month, product_name, quantity) %&gt;% 
+  group_by (year, month, product_name) %&gt;% 
+  mutate (total_counts = sum (quantity)) %&gt;% 
+  distinct(year, month, product_name,total_counts) 
+
+top_line1_2022 =
+  top_line %&gt;% 
+  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;)) %&gt;% 
+  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
+    geom_line() +
+    theme(legend.position = &quot;none&quot;, axis.text.x = element_text(angle=90,hjust = 1)) + 
+    labs(x = &quot;month&quot;,
+         y = &quot;counts of TRADITIONAL BAGUETTE&quot;,
+         title = &quot;Top 1&quot;) +
+    scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
+
+top_line2_2022 =
+  top_line %&gt;% 
+    filter(product_name %in% c(&quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;SPECIAL BREAD&quot;, &quot;FORMULE SANDWICH&quot;,&quot;CEREAL BAGUETTE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  ggplot(aes(x =month, y = total_counts, color = product_name)) + 
+    geom_line() +
+    theme(axis.text.x = element_text(angle=90,hjust = 1), legend.position = &quot;none&quot;, legend.title = element_text(size=7), legend.text = element_text(size=7)) + 
+    labs(x = &quot;month&quot;,
+         y = &quot;counts of bread&quot;,
+         title = &quot;Top 2-10&quot;) +
+    scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
+ 
+ggarrange(top_line2_2022, top_line1_2022, ncol=2, nrow=1, common.legend = TRUE, legend=&quot;bottom&quot;)</code></pre>
+<p><img src="final_report_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
+<p>In general, monthly sale counts in 2022 show similar trend as in
+2021, but monthly sale counts end at 2022-09-30 due to limited data.</p>
+<p>For <code>TRADITIONAL BAGUETTE</code> (line plot on the right), total
+monthly sale counts in 2022 peaked at August (&gt;12,500). However,
+total monthly sale counts decreased from May to June and August to
+September in 2022. Compared to 2021 (&gt;11,250), total monthly sale
+counts of <code>TRADITIONAL BAGUETTE</code> is higher in 2022
+(&gt;12,500).</p>
+<p>For line plot on the left, total monthly sale counts in 2022 are less
+than 3,500 but greater than 500 in every month for top 2-6
+(<code>COUPE</code>, <code>BAGUETTE</code>, <code>BANETTE</code>,
+<code>CROISSANT</code>, <code>PAIN AU CHOCOLAT</code>). For top 7-10
+(<code>SPECIAL BREAD</code>, <code>FORMULE SANDWICH</code>,
+<code>CEREAL BAGUETTE</code>, and <code>BOULE 400G</code>), total
+monthly sale counts in 2022 are less than 600.</p>
+<p>
+ 
+</p >
+</div>
+<div id="ranking-of-mean-prices-of-top-10-products-in-2021"
+class="section level3">
+<h3>Ranking of mean prices of top 10 products in 2021</h3>
+<pre class="r"><code>mean_price_2021 =
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day)) %&gt;%
+  filter(year == 2021) %&gt;% 
+  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;CEREAL BAGUETTE&quot;, &quot;SPECIAL BREAD&quot;, &quot;CAMPAGNE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  group_by(product_name) %&gt;% 
+  summarize(mean_price = mean(unit_price)) %&gt;% 
+  arrange(desc(mean_price)) %&gt;% 
+  mutate(product_name = forcats::fct_relevel(product_name, c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;CEREAL BAGUETTE&quot;, &quot;SPECIAL BREAD&quot;, &quot;CAMPAGNE&quot;, &quot;BOULE 400G&quot;))) %&gt;% 
+  ggplot(aes(x =product_name, y = mean_price, color = product_name)) + 
+      geom_point() +
+      geom_text(aes(label=mean_price), vjust = 0, nudge_y = 0.1) +
+      ylim(0,3) +
+    theme(axis.text.x = element_text(angle=60,hjust = 1), legend.position = &quot;none&quot;) + 
+    labs(x = &quot;name of products&quot;,
+         y = &quot;mean prices in euro&quot;) 
+  
+mean_price_2021 </code></pre>
+<p><img src="final_report_files/figure-html/unnamed-chunk-6-1.png" width="90%" /></p>
+<p>The scatter plot shows the ranking of mean prices of top 10 favorite
+bakery products in 2021, with most popularity to least popularity
+(top1-10) from the left to the right on x-axis.</p>
+<p><code>SPECIAL BREAD</code> has the highest mean price (2.4 €) while
+<code>COUPE</code> has the lowest mean price (0.15 €). The mean prices
+of <code>TRADITIONAL BAGUETTE</code> and <code>PAIN AU CHOCOLAT</code>
+are the same (1.2 €).</p>
+<p>
+ 
+</p >
+</div>
+<div id="ranking-of-mean-prices-of-top-10-products-in-2022"
+class="section level3">
+<h3>Ranking of mean prices of top 10 products in 2022</h3>
+<pre class="r"><code>mean_price_2022 =
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day)) %&gt;%
+  filter(year == 2022) %&gt;% 
+  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;SPECIAL BREAD&quot;, &quot;FORMULE SANDWICH&quot;,&quot;CEREAL BAGUETTE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  group_by(product_name) %&gt;% 
+  summarize(mean_price = mean(unit_price)) %&gt;%
+  mutate(across(where(is.numeric), ~ round(., digits = 2))) %&gt;% 
+  arrange(desc(mean_price)) %&gt;% 
+  mutate(product_name = forcats::fct_relevel(product_name, c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;SPECIAL BREAD&quot;, &quot;FORMULE SANDWICH&quot;,&quot;CEREAL BAGUETTE&quot;, &quot;BOULE 400G&quot;))) %&gt;% 
+  ggplot(aes(x =product_name, y = mean_price, color = product_name)) + 
+      geom_point() +
+      geom_text(aes(label=mean_price), vjust = 0, nudge_y = 0.2) +
+      ylim(0,7.5) +
+    theme(axis.text.x = element_text(angle=60,hjust = 1), legend.position = &quot;none&quot;) + 
+    labs(x = &quot;name of products&quot;,
+         y = &quot;mean prices in euro&quot;) 
+  
+mean_price_2022 </code></pre>
+<p><img src="final_report_files/figure-html/unnamed-chunk-7-1.png" width="90%" /></p>
+<p>The scatter plot shows the ranking of mean prices of top 10 favorite
+bakery products in 2022, with most popularity to least popularity
+(top1-10) from the left to the right on x-axis. In general, the mean
+price of <code>COUPE</code> stayed the same from 2021 to 2022, but mean
+prices of other breads increased slightly.</p>
+<p><code>FORMULE SANDWICH</code> has the highest mean price (6.94 €)
+while <code>COUPE</code> has the lowest mean price (0.15 €). The mean
+prices of <code>TRADITIONAL BAGUETTE</code> and
+<code>PAIN AU CHOCOLAT</code> are the same (1.27 €)., but both increased
+from 1.2 € to 1.27 € when compared to the scatter plot in 2021.</p>
+<p>
+ 
+</p >
+</div>
+<div id="ranking-of-total-revenue-of-top-10-products-in-2021-and-2022"
+class="section level3">
+<h3>Ranking of total revenue of top 10 products in 2021 and 2022</h3>
+<pre class="r"><code>total_rev_bar=
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day)) %&gt;%
+  group_by(year, product_name) %&gt;% 
+  mutate(rev = quantity * unit_price) %&gt;% 
+  summarize(prod_rev = sum(rev)) %&gt;% 
+  arrange(desc(prod_rev)) 
+  
+total_rev_bar_2021=
+  total_rev_bar %&gt;% 
+  filter(year == 2021) %&gt;% 
+  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;CEREAL BAGUETTE&quot;, &quot;SPECIAL BREAD&quot;, &quot;CAMPAGNE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  mutate(product_name = fct_reorder(product_name, prod_rev)) %&gt;% 
+  mutate(across(where(is.numeric), ~ round(., digits = 2))) %&gt;% 
+  ggplot(aes(x =product_name, y= prod_rev, fill=product_name)) + 
+    geom_bar(stat=&quot;identity&quot;, width=0.5) +
+    geom_text(aes(label=prod_rev), vjust = 0, nudge_y = 100, size=3) +
+    ylim(0,80000) +
+    labs(x = &quot;name of products&quot;,
+         y = &quot;total revenue in euro&quot;,
+         title = &quot;ranking in 2021&quot;) +
+  theme(axis.text.x = element_text(angle = 15, hjust = 1), legend.position = &quot;none&quot;)
+  
+total_rev_bar_2022=
+  total_rev_bar %&gt;% 
+  filter(year == 2022) %&gt;% 
+  filter(product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;SPECIAL BREAD&quot;, &quot;FORMULE SANDWICH&quot;,&quot;CEREAL BAGUETTE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  mutate(product_name = fct_reorder(product_name, prod_rev)) %&gt;%
+  mutate(across(where(is.numeric), ~ round(., digits = 2))) %&gt;% 
+  ggplot(aes(x =product_name, y= prod_rev, fill=product_name)) + 
+    geom_bar(stat=&quot;identity&quot;, width=0.5) +
+    geom_text(aes(label=prod_rev), vjust = 0, nudge_y = 100, size=3) +
+    ylim(0,80000) +
+    labs(x = &quot;name of products&quot;,
+         y = &quot;total revenue in euro&quot;,
+         title = &quot;ranking in 2022&quot;) +
+  theme(axis.text.x = element_text(angle = 15, hjust = 1), legend.position = &quot;none&quot;)
+ 
+ggarrange(total_rev_bar_2021, total_rev_bar_2022,  heights = c(5, 5),
+          ncol = 1, nrow = 2)</code></pre>
+<p><img src="final_report_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
+<p>The bar chart shows the ranking of total revenue of top 10 products
+in 2021 and 2022. The total revenues of
+<code>TRADITIONAL BAGUETTE</code> are the highest (78742.8 € in 2021;
+66013.25 € in 2022) while the total revenues of <code>COUPE</code> are
+the lowest (2049.9 € in 2021; 1475.85 € in 2022) in the two years
+respectively. The total revenues of <code>TRADITIONAL BAGUETTE</code> is
+approximately 38 times the total revenues of <code>COUPE</code> in 2021
+and 45 times of that in 2022.</p>
+<p>
+ 
+</p >
+</div>
+<div id="distribution-of-monthly-revenue-in-2021-and-2022"
+class="section level3">
+<h3>Distribution of monthly revenue in 2021 and 2022</h3>
+<pre class="r"><code>dis_rev_bar=
+  bakery_df %&gt;% 
+  separate(date, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;% 
+  mutate(year = as.numeric(year),
+         month = as.integer(month),
+         day = as.integer(day),) 
+
+dis_rev_bar_2021=
+  dis_rev_bar %&gt;%
+    filter(year == 2021,
+         product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;CEREAL BAGUETTE&quot;, &quot;SPECIAL BREAD&quot;, &quot;CAMPAGNE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  group_by(year, month, product_name) %&gt;% 
+  mutate(rev = quantity * unit_price) %&gt;% 
+  summarize(prod_dis_rev = sum(rev)) %&gt;% 
+  arrange(desc(prod_dis_rev)) %&gt;% 
+   mutate(product_name = fct_reorder(product_name, prod_dis_rev)) %&gt;% 
+    ggplot(aes(x =month, y= prod_dis_rev, fill=product_name)) + 
+    scale_fill_viridis_d()+
+    geom_bar(stat=&quot;identity&quot;, position=&quot;stack&quot;) +
+    labs(x = &quot;month&quot;,
+         y = &quot;total revenue in euro&quot;,
+         title = &quot;Distribution of monthly revenue in 2021&quot;) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = &quot;right&quot;, legend.title = element_text(size=7), legend.text = element_text(size=7), legend.key.size = unit(0.2, &#39;cm&#39;)) +
+  scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
+
+dis_rev_bar_2022=
+  dis_rev_bar %&gt;%
+    filter(year == 2022,
+         product_name %in% c(&quot;TRADITIONAL BAGUETTE&quot;, &quot;COUPE&quot;, &quot;BAGUETTE&quot;,&quot;BANETTE&quot;, &quot;CROISSANT&quot;, &quot;PAIN AU CHOCOLAT&quot;, &quot;SPECIAL BREAD&quot;, &quot;FORMULE SANDWICH&quot;,&quot;CEREAL BAGUETTE&quot;, &quot;BOULE 400G&quot;)) %&gt;% 
+  group_by(year, month, product_name) %&gt;% 
+  mutate(rev = quantity * unit_price) %&gt;% 
+  summarize(prod_dis_rev = sum(rev)) %&gt;% 
+  arrange(desc(prod_dis_rev)) %&gt;% 
+   mutate(product_name = fct_reorder(product_name, prod_dis_rev)) %&gt;% 
+    ggplot(aes(x =month, y= prod_dis_rev, fill=product_name)) + 
+    scale_fill_viridis_d()+
+    geom_bar(stat=&quot;identity&quot;, position=&quot;stack&quot;) +
+    labs(x = &quot;month&quot;,
+         y = &quot;total revenue in euro&quot;,
+         title = &quot;Distribution of monthly revenue in 2022&quot;) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = &quot;right&quot;,legend.title = element_text(size=7), legend.text = element_text(size=7), legend.key.size = unit(0.2, &#39;cm&#39;)) +
+  scale_x_continuous(
+    breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+    labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
+
+ggarrange(dis_rev_bar_2021, dis_rev_bar_2022,  heights = c(5, 5),
+          ncol = 1, nrow = 2)</code></pre>
+<p><img src="final_report_files/figure-html/unnamed-chunk-9-1.png" width="90%" /></p>
+The bar plots show distributions of monthly revenue in 2021 and 2022.
+<code>TRADITIONAL BAGUETTE</code> has the largest proportion of monthly
+revenues (around 50%) in 2021 and 2022. Moreover, the revenue trend from
+Jan to Dec is similar in 2021 and 2022. Since the bakery sold more
+products in summer than winter, and reached peak in August, we could
+expect higher revenue in summer than winter, and the highest revenue in
+August.
+<p>
+ 
+</p >
+</div>
 </div>
 <div id="forecast-modeling" class="section level2">
 <h2>Forecast modeling</h2>
@@ -509,25 +1020,6 @@ to make predictions of what might happen in the future.</p>
 <p>
  
 </p >
-</div>
-<div id="summary-of-packages" class="section level2">
-<h2>Summary of packages</h2>
-<p>tidyverse, forecast, astsa, MLmetrics, lubridate</p>
-<pre class="r"><code># Load and clean dataset:
-
-bakery_df = 
-  read_csv(&quot;./Data/Bakery_sales.csv&quot;) %&gt;% 
-  janitor::clean_names() %&gt;% 
-  mutate(
-    unit_price = str_replace(unit_price, &quot;€&quot;, &quot;&quot;),
-    unit_price = str_replace(unit_price, &quot;,&quot;, &quot;.&quot;),
-    unit_price = as.numeric(unit_price),
-    year = year(date),
-    month = month(date),
-    hour = hour(time),
-    product_name = article) %&gt;% 
-  filter(product_name != &quot;.&quot;) %&gt;% 
-  select(-article)</code></pre>
 <p>In 2021, how many products were sold each day?</p>
 <pre class="r"><code>sale_2021 = 
   bakery_df %&gt;% 
@@ -956,12 +1448,17 @@ bakery from October to December in 2022.</p>
 </div>
 <div id="descriptions-of-approaches" class="section level2">
 <h2>Descriptions of approaches</h2>
-<p>We will perform several statistical analysis in this bakery including
-ANOVA to check the mean difference of peak sale months between 2021 and
-2022, One-Sample t-test to check the mean price of baguette with average
-price in the nation, simple linear regression to test the linear
-relationship between quantity of sale and hours in the day, and finally
-multiple linear regression.</p>
+<p>In Exploratory Analyses, we focused on product count, unit price,
+revenue, and time trend by using pie, doughnut, bar, line, and scatter
+plots. We mainly analyzed the top 10 favorite bakery products to
+increase annual sales and profit, hit revenue targets, and gain more
+clients.</p>
+<p>In Statistical Analyses, we will perform several statistical analysis
+in this bakery including ANOVA to check the mean difference of peak sale
+months between 2021 and 2022, One-Sample t-test to check the mean price
+of baguette with average price in the nation, simple linear regression
+to test the linear relationship between quantity of sale and hours in
+the day, and finally multiple linear regression.</p>
 </div>
 <div id="discussion-of-results" class="section level2">
 <h2>Discussion of results</h2>
@@ -1101,7 +1598,7 @@ limit theorem.</p>
     axis.text = element_text(size = 12),
     axis.title = element_text(size = 14, face = &quot;bold&quot;),
     plot.title = element_text(hjust = 0.4, face = &quot;bold&quot;))</code></pre>
-<p><img src="final_report_files/figure-html/unnamed-chunk-2-1.png" width="90%" /></p>
+<p><img src="final_report_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
 <pre class="r"><code>baguette_onet = 
   bakery_df %&gt;% 
   filter(product_name == &quot;BAGUETTE&quot;) %&gt;%
@@ -1283,7 +1780,7 @@ bakery_df %&gt;%
     axis.text = element_text(size = 12),
     axis.title = element_text(size = 14, face = &quot;bold&quot;),
     plot.title = element_text(hjust = 0.4, face = &quot;bold&quot;))</code></pre>
-<p><img src="final_report_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
+<p><img src="final_report_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
 <p>From the graph above, it seems like there is a linear trend from 7 AM
 to 11 AM. Hence, we should take a look at the morning hours with a
 monotonic function from 7 AM to 11 AM.</p>
@@ -1306,7 +1803,7 @@ monotonic function from 7 AM to 11 AM.</p>
     axis.text = element_text(size = 12),
     axis.title = element_text(size = 14, face = &quot;bold&quot;),
     plot.title = element_text(hjust = 0.4, face = &quot;bold&quot;))</code></pre>
-<p><img src="final_report_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
+<p><img src="final_report_files/figure-html/unnamed-chunk-14-1.png" width="90%" /></p>
 <p>It looks like a monotonic linear relationship that we can take a
 further look at using simple linear regression model.</p>
 <pre class="r"><code>slr_df = 
@@ -1364,7 +1861,7 @@ smooth_mod = gam(quantity ~ s(Hour), data = slr_df)</code></pre>
   geom_line(aes(y = pred), color = &quot;red&quot;) +
   ylim(1, 2) +
   facet_grid(~model)</code></pre>
-<p><img src="final_report_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
+<p><img src="final_report_files/figure-html/unnamed-chunk-17-1.png" width="90%" /></p>
 <p>The three models with original scales are very similar. Therefore,
 when we visualize the three models, we change the y-axis scale to 0-3 as
 a zoom-in function in order to see the nuance differences between each
@@ -1434,7 +1931,7 @@ cv_df =
     names_prefix = &quot;rmse_&quot;) %&gt;% 
   mutate(model = fct_inorder(model)) %&gt;% 
   ggplot(aes(x = model, y = rmse)) + geom_violin()</code></pre>
-<p><img src="final_report_files/figure-html/unnamed-chunk-10-1.png" width="90%" />
+<p><img src="final_report_files/figure-html/unnamed-chunk-19-1.png" width="90%" />
 From the visualization graphs of three rmse models, it is hard to
 determine the slightly change of each model, but from our mean rmse
 table we conclude that the smooth model is the best out of the three
@@ -1515,7 +2012,7 @@ baguette_reg %&gt;%
 <p>Examine assumptions for the chosen Linear Regression model</p>
 <pre class="r"><code>par(mfrow = c(2, 2))
 plot(baguette_reg)</code></pre>
-<p><img src="final_report_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
+<p><img src="final_report_files/figure-html/unnamed-chunk-21-1.png" width="90%" /></p>
 <p>According to the assumption check graph, the normal qq plot is
 approximately closed to the predicted line with residuals on both sides,
 but the residual plots might violate some of the linear regression

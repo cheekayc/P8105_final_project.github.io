@@ -55,4 +55,4 @@ Email: yl4610@cumc.columbia.edu
 
 Department of Epidemiology, Chronic Diseases certificate
 
-[Yuxin's page] (https://yuxinliu98.github.io/YuxinLiu9822.github.io/)
+[Yuxin's page] (https://jy3186.github.io/)
