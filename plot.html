@@ -389,7 +389,7 @@ div.tocify {
 </div>
 
 
-<pre class="r"><code>knitr::opts_chunk$set(message = FALSE)
+<pre class="r"><code>knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 library(tidyverse)
 library(lubridate)
 library(plotly)
@@ -450,6 +450,27 @@ the missing data via <code>filter()</code> and <code>article</code> via
 </div>
 <div id="visualization" class="section level2">
 <h2>Visualization</h2>
+<div id="hr-time-trends" class="section level3">
+<h3>24hr Time trends</h3>
+<pre class="r"><code>bakery_df = 
+  bakery_df %&gt;% 
+  mutate(
+    Hour = hour(time),
+    Month = month(date))
+
+bakery_df %&gt;% 
+  group_by(Hour) %&gt;% 
+  count() %&gt;% 
+  ggplot(aes(x = Hour, y = n)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
+  scale_y_continuous(limit = c(0,50000)) +
+  labs(title = &quot;Peak hours&quot;,
+       x = &quot;Hour (24-hour format)&quot;,
+       y = &quot;Number of transactions&quot;)</code></pre>
+<p><img src="plot_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
 <div id="top-10-favorite-bakery-products" class="section level3">
 <h3>Top 10 favorite bakery products</h3>
 <pre class="r"><code>plot_pie =
@@ -463,8 +484,8 @@ the missing data via <code>filter()</code> and <code>article</code> via
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie</code></pre>
-<div id="htmlwidget-ba8333ae7437ee0ca54d" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ba8333ae7437ee0ca54d">{"x":{"visdat":{"7415d68dbce":["function () ","plotlyVisDat"]},"cur_data":"7415d68dbce","attrs":{"7415d68dbce":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-996efd16032bca7eea34" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-996efd16032bca7eea34">{"x":{"visdat":{"774924a60327":["function () ","plotlyVisDat"]},"cur_data":"774924a60327","attrs":{"774924a60327":{"labels":{},"values":{},"colors":"viridis","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","CEREAL BAGUETTE","FORMULE SANDWICH","BOULE 400G"],"values":[67689,20470,15292,15130,11508,10578,5195,4961,4202,4099],"type":"pie","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>The pie chart shows the total of sale counts of top 10 favorite
 bakery products from 2021-01-01 to 2022-09-30. As the plot shows that
 the <code>TRADITIONAL BAGUETTE</code> (67,689; 42.5%) is the most
@@ -517,11 +538,11 @@ plot_pie_2022 =
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 plot_pie_2021</code></pre>
-<div id="htmlwidget-f9666770940a7f0808d5" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-f9666770940a7f0808d5">{"x":{"visdat":{"741517b25e4":["function () ","plotlyVisDat"]},"cur_data":"741517b25e4","attrs":{"741517b25e4":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favorite bakery products in 2021","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","CEREAL BAGUETTE","SPECIAL BREAD","CAMPAGNE","BOULE 400G"],"values":[37399,11759,8713,8575,6291,5739,3070,2936,2289,2283],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-d9f7fa18930ebb243133" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d9f7fa18930ebb243133">{"x":{"visdat":{"7749346be489":["function () ","plotlyVisDat"]},"cur_data":"7749346be489","attrs":{"7749346be489":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favorite bakery products in 2021","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","CEREAL BAGUETTE","SPECIAL BREAD","CAMPAGNE","BOULE 400G"],"values":[37399,11759,8713,8575,6291,5739,3070,2936,2289,2283],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <pre class="r"><code>plot_pie_2022</code></pre>
-<div id="htmlwidget-b4149d0210d77a309f9a" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-b4149d0210d77a309f9a">{"x":{"visdat":{"74153bf49c7e":["function () ","plotlyVisDat"]},"cur_data":"74153bf49c7e","attrs":{"74153bf49c7e":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favorite bakery products in 2022","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","FORMULE SANDWICH","CEREAL BAGUETTE","BOULE 400G"],"values":[30290,8711,6579,6555,5217,4839,2259,1976,1891,1816],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-7769de4a2747b3cf7c8a" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7769de4a2747b3cf7c8a">{"x":{"visdat":{"77491768f942":["function () ","plotlyVisDat"]},"cur_data":"77491768f942","attrs":{"77491768f942":{"labels":{},"values":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"pie","hole":0.6,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Top 10 favorite bakery products in 2022","xaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"yaxis":{"showgrid":false,"zeroline":false,"showticklabels":false},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"labels":["TRADITIONAL BAGUETTE","COUPE","BAGUETTE","BANETTE","CROISSANT","PAIN AU CHOCOLAT","SPECIAL BREAD","FORMULE SANDWICH","CEREAL BAGUETTE","BOULE 400G"],"values":[30290,8711,6579,6555,5217,4839,2259,1976,1891,1816],"type":"pie","hole":0.6,"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(255,255,255,1)"}},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>The first donut chart shows the total of sale counts of top 10
 favorite bakery products from 2021-01-01 to 2021-12-31. As the plot
 shows that the <code>TRADITIONAL BAGUETTE</code> (37,399; 42%) is the
@@ -593,7 +614,7 @@ top_line2_2021 =
     labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;))
 
 ggarrange(top_line2_2021, top_line1_2021, ncol=2, nrow=1, common.legend = TRUE, legend=&quot;bottom&quot;)</code></pre>
-<p><img src="plot_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="plot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>In general, monthly sale counts in 2021 increased dramatically from
 June to August.</p>
 <p>For <code>TRADITIONAL BAGUETTE</code> (line plot on the right), total
@@ -653,7 +674,7 @@ top_line2_2022 =
     labels = c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,&quot;Apr&quot;,&quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)) 
  
 ggarrange(top_line2_2022, top_line1_2022, ncol=2, nrow=1, common.legend = TRUE, legend=&quot;bottom&quot;)</code></pre>
-<p><img src="plot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="plot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>In general, monthly sale counts in 2022 show similar trend as in
 2021, but monthly sale counts end at 2022-09-30 due to limited data.</p>
 <p>For <code>TRADITIONAL BAGUETTE</code> (line plot on the right), total
@@ -697,7 +718,7 @@ class="section level3">
          y = &quot;mean prices in euro&quot;) 
   
 mean_price_2021 </code></pre>
-<p><img src="plot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="plot_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>The scatter plot shows the ranking of mean prices of top 10 favorite
 bakery products in 2021, with most popularity to least popularity
 (top1-10) from the left to the right on x-axis.</p>
@@ -734,7 +755,7 @@ class="section level3">
          y = &quot;mean prices in euro&quot;) 
   
 mean_price_2022 </code></pre>
-<p><img src="plot_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="plot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>The scatter plot shows the ranking of mean prices of top 10 favorite
 bakery products in 2022, with most popularity to least popularity
 (top1-10) from the left to the right on x-axis. In general, the mean
@@ -795,7 +816,7 @@ total_rev_bar_2022=
  
 ggarrange(total_rev_bar_2021, total_rev_bar_2022,  heights = c(5, 5),
           ncol = 1, nrow = 2)</code></pre>
-<p><img src="plot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="plot_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>The bar chart shows the ranking of total revenue of top 10 products
 in 2021 and 2022. The total revenues of
 <code>TRADITIONAL BAGUETTE</code> are the highest (78742.8 € in 2021;
@@ -860,7 +881,7 @@ dis_rev_bar_2022=
 
 ggarrange(dis_rev_bar_2021, dis_rev_bar_2022,  heights = c(5, 5),
           ncol = 1, nrow = 2)</code></pre>
-<p><img src="plot_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="plot_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 <p>The bar plots show distributions of monthly revenue in 2021 and 2022.
 <code>TRADITIONAL BAGUETTE</code> has the largest proportion of monthly
 revenues (around 50%) in 2021 and 2022. Moreover, the revenue trend from

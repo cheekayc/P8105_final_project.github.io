@@ -66,6 +66,30 @@ Firstly, we used `read_csv()` to import the dataset "Bakery_sales.csv", and appl
 <p>&nbsp;</p >
 ## Visualization
 
+### 24hr Time trends
+```{r}
+bakery_df = 
+  bakery_df %>% 
+  mutate(
+    Hour = hour(time),
+    Month = month(date))
+
+bakery_df %>% 
+  group_by(Hour) %>% 
+  count() %>% 
+  ggplot(aes(x = Hour, y = n)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
+  scale_y_continuous(limit = c(0,50000)) +
+  labs(title = "Peak hours",
+       x = "Hour (24-hour format)",
+       y = "Number of transactions")
+```
+
+
+
+
 ### Top 10 favorite bakery products
 ```{r}
 plot_pie =
