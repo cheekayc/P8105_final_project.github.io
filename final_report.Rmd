@@ -7,17 +7,14 @@ output:
     code_folding: hide
 ---
 
-# Proposal
-<p>&nbsp;</p >
-
-
-## The tentative project title
+## Project title
 A French Bakery’s Daily Sales in 2021-2022
 <p>&nbsp;</p >
 
 
 ## Data collection and cleaning
 [kaggle](https://www.kaggle.com/datasets/matthieugimbert/french-bakery-daily-sales)
+
 [price comparison](https://www.france-hotel-guide.com/en/blog/cost-baguette-paris/)
 <p>&nbsp;</p >
 
@@ -39,10 +36,11 @@ The dataset includes:
 
 `objective`: forecast the sales in order to ease the production planning
 
-It contains `r ncol(bakery_df)` variables and `r nrow(bakery_df)` observations.
+It contains 7 variables and 234000 observations.
 
 <p>&nbsp;</p >
 Firstly, we used `read_csv()` to import the dataset "Bakery_sales.csv", and applied `janitor::clean_names()` to change the variables' names into lower cases. Next, we tidied dataset by applying `mutate()` to remove the euro sign "€", change "," to ".", convert `unit_price` to numeric form, and renamed the `article` as `product_name`. Finally, we deleted the missing data via `filter()` and `article` via `select()`. We created an `revenue` by `unit_price` * `quantity`.
+<p>&nbsp;</p >
 
 ## Motivation 
 It is 10:05 am in the morning, you sit in the lecture hall having your earliest lecture of the day Data Science, empty-stomached. 
@@ -62,7 +60,7 @@ how is the sale distributed and so much more…
 ## Related work
 <p>&nbsp;</p >
 
-## Initial questions:
+## Initial questions
 <p>&nbsp;</p >
 
 ## Exploratory analyses

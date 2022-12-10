@@ -382,7 +382,125 @@ div.tocify {
 </div>
 
 
-
+<div id="project-title" class="section level2">
+<h2>Project title</h2>
+A French Bakery’s Daily Sales in 2021-2022
+<p>
+ 
+</p >
+</div>
+<div id="data-collection-and-cleaning" class="section level2">
+<h2>Data collection and cleaning</h2>
+<p><a
+href="https://www.kaggle.com/datasets/matthieugimbert/french-bakery-daily-sales">kaggle</a></p>
+<a
+href="https://www.france-hotel-guide.com/en/blog/cost-baguette-paris/">price
+comparison</a>
+<p>
+ 
+</p >
+<p>We used updated version dataset of a French bakery from 2021-01-01 to
+2022-09-30. The dataset provides the daily transaction details of
+customers. Since the dataset is still updating, we used downloaded
+version on 2022-12-03.</p>
+<p>The dataset includes:</p>
+<p><code>date</code>: date order</p>
+<p><code>time</code>: time order</p>
+<p><code>ticket number</code>: identifier for every single
+transaction</p>
+<p><code>article</code>: name of the product sold (in French)</p>
+<p><code>quantity</code>: quantity sold</p>
+<p><code>unit_price</code>: price per product (in Euro)</p>
+<p><code>objective</code>: forecast the sales in order to ease the
+production planning</p>
+<p>It contains 7 variables and 234000 observations.</p>
+<p>
+ 
+</p >
+Firstly, we used <code>read_csv()</code> to import the dataset
+“Bakery_sales.csv”, and applied <code>janitor::clean_names()</code> to
+change the variables’ names into lower cases. Next, we tidied dataset by
+applying <code>mutate()</code> to remove the euro sign “€”, change “,”
+to “.”, convert <code>unit_price</code> to numeric form, and renamed the
+<code>article</code> as <code>product_name</code>. Finally, we deleted
+the missing data via <code>filter()</code> and <code>article</code> via
+<code>select()</code>. We created an <code>revenue</code> by
+<code>unit_price</code> * <code>quantity</code>.
+<p>
+ 
+</p >
+</div>
+<div id="motivation" class="section level2">
+<h2>Motivation</h2>
+<p>It is 10:05 am in the morning, you sit in the lecture hall having
+your earliest lecture of the day Data Science, empty-stomached. A cup of
+coffee and a nicely warmed chocolate croissant or as French says ‘Pain
+Au Chocolat’ is the only thing existing in your mind… You wonder why the
+bakery items are so good and what you can do with it accompanied with
+the ongoing endless talking of data science explained by your energetic
+professor… Well, you jumped online and searched datasets for a French
+bakery and here it happens…</p>
+<p>Bread is so much a part of French culture that even the word for
+“friend” comes from Latin cum pane (with bread) meaning the person with
+whom you break bread. These everyday bakery items can still be something
+of a mystery to people like you and me (I mean, who doesn’t like
+carbs?)</p>
+In this journey, we will take you around the analysis of a typical
+French bakery and find out what’s the best-seller, how much they sell,
+how is the sale distributed and so much more…
+<p>
+ 
+</p >
+</div>
+<div id="related-work" class="section level2">
+<h2>Related work</h2>
+<p>
+ 
+</p >
+</div>
+<div id="initial-questions" class="section level2">
+<h2>Initial questions</h2>
+<p>
+ 
+</p >
+</div>
+<div id="exploratory-analyses" class="section level2">
+<h2>Exploratory analyses</h2>
+<p>
+ 
+</p >
+</div>
+<div id="alternative-strategies-forecast-modeling"
+class="section level2">
+<h2>Alternative strategies/ forecast modeling</h2>
+<p>
+ 
+</p >
+</div>
+<div id="descriptions-of-approaches" class="section level2">
+<h2>Descriptions of approaches</h2>
+<p>
+ 
+</p >
+</div>
+<div id="discussion-of-results" class="section level2">
+<h2>Discussion of results</h2>
+<p>
+ 
+</p >
+</div>
+<div id="strengths-and-limitations" class="section level2">
+<h2>Strengths and Limitations</h2>
+<p>
+ 
+</p >
+</div>
+<div id="finding-summary-and-expectation" class="section level2">
+<h2>Finding, Summary, and Expectation</h2>
+<p>
+ 
+</p >
+</div>
 
 
 
