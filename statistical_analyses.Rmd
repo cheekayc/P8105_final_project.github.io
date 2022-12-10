@@ -104,9 +104,6 @@ The ANOVA test p-value is 0.01 which is less than alpha level of 0.05, so we rej
 
 We are interested in testing if the mean price of `BAGUETTE` in this bakery is significantly different from the average price for a baguette in Paris, which is 1.07 euros. 
 
-<p>&nbsp;</p>
-<img src="images/baguette.gif" style="width:100%">
-
 Null hypothesis: The mean price of baguette in this bakery is the same as the average price of baguette in Paris.
 
 Alternative hypothesis: The mean price of baguette in this bakery is different from the average price of baguette in Paris.
@@ -144,6 +141,9 @@ baguette_t_results %>%
 
 The p-value is much smaller than the alpha (0.05), so we would reject the null hypothesis. At 5% level of significance, we have sufficient 
 evidence to conclude that the mean price of baguette in this bakery is significantly different from the average price of baguette in Paris.
+
+<p>&nbsp;</p>
+<img src="images/baguette.gif" style="width:100%">
 
 <p>&nbsp;</p >
 ### Traditional Baguette (One-sided)
@@ -362,3 +362,11 @@ The tentative model for multiple linear regression of baguette's revenue is
 Revenue = -1.43 + 1.21 * unit_price + 1.19 * quantity + 0.001 * month
 
 We might not consider doing MLR for the sake of this research due to the unmet assumptions.
+
+
+<p>&nbsp;</p >
+Reference
+
+[Image 1] (https://www.pinterest.com/pin/baguette-bread-gif-baguette-bread-churros-discover-share-gifs--629659591639010342/)
+
+[Image 2] (https://tenor.com/view/sweet-carbs-croissant-remicone-the-central-sweets-good-food-gif-14089199)
