@@ -13,7 +13,7 @@
 
 <title>Statistical Analyses</title>
 
-<script src="site_libs/header-attrs-2.16/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/sandstone.min.css" rel="stylesheet" />
@@ -184,8 +184,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -193,16 +193,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -396,8 +389,11 @@ library(plotly)
 library(mgcv)
 library(moments)
 library(modelr)</code></pre>
-<p>Data input and cleaning</p>
-<pre class="r"><code>bakery_df =
+<div id="summary-of-packages" class="section level2">
+<h2>Summary of packages</h2>
+<p>tidyverse, lubridate, plotly, mgcv, moments, modelr</p>
+<pre class="r"><code># Data input and cleaning 
+bakery_df =
   read_csv(&quot;./Data/Bakery_sales.csv&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
   mutate(
@@ -409,8 +405,9 @@ library(modelr)</code></pre>
     ) %&gt;% 
   filter(product_name != &quot;.&quot;) %&gt;% 
   select(-article)</code></pre>
-<div id="anova" class="section level3">
-<h3>ANOVA</h3>
+</div>
+<div id="anova" class="section level2">
+<h2>ANOVA</h2>
 <p>ANOVA tests whether there is a difference in means of the groups at
 each level (each individual month) of the independent variable of peak
 months (Jun - Sep).</p>
@@ -451,21 +448,54 @@ anova_test_df =
   left_join(one_sales, two_sales, by = c(&quot;ID&quot;))
 
 
-one.way &lt;- aov(one_sales ~ two_sales, data = anova_test_df)
+one.way &lt;- aov(one_sales ~ two_sales, data = anova_test_df) %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 2) 
 
-summary(one.way)</code></pre>
-<pre><code>##             Df   Sum Sq  Mean Sq F value  Pr(&gt;F)   
-## two_sales    1 74405983 74405983   196.6 0.00505 **
-## Residuals    2   756817   378409                   
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>The ANOVA test p-value is 0.00505 which is less than alpha level of
+one.way</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">df</th>
+<th align="right">sumsq</th>
+<th align="right">meansq</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">two_sales</td>
+<td align="right">1</td>
+<td align="right">74405982.9</td>
+<td align="right">74405982.9</td>
+<td align="right">196.63</td>
+<td align="right">0.01</td>
+</tr>
+<tr class="even">
+<td align="left">Residuals</td>
+<td align="right">2</td>
+<td align="right">756817.1</td>
+<td align="right">378408.5</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<p>The ANOVA test p-value is 0.01 which is less than alpha level of
 0.05, so we reject the null hypothesis and conclude that the mean sales
 of peak months in 2021 is statistically significantly different from the
 mean sales of peak months in 2022.</p>
+<p>
+ 
+</p >
 </div>
-<div id="generalized-additive-model" class="section level3">
-<h3>Generalized Additive Model</h3>
+<div id="simple-linear-regression" class="section level2">
+<h2>Simple Linear Regression</h2>
+<p>We conduct a simple linear regression for croissant’s sale counts and
+when it’s being sold (hour of the day) and test the model using
+<code>Cross Validation</code>.</p>
 <p>Find the <em>rush hours</em> of a typical day:</p>
 <pre class="r"><code>bakery_df = 
   bakery_df %&gt;% 
@@ -507,49 +537,68 @@ function from 7 AM to 11 AM.</p>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-3-1.png" width="90%" /></p>
 <p>It looks like a monotonic linear relationship that we can take a
 further look at using simple linear regression model.</p>
-</div>
-<div
-id="simple-linear-regression-for-croissants-sale-counts-and-when-its-being-sold-hour-of-the-day-and-test-the-model-using-cross-validation"
-class="section level3">
-<h3>Simple Linear Regression for croissant’s sale counts and when it’s
-being sold (hour of the day) and test the model using Cross
-Validation</h3>
 <pre class="r"><code>slr_df = 
   bakery_df  %&gt;% 
   mutate(
-    hour_cp = (Hour &gt; 8) * (Hour - 8)
-    )
+    hour_cp = (Hour &gt; 8) * (Hour - 8))
 
-ggplot(slr_df, aes(x = Hour, y = quantity)) +
-  geom_point() + scale_x_continuous(breaks = seq(7, 11), limit = c(7, 11)) +
-  scale_y_continuous(limit = c(0,50)) </code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
-<pre class="r"><code>slr_reg = lm(quantity ~ Hour, slr_df)
+slr_reg = lm(quantity ~ Hour, slr_df)
 
 slr_reg %&gt;% 
-  broom::tidy()</code></pre>
-<pre><code>## # A tibble: 2 × 5
-##   term        estimate std.error statistic p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-## 1 (Intercept)   1.99    0.0109       182.        0
-## 2 Hour         -0.0407  0.000957     -42.6       0</code></pre>
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 2) </code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">1.99</td>
+<td align="right">0.01</td>
+<td align="right">182.09</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Hour</td>
+<td align="right">-0.04</td>
+<td align="right">0.00</td>
+<td align="right">-42.57</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
 <p>The model is Sale count = 1.99 - 0.04 * Hour</p>
-<p>Examine cross validation of this simple linear regression model</p>
-<pre class="r"><code>linear_mod = lm(quantity ~ Hour, slr_df)
+<p>
+ 
+</p >
+<div id="cross-validation-of-simple-linear-regression-model"
+class="section level3">
+<h3>Cross validation of simple linear regression model</h3>
+<pre class="r"><code># created 3 models: linear, piecewise, and smooth models 
+linear_mod = lm(quantity ~ Hour, slr_df)
 pwl_mod    = lm(quantity ~ Hour + hour_cp, data = slr_df)
 smooth_mod = gam(quantity ~ s(Hour), data = slr_df)</code></pre>
 <pre class="r"><code>slr_df %&gt;% 
   gather_predictions(linear_mod, pwl_mod, smooth_mod) %&gt;% 
   mutate(model = fct_inorder(model)) %&gt;% 
   ggplot(aes(x = Hour, y = quantity)) + 
-  geom_point(alpha = .5) +
-  geom_line(aes(y = pred), color = &quot;red&quot;) + 
+  geom_point(alpha = .5, size = 0.05) +
+  geom_line(aes(y = pred), color = &quot;red&quot;) +
+  ylim(1, 2) +
   facet_grid(~model)</code></pre>
 <p><img src="statistical_analyses_files/figure-html/unnamed-chunk-6-1.png" width="90%" /></p>
 <p>The three models are very similar.</p>
 <p>Re-sample the dataset by <code>crossv_mc</code> and let’s see the
 rmse of each model</p>
-<pre class="r"><code>set.seed(2022)
+<pre class="r"><code># created a train model and test model; check rmse 
+set.seed(2022)
 cv_df =
   crossv_mc(slr_df, 100) %&gt;% 
   mutate(
@@ -565,7 +614,8 @@ cv_df =
   mutate(
     rmse_linear = map2_dbl(linear_mod, test, ~rmse(model = .x, data = .y)),
     rmse_pwl    = map2_dbl(pwl_mod, test, ~rmse(model = .x, data = .y)),
-    rmse_smooth = map2_dbl(smooth_mod, test, ~rmse(model = .x, data = .y)))</code></pre>
+    rmse_smooth = map2_dbl(smooth_mod, test, ~rmse(model = .x, data = .y))) %&gt;% 
+  select(rmse_linear, rmse_pwl, rmse_smooth)</code></pre>
 <p>Then plot the rmse graph</p>
 <pre class="r"><code>cv_df %&gt;% 
   select(starts_with(&quot;rmse&quot;)) %&gt;% 
@@ -721,6 +771,7 @@ bakery_df %&gt;%
 print(skewness(skew))</code></pre>
 <pre><code>##        date  total_sale 
 ## -0.01517941  1.20058066</code></pre>
+</div>
 </div>
 </div>
 

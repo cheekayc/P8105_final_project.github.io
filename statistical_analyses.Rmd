@@ -24,8 +24,11 @@ library(moments)
 library(modelr)
 ```
 
-Data input and cleaning 
-```{r, warning = FALSE}
+## Summary of packages
+tidyverse, lubridate, plotly, mgcv, moments, modelr
+
+```{r, warning = FALSE, message=FALSE}
+# Data input and cleaning 
 bakery_df =
   read_csv("./Data/Bakery_sales.csv") %>% 
   janitor::clean_names() %>% 
@@ -41,7 +44,7 @@ bakery_df =
 
 ```
 
-### ANOVA
+## ANOVA
 
 ANOVA tests whether there is a difference in means of the groups at each level (each individual month) of the independent variable of peak months (Jun - Sep).
 
@@ -50,7 +53,7 @@ One way anova test can test if the mean sales of peak months (Jun - Sep) in 2021
 The null hypothesis is that there is no difference in the mean sales of peak months in 2021 and 2022.                                        
 The alternative hypothesis is that the means are different from one another.
 
-```{r ANOVA, warning = FALSE}
+```{r ANOVA, warning = FALSE, message = FALSE}
 anova_df =
   bakery_df %>% 
   mutate(
@@ -81,14 +84,17 @@ anova_test_df =
   left_join(one_sales, two_sales, by = c("ID"))
 
 
-one.way <- aov(one_sales ~ two_sales, data = anova_test_df)
+one.way <- aov(one_sales ~ two_sales, data = anova_test_df) %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 2) 
 
-summary(one.way)
+one.way
 ```
-The ANOVA test p-value is 0.00505 which is less than alpha level of 0.05, so we reject the null hypothesis and conclude that the mean sales of peak months in 2021 is statistically significantly different from the mean sales of peak months in 2022.
+The ANOVA test p-value is 0.01 which is less than alpha level of 0.05, so we reject the null hypothesis and conclude that the mean sales of peak months in 2021 is statistically significantly different from the mean sales of peak months in 2022.
  
- 
-### Generalized Additive Model 
+<p>&nbsp;</p >
+## Simple Linear Regression 
+We conduct a simple linear regression for croissant's sale counts and when it's being sold (hour of the day) and test the model using `Cross Validation`.
 
 Find the *rush hours* of a typical day:
 ```{r, warning = FALSE}
@@ -136,28 +142,25 @@ bakery_df %>%
 
 It looks like a monotonic linear relationship that we can take a further look at using simple linear regression model.
 
-### Simple Linear Regression for croissant's sale counts and when it's being sold (hour of the day) and test the model using Cross Validation
 ```{r, warning = FALSE}
 slr_df = 
   bakery_df  %>% 
   mutate(
-    hour_cp = (Hour > 8) * (Hour - 8)
-    )
-
-ggplot(slr_df, aes(x = Hour, y = quantity)) +
-  geom_point() + scale_x_continuous(breaks = seq(7, 11), limit = c(7, 11)) +
-  scale_y_continuous(limit = c(0,50)) 
+    hour_cp = (Hour > 8) * (Hour - 8))
 
 slr_reg = lm(quantity ~ Hour, slr_df)
 
 slr_reg %>% 
-  broom::tidy()
+  broom::tidy() %>% 
+  knitr::kable(digits = 2) 
 ```
 The model is 
 Sale count = 1.99 - 0.04 * Hour
 
-Examine cross validation of this simple linear regression model
+<p>&nbsp;</p >
+### Cross validation of simple linear regression model
 ```{r, warning = FALSE}
+# created 3 models: linear, piecewise, and smooth models 
 linear_mod = lm(quantity ~ Hour, slr_df)
 pwl_mod    = lm(quantity ~ Hour + hour_cp, data = slr_df)
 smooth_mod = gam(quantity ~ s(Hour), data = slr_df)
@@ -168,8 +171,9 @@ slr_df %>%
   gather_predictions(linear_mod, pwl_mod, smooth_mod) %>% 
   mutate(model = fct_inorder(model)) %>% 
   ggplot(aes(x = Hour, y = quantity)) + 
-  geom_point(alpha = .5) +
-  geom_line(aes(y = pred), color = "red") + 
+  geom_point(alpha = .5, size = 0.05) +
+  geom_line(aes(y = pred), color = "red") +
+  ylim(1, 2) +
   facet_grid(~model)
 ```
 
@@ -177,6 +181,7 @@ The three models are very similar.
 
 Re-sample the dataset by `crossv_mc` and let's see the rmse of each model
 ```{r, warning = FALSE}
+# created a train model and test model; check rmse 
 set.seed(2022)
 cv_df =
   crossv_mc(slr_df, 100) %>% 
@@ -193,7 +198,8 @@ cv_df =
   mutate(
     rmse_linear = map2_dbl(linear_mod, test, ~rmse(model = .x, data = .y)),
     rmse_pwl    = map2_dbl(pwl_mod, test, ~rmse(model = .x, data = .y)),
-    rmse_smooth = map2_dbl(smooth_mod, test, ~rmse(model = .x, data = .y)))
+    rmse_smooth = map2_dbl(smooth_mod, test, ~rmse(model = .x, data = .y))) %>% 
+  select(rmse_linear, rmse_pwl, rmse_smooth)
 
 ```
 Then plot the rmse graph

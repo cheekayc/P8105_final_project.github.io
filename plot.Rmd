@@ -18,7 +18,7 @@ library(ggplot2)
 ```
 
 ## Summary of packages
-tidyverse, lubridate, plotly, patchwork, ggpubr
+tidyverse, lubridate, plotly, patchwork, ggpubr, ggplot2
 
 
 ```{r,data cleaning, message = FALSE}
