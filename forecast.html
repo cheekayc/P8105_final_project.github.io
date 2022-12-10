@@ -385,8 +385,8 @@ div.tocify {
 <pre class="r"><code>knitr::opts_chunk$set(
   message = FALSE, 
   warning = FALSE,
-  fig.width = 14,
-  fig.height = 6,
+  fig.width = 18,
+  fig.height = 8,
   out.width = &quot;90%&quot;,
   set.seed(8))
 
@@ -395,8 +395,27 @@ library(forecast)
 library(astsa)
 library(MLmetrics)
 library(lubridate)</code></pre>
+<p>In this page, we will be testing four forecast models and identify
+the best model to help us predict the daily sale for this French
+bakery.</p>
+<p>
+ 
+</p >
+<p>Sales forecast is important because it can be used as a daily
+production reference and help the bakery to operate smoothly and reduce
+wasting of resources, which in turn can reduce costs and increase
+profit.</p>
+<p>
+ 
+</p >
 <p>Time series forecasting involves using historical, time-stamped data
 to make predictions of what might happen in the future.</p>
+<p>
+ 
+</p >
+<div id="summary-of-packages" class="section level2">
+<h2>Summary of packages</h2>
+<p>tidyverse, forecast, astsa, MLmetrics, lubridate</p>
 <pre class="r"><code># Load and clean dataset:
 
 bakery_df = 
@@ -488,14 +507,18 @@ in 2021.</p>
     y = &quot;Number of products sold&quot;,
     title = &quot;Bakery&#39;s Daily Sales (2021)&quot;) +
   theme_minimal() +
-  theme(legend.position = &quot;bottom&quot;) +
-  theme(plot.title = element_text(hjust = 0.4))</code></pre>
+  theme(legend.position = &quot;none&quot;) +
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = &quot;bold&quot;),
+    plot.title = element_text(hjust = 0.4, size = 19, face = &quot;bold&quot;))</code></pre>
 <p><img src="forecast_files/figure-html/2021%20daily%20sales%20line%20plot-1.png" width="90%" /></p>
 <p>We will see this trend again as we verify the accuracy of different
 forecast models in the next few sections.</p>
 <p>
  
 </p>
+</div>
 <div id="data-pre-processing" class="section level2">
 <h2>Data Pre-processing</h2>
 <p>We need to create a simple and clean dataframe derived from the
@@ -533,10 +556,13 @@ test =
 <h3>Mean Absolute Percentage Error (MAPE)</h3>
 <p>For model evaluation, we will be relying on the <strong><em>Mean
 Absolute Percentage Error (MAPE)</em></strong> to measure the accuracy
-of our predictions.</p>
+of our predictions. <em>MAPE</em> is a numeric value which ranges
+between 0 to 1.</p>
 <p>The accuracy of the model can be calculated as <span
-class="math inline">\(100 - MAPE\)</span>. For example, an <em>MAPE</em>
-value of 70 indicates the model has an accuracy of 30%.</p>
+class="math inline">\((1 - MAPE) * 100%\)</span>. For example, an
+<em>MAPE</em> value of 0.7 indicates the model has an accuracy of
+30%.</p>
+<p>We will report each model’s accuracy using inline R code.</p>
 <p>
  
 </p>
@@ -582,8 +608,16 @@ results of our <em>Seasonal Naive</em> model.</p>
     title = &quot;Seasonal Naive Forecast of Daily Sales for September (2022)&quot;) +
   theme_minimal() +
   theme(legend.position = &quot;bottom&quot;) +
-  theme(plot.title = element_text(hjust = 0.4))</code></pre>
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = &quot;bold&quot;),
+    plot.title = element_text(hjust = 0.4, size = 19, face = &quot;bold&quot;),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))</code></pre>
 <p><img src="forecast_files/figure-html/plot%20SNM%20prediction-1.png" width="90%" /></p>
+<p>
+ 
+</p>
 <p>Comments: Although the <em>Seasonal Naive Model</em> gives high
 accuracy, the prediction line is a horizontal straight line, which means
 this model predicted that the amount of products sold is the same for
@@ -633,8 +667,16 @@ results of our <em>DSHW</em> model.</p>
     title = &quot;Double-Seasonal Holt-Winters Forecast of Daily Sales for September (2022)&quot;) +
   theme_minimal() +
   theme(legend.position = &quot;bottom&quot;) +
-  theme(plot.title = element_text(hjust = 0.4))</code></pre>
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = &quot;bold&quot;),
+    plot.title = element_text(hjust = 0.4, size = 19, face = &quot;bold&quot;),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))</code></pre>
 <p><img src="forecast_files/figure-html/DSHW%20prediction%20plot-1.png" width="90%" /></p>
+<p>
+ 
+</p>
 <p>Comments: Although the <em>DSHW</em> model has a worse accuracy than
 the basic model (<em>Seasonal Naive</em>), but visually it is better
 than the basic model because it shows dynamic trend. This would make
@@ -684,8 +726,16 @@ produce a time-series forecast plot.</p>
     title = &quot;TBATS Forecast of Daily Sales for September (2022)&quot;) +
   theme_minimal() +
   theme(legend.position = &quot;bottom&quot;) +
-  theme(plot.title = element_text(hjust = 0.4))</code></pre>
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = &quot;bold&quot;),
+    plot.title = element_text(hjust = 0.4, size = 19, face = &quot;bold&quot;),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))</code></pre>
 <p><img src="forecast_files/figure-html/TBATS%20plot-1.png" width="90%" /></p>
+<p>
+ 
+</p>
 <p>Comments: As we can see from the plot, the prediction line (blue)
 demonstrates dynamic pattern as the <em>DSHW</em> model, but the
 accuracy of the <em>TBATS</em> model is slightly better than the
@@ -734,8 +784,16 @@ can produce a time-series forecast plot.</p>
     title = &quot;Neural Network Forecast of Daily Sales for September (2022)&quot;) +
   theme_minimal() +
   theme(legend.position = &quot;bottom&quot;) +
-  theme(plot.title = element_text(hjust = 0.4))</code></pre>
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = &quot;bold&quot;),
+    plot.title = element_text(hjust = 0.4, size = 19, face = &quot;bold&quot;),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))</code></pre>
 <p><img src="forecast_files/figure-html/NN%20plot-1.png" width="90%" /></p>
+<p>
+ 
+</p>
 <p>Comments: As shown in the plot, the predicted trendline (blue) looks
 similar to the actual trendline (red) and highly overlaps it. Although
 the prediction accuracy is not 100%, but this <mark ><strong>Neural
@@ -788,8 +846,25 @@ bakery from October to December in 2022.</p>
     title = &quot;Predicted Daily Sales from October to December (2022)&quot;) +
   theme_minimal() +
   theme(legend.position = &quot;none&quot;) +
-  theme(plot.title = element_text(hjust = 0.4))</code></pre>
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = &quot;bold&quot;),
+    plot.title = element_text(hjust = 0.4, size = 19, face = &quot;bold&quot;),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))</code></pre>
 <p><img src="forecast_files/figure-html/predicted%20future%20sales-1.png" width="90%" /></p>
+<p>
+ 
+</p>
+<p>
+ 
+</p>
+<p>
+ 
+</p>
+<p>The codes for time-series forecasting are learned from this <a
+href="https://medium.com/@siglimumuni/getting-started-with-time-series-forecasting-in-r-66af90510848">blog</a>
+by <em>Sigli Mumuni</em>.</p>
 </div>
 
 

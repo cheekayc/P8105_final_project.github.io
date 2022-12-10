@@ -11,8 +11,8 @@ output:
 knitr::opts_chunk$set(
   message = FALSE, 
   warning = FALSE,
-  fig.width = 14,
-  fig.height = 6,
+  fig.width = 18,
+  fig.height = 8,
   out.width = "90%",
   set.seed(8))
 
@@ -23,7 +23,19 @@ library(MLmetrics)
 library(lubridate)
 ```
 
+In this page, we will be testing four forecast models and identify the best model to help us predict the daily sale for this French bakery. 
+
+<p>&nbsp;</p >
+Sales forecast is important because it can be used as a daily production reference and help the bakery to operate smoothly and reduce wasting of resources, 
+which in turn can reduce costs and increase profit.
+
+<p>&nbsp;</p >
 Time series forecasting involves using historical, time-stamped data to make predictions of what might happen in the future.
+
+<p>&nbsp;</p >
+## Summary of packages
+tidyverse, forecast, astsa, MLmetrics, lubridate
+
 
 ```{r original dataset}
 # Load and clean dataset:
@@ -72,8 +84,11 @@ sale_2021 %>%
     y = "Number of products sold",
     title = "Bakery's Daily Sales (2021)") +
   theme_minimal() +
-  theme(legend.position = "bottom") +
-  theme(plot.title = element_text(hjust = 0.4))
+  theme(legend.position = "none") +
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"))
 ```
 
 We will see this trend again as we verify the accuracy of different forecast models in the next few sections.
@@ -111,9 +126,11 @@ test =
 <p>&nbsp;</p>
 ### Mean Absolute Percentage Error (MAPE)
 
-For model evaluation, we will be relying on the ***Mean Absolute Percentage Error (MAPE)*** to measure the accuracy of our predictions.
+For model evaluation, we will be relying on the ***Mean Absolute Percentage Error (MAPE)*** to measure the accuracy of our predictions. *MAPE* is a numeric value which ranges between 0 to 1.
 
-The accuracy of the model can be calculated as $100 - MAPE$. For example, an *MAPE* value of 70 indicates the model has an accuracy of 30%.
+The accuracy of the model can be calculated as $(1 - MAPE) * 100%$. For example, an *MAPE* value of 0.7 indicates the model has an accuracy of 30%.
+
+We will report each model's accuracy using inline R code.
 
 <p>&nbsp;</p>
 ## Seasonal Naive Model
@@ -159,9 +176,15 @@ train %>%
     title = "Seasonal Naive Forecast of Daily Sales for September (2022)") +
   theme_minimal() +
   theme(legend.position = "bottom") +
-  theme(plot.title = element_text(hjust = 0.4))
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))
 ```
 
+<p>&nbsp;</p>
 Comments: Although the *Seasonal Naive Model* gives high accuracy, the prediction line is a horizontal straight line, which means this model predicted that 
 the amount of products sold is the same for each day. Therefore, we think that the predictions from this model are not the best.
 
@@ -207,9 +230,15 @@ train %>%
     title = "Double-Seasonal Holt-Winters Forecast of Daily Sales for September (2022)") +
   theme_minimal() +
   theme(legend.position = "bottom") +
-  theme(plot.title = element_text(hjust = 0.4))
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))
 ```
 
+<p>&nbsp;</p>
 Comments: Although the *DSHW* model has a worse accuracy than the basic model (*Seasonal Naive*), but visually it is better than the basic model because it shows dynamic trend.
 This would make more sense than the predictions given by the *Seasonal Naive* model as we can see that it is no longer predicting that the daily sales are the same for each day.
 
@@ -256,9 +285,15 @@ train %>%
     title = "TBATS Forecast of Daily Sales for September (2022)") +
   theme_minimal() +
   theme(legend.position = "bottom") +
-  theme(plot.title = element_text(hjust = 0.4))
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))
 ```
 
+<p>&nbsp;</p>
 Comments: As we can see from the plot, the prediction line (blue) demonstrates dynamic pattern as the *DSHW* model, but the accuracy of the *TBATS* model is slightly better than the *DSHW* model.
 
 <p>&nbsp;</p>
@@ -306,9 +341,15 @@ train %>%
     title = "Neural Network Forecast of Daily Sales for September (2022)") +
   theme_minimal() +
   theme(legend.position = "bottom") +
-  theme(plot.title = element_text(hjust = 0.4))
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))
 ```
 
+<p>&nbsp;</p>
 Comments: As shown in the plot, the predicted trendline (blue) looks similar to the actual trendline (red) and highly overlaps it. Although the prediction accuracy is not 100%,
 but this <mark >**Neural Network**</mark> model gives us the highest accuracy among all forecast models that has been tested.
 
@@ -360,5 +401,18 @@ date_df %>%
     title = "Predicted Daily Sales from October to December (2022)") +
   theme_minimal() +
   theme(legend.position = "none") +
-  theme(plot.title = element_text(hjust = 0.4))
+  theme(
+    axis.text = element_text(size = 15),
+    axis.title = element_text(size = 17, face = "bold"),
+    plot.title = element_text(hjust = 0.4, size = 19, face = "bold"),
+    legend.text = element_text(size = 17),
+    legend.title = element_text(size = 17))
 ```
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+The codes for time-series forecasting are learned from this [blog](https://medium.com/@siglimumuni/getting-started-with-time-series-forecasting-in-r-66af90510848) by *Sigli Mumuni*. 
+
