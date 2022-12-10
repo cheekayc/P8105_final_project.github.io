@@ -41,7 +41,7 @@ bakery_df =
 ## Introduction
 
 <p>&nbsp;</p >
-###Background 
+### Background 
 
 We used updated version dataset of a French bakery from 2021-01-01 to 2022-09-30. The dataset provides the daily transaction details of customers. Since the dataset is still updating, we used downloaded version on 2022-12-03.
 
