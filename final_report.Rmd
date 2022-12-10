@@ -475,8 +475,9 @@ date_df %>%
 
 <p>&nbsp;</p >
 ## Descriptions of approaches
-<p>&nbsp;</p >
+
 We will perform several statistical analysis in this bakery including ANOVA to check the mean difference of peak sale months between 2021 and 2022, One-Sample t-test to check the mean price of baguette with average price in the nation, simple linear regression to test the linear relationship between quantity of sale and hours in the day, and finally multiple linear regression.
+
 
 ## Discussion of results
 <p>&nbsp;</p >
@@ -549,8 +550,6 @@ The ANOVA test p-value is 0.01 which is less than alpha level of 0.05, so we rej
 ### One Sample T-test
 We are interested in testing if the mean price of `BAGUETTE` in this bakery is significantly different from the average price for a baguette in Paris, which is 1.07 euros. 
 
-<p>&nbsp;</p>
-<img src="images/baguette.gif" style="width:100%">
 
 Null hypothesis: The mean price of baguette in this bakery is the same as the average price of baguette in Paris.
 
@@ -627,7 +626,6 @@ evidence to conclude that the mean price of traditional baguette in this bakery 
 ### Simple Linear Regression 
 We conduct a simple linear regression for `CROISSANT`'s sale counts and when it's being sold (hour of the day) and test the model using `Cross Validation`.
 
-<img src="images/croissant.gif" style="width:100%">
 
 The plot below shows the average amount of products sold in each hour during the business hour.
 ```{r, warning = FALSE}
