@@ -392,3 +392,8 @@ ggarrange(dis_rev_bar_2021, dis_rev_bar_2022,  heights = c(5, 5),
           ncol = 1, nrow = 2)
 ```
 
+The bar plots show distributions of monthly revenue in 2021 and 2022. `TRADITIONAL BAGUETTE` has the largest proportion of monthly revenues (around 50%) in 2021 and 2022.
+
+<p>&nbsp;</p >
+#### Summary 
+`TRADITIONAL BAGUETTE` is the most favorite bread in this French bakery store. 
