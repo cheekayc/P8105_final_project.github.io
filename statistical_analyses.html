@@ -396,6 +396,16 @@ library(plotly)
 library(mgcv)
 library(moments)
 library(modelr)</code></pre>
+<p>In this section, we will perform several statistical analysis in this
+bakery including ANOVA to check the mean difference of peak sale months
+between 2021 and 2022, One-Sample t-test to check the mean price of
+baguette with average price of it in the nation, Simple Linear
+Regression to test the linear relationship between quantity of sale and
+hours in the day, and finally Multiple Linear Regression to see
+additional predictors.</p>
+<p>
+ 
+</p >
 <div id="summary-of-packages" class="section level2">
 <h2>Summary of packages</h2>
 <p>tidyverse, lubridate, plotly, mgcv, moments, modelr</p>
@@ -412,6 +422,9 @@ bakery_df =
     ) %&gt;% 
   filter(product_name != &quot;.&quot;) %&gt;% 
   select(-article)</code></pre>
+<p>
+ 
+</p >
 </div>
 <div id="anova" class="section level2">
 <h2>ANOVA</h2>
@@ -421,6 +434,11 @@ months (Jun - Sep).</p>
 <p>One way anova test can test if the mean sales of peak months (Jun -
 Sep) in 2021 is different from the mean sales of peak months (Jun - Sep)
 in 2022.</p>
+<p>Our data contains 7 variables and 234000 observations, and we can
+assume the large sample size being normally distributed by central limit
+theorem. (The central limit theorem (CLT) states that the distribution
+of sample means approximates a normal distribution as the sample size
+gets larger(n&gt;30), regardless of the population’s distribution.)</p>
 <p>The null hypothesis is that there is no difference in the mean sales
 of peak months in 2021 and 2022.<br />
 The alternative hypothesis is that the means are different from one
@@ -498,273 +516,6 @@ mean sales of peak months in 2022.</p>
  
 </p >
 </div>
-<div id="simple-linear-regression" class="section level2">
-<h2>Simple Linear Regression</h2>
-<p>We conduct a simple linear regression for <code>CROISSANT</code>’s
-sale counts and when it’s being sold (hour of the day) and test the
-model using <code>Cross Validation</code>.</p>
-<p><img src="images/croissant.gif" style="width:100%"></p>
-<p>Find the <em>rush hours</em> of a typical day:</p>
-<pre class="r"><code>bakery_df = 
-  bakery_df %&gt;% 
-  mutate(
-    Hour = hour(time),
-    Month = month(date))
-
-bakery_df %&gt;% 
-  group_by(Hour) %&gt;% 
-  count() %&gt;% 
-  ggplot(aes(x = Hour, y = n)) +
-  geom_point() +
-  geom_line() +
-  scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
-  scale_y_continuous(limit = c(0,50000)) +
-  labs(
-    title = &quot;Peak hours&quot;,
-    x = &quot;Hour (24-hour format)&quot;,
-    y = &quot;Number of times appeared&quot;)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-2-1.png" width="90%" /></p>
-<p>Overall, what hours has the most number of products sold?</p>
-<p>Then we only take a look at the morning hours with a monotonic
-function from 7 AM to 11 AM.</p>
-<pre class="r"><code>bakery_df %&gt;% 
-  mutate(year = year(date)) %&gt;% 
-  filter(year == 2021) %&gt;% 
-  group_by(Hour) %&gt;% 
-  summarize(
-    n_sold = sum(quantity) / 365) %&gt;% 
-  ggplot(aes(x = Hour, y = n_sold)) +
-  geom_point() +
-  geom_line() +
-  scale_x_continuous(breaks = seq(7, 11), limit = c(7, 11)) +
-  scale_y_continuous(limit = c(0,120)) +
-  labs(
-    title = &quot;Peak hours&quot;,
-    x = &quot;Hour (24-hour format)&quot;,
-    y = &quot;Number of products sold&quot;)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-3-1.png" width="90%" /></p>
-<p>It looks like a monotonic linear relationship that we can take a
-further look at using simple linear regression model.</p>
-<pre class="r"><code>slr_df = 
-  bakery_df  %&gt;% 
-  mutate(
-    hour_cp = (Hour &gt; 8) * (Hour - 8))
-
-slr_reg = lm(quantity ~ Hour, slr_df)
-
-slr_reg %&gt;% 
-  broom::tidy() %&gt;% 
-  knitr::kable(digits = 2) </code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">term</th>
-<th align="right">estimate</th>
-<th align="right">std.error</th>
-<th align="right">statistic</th>
-<th align="right">p.value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">(Intercept)</td>
-<td align="right">1.99</td>
-<td align="right">0.01</td>
-<td align="right">182.09</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">Hour</td>
-<td align="right">-0.04</td>
-<td align="right">0.00</td>
-<td align="right">-42.57</td>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
-<p>The model is Sale count = 1.99 - 0.04 * Hour</p>
-<p>
- 
-</p >
-<div id="cross-validation" class="section level3">
-<h3>Cross validation</h3>
-<pre class="r"><code># created 3 models: linear, piecewise, and smooth models 
-linear_mod = lm(quantity ~ Hour, slr_df)
-pwl_mod    = lm(quantity ~ Hour + hour_cp, data = slr_df)
-smooth_mod = gam(quantity ~ s(Hour), data = slr_df)</code></pre>
-<pre class="r"><code>slr_df %&gt;% 
-  gather_predictions(linear_mod, pwl_mod, smooth_mod) %&gt;% 
-  mutate(model = fct_inorder(model)) %&gt;% 
-  ggplot(aes(x = Hour, y = quantity)) + 
-  geom_point(alpha = .5, size = 0.05) +
-  geom_line(aes(y = pred), color = &quot;red&quot;) +
-  ylim(1, 2) +
-  facet_grid(~model)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-6-1.png" width="90%" /></p>
-<p>The three models are very similar.</p>
-<p>Re-sample the dataset by <code>crossv_mc</code> and let’s see the
-rmse of each model</p>
-<pre class="r"><code># created a train model and test model; check rmse 
-set.seed(2022)
-cv_df =
-  crossv_mc(slr_df, 100) %&gt;% 
-  mutate(
-    train = map(train, as_tibble),
-    test = map(test, as_tibble))
-
-cv_df = 
-  cv_df %&gt;% 
-  mutate(
-    linear_mod  = map(train, ~lm(quantity ~ Hour, data = .x)),
-    pwl_mod     = map(train, ~lm(quantity ~ Hour + hour_cp, data = .x)),
-    smooth_mod  = map(train, ~gam(quantity ~ s(Hour), data = as_tibble(.x)))) %&gt;% 
-  mutate(
-    rmse_linear = map2_dbl(linear_mod, test, ~rmse(model = .x, data = .y)),
-    rmse_pwl    = map2_dbl(pwl_mod, test, ~rmse(model = .x, data = .y)),
-    rmse_smooth = map2_dbl(smooth_mod, test, ~rmse(model = .x, data = .y))) 
-
-  cv_df %&gt;% 
-  select(rmse_linear, rmse_pwl, rmse_smooth) %&gt;% 
-  pivot_longer(
-    everything(),
-    names_to = &quot;model&quot;, 
-    values_to = &quot;rmse&quot;,
-    names_prefix = &quot;rmse_&quot;) %&gt;% 
-  group_by(model) %&gt;% 
-  summarize(mean(rmse)) %&gt;% 
-  mutate(mean_rmse = `mean(rmse)`) %&gt;% 
-  select(-`mean(rmse)`) %&gt;% 
-  knitr::kable(digits = 4)</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">model</th>
-<th align="right">mean_rmse</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">linear</td>
-<td align="right">1.2719</td>
-</tr>
-<tr class="even">
-<td align="left">pwl</td>
-<td align="right">1.2715</td>
-</tr>
-<tr class="odd">
-<td align="left">smooth</td>
-<td align="right">1.2688</td>
-</tr>
-</tbody>
-</table>
-<p>Then plot the rmse graph</p>
-<pre class="r"><code>cv_df %&gt;% 
-  select(starts_with(&quot;rmse&quot;)) %&gt;% 
-  pivot_longer(
-    everything(),
-    names_to = &quot;model&quot;, 
-    values_to = &quot;rmse&quot;,
-    names_prefix = &quot;rmse_&quot;) %&gt;% 
-  mutate(model = fct_inorder(model)) %&gt;% 
-  ggplot(aes(x = model, y = rmse)) + geom_violin()</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
-<p>Based on the results, there is a slightly improvement using smooth
-model as it has a lower tail of rmse on the top. Since there are no
-significant difference between the three model including the non-linear
-smooth model, we can conclude that the basic linear model is clear
-enough to be accounted for this relationship in the product of
-croissant.</p>
-<p>
- 
-</p >
-</div>
-</div>
-<div id="multiple-linear-regression" class="section level2">
-<h2>Multiple Linear Regression</h2>
-<p>We are interested in testing the relationship between the revenue
-(outcome variable) and 2 main predictors, which are unit price of a
-product and its quantity being sold. Considering that the sales of
-bakery varies by month, we included <code>month</code> in our model as a
-confounder to be controlled.</p>
-<p>
- 
-</p>
-<img src="images/baguette.gif" style="width:100%">
-<p>
- 
-</p>
-<p>Multivariable linear regression model</p>
-<pre class="r"><code>baguette_df = 
-  bakery_df %&gt;% 
-  filter(str_detect(product_name, &quot;BAGUETTE&quot;)) %&gt;% 
-  mutate(
-    month = month(date)
-  )
-baguette_reg = lm(rev ~ unit_price + quantity + month, baguette_df)
-
-
-baguette_reg %&gt;% 
-  broom::tidy() %&gt;% 
-  knitr::kable(digits = 4)</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">term</th>
-<th align="right">estimate</th>
-<th align="right">std.error</th>
-<th align="right">statistic</th>
-<th align="right">p.value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">(Intercept)</td>
-<td align="right">-1.4321</td>
-<td align="right">0.0038</td>
-<td align="right">-374.6061</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">unit_price</td>
-<td align="right">1.2071</td>
-<td align="right">0.0031</td>
-<td align="right">393.5209</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">quantity</td>
-<td align="right">1.1881</td>
-<td align="right">0.0005</td>
-<td align="right">2603.5416</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">month</td>
-<td align="right">0.0012</td>
-<td align="right">0.0002</td>
-<td align="right">6.1995</td>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
-<p>Examine assumptions for the chosen Linear Regression model</p>
-<pre class="r"><code>par(mfrow = c(2, 2))
-plot(baguette_reg)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-10-1.png" width="90%" /></p>
-<p>According to the assumption check graph, the normal qq plot is
-approximately closed to the predicted line with residuals on both sides,
-but the residual plots might violate some of the linear regression
-assumptions (homoscedasticity).</p>
-<p>The tentative model for multiple linear regression of baguette’s
-revenue is<br />
-Revenue = -1.43 + 1.21 * unit_price + 1.19 * quantity + 0.001 *
-month</p>
-<p>We might not consider doing MLR for the sake of this research due to
-the unmet assumptions.</p>
-<p>
- 
-</p >
-</div>
 <div id="one-sample-t-test" class="section level2">
 <h2>One-sample T-test</h2>
 <div id="regular-baguette-two-sided" class="section level3">
@@ -772,6 +523,10 @@ the unmet assumptions.</p>
 <p>We are interested in testing if the mean price of
 <code>BAGUETTE</code> in this bakery is significantly different from the
 average price for a baguette in Paris, which is 1.07 euros.</p>
+<p>
+ 
+</p>
+<p><img src="images/baguette.gif" style="width:100%"></p>
 <p>Null hypothesis: The mean price of baguette in this bakery is the
 same as the average price of baguette in Paris.</p>
 <p>Alternative hypothesis: The mean price of baguette in this bakery is
@@ -785,7 +540,7 @@ limit theorem.</p>
   summarize(total_sale = sum(quantity)) %&gt;% 
   ggplot(aes(x = total_sale)) +
   geom_histogram()</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-2-1.png" width="90%" /></p>
 <pre class="r"><code>baguette_onet = 
   bakery_df %&gt;% 
   filter(product_name == &quot;BAGUETTE&quot;) %&gt;%
@@ -932,7 +687,275 @@ the null hypothesis. At 5% level of significance, we have sufficient
 evidence to conclude that the mean price of traditional baguette in this
 bakery is significantly higher than the average price of baguette in
 Paris.</p>
+<p>
+ 
+</p >
 </div>
+</div>
+<div id="simple-linear-regression" class="section level2">
+<h2>Simple Linear Regression</h2>
+<p>We conduct a simple linear regression for <code>CROISSANT</code>’s
+sale counts and when it’s being sold (hour of the day) and test the
+model using <code>Cross Validation</code>.</p>
+<p><img src="images/croissant.gif" style="width:100%"></p>
+<p>Find the <em>rush hours</em> of a typical day:</p>
+<pre class="r"><code>bakery_df = 
+  bakery_df %&gt;% 
+  mutate(
+    Hour = hour(time),
+    Month = month(date))
+
+bakery_df %&gt;% 
+  group_by(Hour) %&gt;% 
+  count() %&gt;% 
+  ggplot(aes(x = Hour, y = n)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = seq(7, 20), limit = c(7, 20)) +
+  scale_y_continuous(limit = c(0,50000)) +
+  labs(
+    title = &quot;Peak hours&quot;,
+    x = &quot;Hour (24-hour format)&quot;,
+    y = &quot;Number of times appeared&quot;)</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
+<p>Overall, what hours has the most number of products sold?</p>
+<p>Then we only take a look at the morning hours with a monotonic
+function from 7 AM to 11 AM.</p>
+<pre class="r"><code>bakery_df %&gt;% 
+  mutate(year = year(date)) %&gt;% 
+  filter(year == 2021) %&gt;% 
+  group_by(Hour) %&gt;% 
+  summarize(
+    n_sold = sum(quantity) / 365) %&gt;% 
+  ggplot(aes(x = Hour, y = n_sold)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = seq(7, 11), limit = c(7, 11)) +
+  scale_y_continuous(limit = c(0,120)) +
+  labs(
+    title = &quot;Peak hours&quot;,
+    x = &quot;Hour (24-hour format)&quot;,
+    y = &quot;Number of products sold&quot;)</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
+<p>It looks like a monotonic linear relationship that we can take a
+further look at using simple linear regression model.</p>
+<pre class="r"><code>slr_df = 
+  bakery_df  %&gt;% 
+  mutate(
+    hour_cp = (Hour &gt; 8) * (Hour - 8))
+
+slr_reg = lm(quantity ~ Hour, slr_df)
+
+slr_reg %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 2) </code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">1.99</td>
+<td align="right">0.01</td>
+<td align="right">182.09</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Hour</td>
+<td align="right">-0.04</td>
+<td align="right">0.00</td>
+<td align="right">-42.57</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>The model is Sale count = 1.99 - 0.04 * Hour</p>
+<p>
+ 
+</p >
+<div id="cross-validation" class="section level3">
+<h3>Cross validation</h3>
+<pre class="r"><code># created 3 models: linear, piecewise, and smooth models 
+linear_mod = lm(quantity ~ Hour, slr_df)
+pwl_mod    = lm(quantity ~ Hour + hour_cp, data = slr_df)
+smooth_mod = gam(quantity ~ s(Hour), data = slr_df)</code></pre>
+<pre class="r"><code>slr_df %&gt;% 
+  gather_predictions(linear_mod, pwl_mod, smooth_mod) %&gt;% 
+  mutate(model = fct_inorder(model)) %&gt;% 
+  ggplot(aes(x = Hour, y = quantity)) + 
+  geom_point(alpha = .5, size = 0.05) +
+  geom_line(aes(y = pred), color = &quot;red&quot;) +
+  ylim(1, 2) +
+  facet_grid(~model)</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
+<p>The three models with original scales are very similar. Therefore,
+when we visualize the three models, we change the y-axis scale to 0-3 as
+a zoom-in function in order to see the nuance differences between each
+model.</p>
+<p>Re-sample the dataset by <code>crossv_mc</code> and let’s see the
+rmse of each model and make a table</p>
+<pre class="r"><code># created a train model and test model; check rmse 
+set.seed(2022)
+cv_df =
+  crossv_mc(slr_df, 100) %&gt;% 
+  mutate(
+    train = map(train, as_tibble),
+    test = map(test, as_tibble))
+
+cv_df = 
+  cv_df %&gt;% 
+  mutate(
+    linear_mod  = map(train, ~lm(quantity ~ Hour, data = .x)),
+    pwl_mod     = map(train, ~lm(quantity ~ Hour + hour_cp, data = .x)),
+    smooth_mod  = map(train, ~gam(quantity ~ s(Hour), data = as_tibble(.x)))) %&gt;% 
+  mutate(
+    rmse_linear = map2_dbl(linear_mod, test, ~rmse(model = .x, data = .y)),
+    rmse_pwl    = map2_dbl(pwl_mod, test, ~rmse(model = .x, data = .y)),
+    rmse_smooth = map2_dbl(smooth_mod, test, ~rmse(model = .x, data = .y))) 
+
+  cv_df %&gt;% 
+  select(rmse_linear, rmse_pwl, rmse_smooth) %&gt;% 
+  pivot_longer(
+    everything(),
+    names_to = &quot;model&quot;, 
+    values_to = &quot;rmse&quot;,
+    names_prefix = &quot;rmse_&quot;) %&gt;% 
+  group_by(model) %&gt;% 
+  summarize(mean(rmse)) %&gt;% 
+  mutate(mean_rmse = `mean(rmse)`) %&gt;% 
+  select(-`mean(rmse)`) %&gt;% 
+  knitr::kable(digits = 4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">model</th>
+<th align="right">mean_rmse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">linear</td>
+<td align="right">1.2719</td>
+</tr>
+<tr class="even">
+<td align="left">pwl</td>
+<td align="right">1.2715</td>
+</tr>
+<tr class="odd">
+<td align="left">smooth</td>
+<td align="right">1.2688</td>
+</tr>
+</tbody>
+</table>
+<p>Then plot the rmse graph</p>
+<pre class="r"><code>cv_df %&gt;% 
+  select(starts_with(&quot;rmse&quot;)) %&gt;% 
+  pivot_longer(
+    everything(),
+    names_to = &quot;model&quot;, 
+    values_to = &quot;rmse&quot;,
+    names_prefix = &quot;rmse_&quot;) %&gt;% 
+  mutate(model = fct_inorder(model)) %&gt;% 
+  ggplot(aes(x = model, y = rmse)) + geom_violin()</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-10-1.png" width="90%" />
+From the visualization graphs of three rmse models, it is hard to
+determine the slightly change of each model, but from our mean rmse
+table we conclude that the smooth model is the best out of the three
+with the least mean rmse (1.2688).</p>
+<p>Based on the results, there is a slightly improvement using smooth
+model as it has the lowest rmse, we can conclude that the smooth model
+is to be accounted for this relationship in the product of
+croissant.</p>
+<p>
+ 
+</p >
+</div>
+</div>
+<div id="multiple-linear-regression" class="section level2">
+<h2>Multiple Linear Regression</h2>
+<p>We are interested in testing the relationship between the revenue
+(outcome variable) and 2 main predictors, which are unit price of a
+product and its quantity being sold. Considering that the sales of
+bakery varies by month, we included <code>month</code> in our model as a
+confounder to be controlled.</p>
+<p>
+ 
+</p>
+<p>Multivariable linear regression model</p>
+<pre class="r"><code>baguette_df = 
+  bakery_df %&gt;% 
+  filter(str_detect(product_name, &quot;BAGUETTE&quot;)) %&gt;% 
+  mutate(
+    month = month(date)
+  )
+baguette_reg = lm(rev ~ unit_price + quantity + month, baguette_df)
+
+
+baguette_reg %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 4)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.4321</td>
+<td align="right">0.0038</td>
+<td align="right">-374.6061</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">unit_price</td>
+<td align="right">1.2071</td>
+<td align="right">0.0031</td>
+<td align="right">393.5209</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">quantity</td>
+<td align="right">1.1881</td>
+<td align="right">0.0005</td>
+<td align="right">2603.5416</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">month</td>
+<td align="right">0.0012</td>
+<td align="right">0.0002</td>
+<td align="right">6.1995</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>Examine assumptions for the chosen Linear Regression model</p>
+<pre class="r"><code>par(mfrow = c(2, 2))
+plot(baguette_reg)</code></pre>
+<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
+<p>According to the assumption check graph, the normal qq plot is
+approximately closed to the predicted line with residuals on both sides,
+but the residual plots might violate some of the linear regression
+assumptions (homoscedasticity).</p>
+<p>The tentative model for multiple linear regression of baguette’s
+revenue is<br />
+Revenue = -1.43 + 1.21 * unit_price + 1.19 * quantity + 0.001 *
+month</p>
+<p>We might not consider doing MLR for the sake of this research due to
+the unmet assumptions.</p>
 </div>
 
 

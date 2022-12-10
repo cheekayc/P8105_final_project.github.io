@@ -23,7 +23,9 @@ library(mgcv)
 library(moments)
 library(modelr)
 ```
+In this section, we will perform several statistical analysis in this bakery including ANOVA to check the mean difference of peak sale months between 2021 and 2022, One-Sample t-test to check the mean price of baguette with average price of it in the nation, Simple Linear Regression to test the linear relationship between quantity of sale and hours in the day, and finally Multiple Linear Regression to see additional predictors.
 
+<p>&nbsp;</p >
 ## Summary of packages
 tidyverse, lubridate, plotly, mgcv, moments, modelr
 
@@ -43,12 +45,14 @@ bakery_df =
   select(-article)
 
 ```
-
+<p>&nbsp;</p >
 ## ANOVA
 
 ANOVA tests whether there is a difference in means of the groups at each level (each individual month) of the independent variable of peak months (Jun - Sep).
 
 One way anova test can test if the mean sales of peak months (Jun - Sep) in 2021 is different from the mean sales of peak months (Jun - Sep) in 2022.
+
+Our data contains 7 variables and 234000 observations, and we can assume the large sample size being normally distributed by central limit theorem. (The central limit theorem (CLT) states that the distribution of sample means approximates a normal distribution as the sample size gets larger(n>30), regardless of the population's distribution.) 
 
 The null hypothesis is that there is no difference in the mean sales of peak months in 2021 and 2022.                                        
 The alternative hypothesis is that the means are different from one another.
@@ -92,6 +96,80 @@ one.way
 ```
 The ANOVA test p-value is 0.01 which is less than alpha level of 0.05, so we reject the null hypothesis and conclude that the mean sales of peak months in 2021 is statistically significantly different from the mean sales of peak months in 2022.
  
+
+<p>&nbsp;</p >
+## One-sample T-test
+
+### Regular Baguette (Two-sided)
+
+We are interested in testing if the mean price of `BAGUETTE` in this bakery is significantly different from the average price for a baguette in Paris, which is 1.07 euros. 
+
+<p>&nbsp;</p>
+<img src="images/baguette.gif" style="width:100%">
+
+Null hypothesis: The mean price of baguette in this bakery is the same as the average price of baguette in Paris.
+
+Alternative hypothesis: The mean price of baguette in this bakery is different from the average price of baguette in Paris.
+
+Our population follows a Poisson distribution as shown below, and we can assume the large sample size being normally distributed by central limit theorem. 
+
+```{r, warning = FALSE, message = FALSE}
+bakery_df %>% 
+  filter(product_name == "TRADITIONAL BAGUETTE") %>% 
+  group_by(date) %>% 
+  summarize(total_sale = sum(quantity)) %>% 
+  ggplot(aes(x = total_sale)) +
+  geom_histogram()
+
+baguette_onet = 
+  bakery_df %>% 
+  filter(product_name == "BAGUETTE") %>%
+  select(unit_price)
+
+baguette_t_results = 
+  t.test(baguette_onet, mu = 1.07 , alternative = "two.sided") %>% 
+  broom::tidy() 
+
+baguette_t_results %>% 
+  knitr::kable(digits = 4)
+```
+
+The p-value is much smaller than the alpha (0.05), so we would reject the null hypothesis. At 5% level of significance, we have sufficient 
+evidence to conclude that the mean price of baguette in this bakery is significantly different from the average price of baguette in Paris.
+
+<p>&nbsp;</p >
+### Traditional Baguette (One-sided)
+
+We noticed that the price of traditional baguette in this bakery is higher than the average price of traditional baguette in France. The
+price of the traditional French loaf is around 0.90 Euros in bakeries. Therefore, we would like to conduct a one-sided T-test to see if the price difference is significant. 
+
+Null hypothesis: The mean price of traditional baguette in this bakery is the same as the average price of traditional baguette in France.
+
+Alternative hypothesis: The mean price of traditional baguette in this bakery is higher than the average price of traditional baguette in
+France.
+
+```{r, warning = FALSE}
+bakery_df %>% 
+  filter(product_name == "TRADITIONAL BAGUETTE") %>% 
+  count(unit_price) %>% 
+   knitr::kable(digits = 4)
+  
+trad_baguette_onet = 
+  bakery_df %>% 
+  filter(product_name == "TRADITIONAL BAGUETTE") %>%
+  select(unit_price)
+
+trad_baguette_t_results = 
+  t.test(trad_baguette_onet, mu = 0.90, alternative = "greater") %>% 
+  broom::tidy() 
+
+trad_baguette_t_results %>% 
+   knitr::kable(digits = 4)
+```
+
+The p-value is much smaller than the alpha (0.05), so we would reject the null hypothesis. At 5% level of significance, we have sufficient 
+evidence to conclude that the mean price of traditional baguette in this bakery is significantly higher than the average price of baguette in Paris.
+
 <p>&nbsp;</p >
 ## Simple Linear Regression 
 We conduct a simple linear regression for `CROISSANT`'s sale counts and when it's being sold (hour of the day) and test the model using `Cross Validation`.
@@ -179,9 +257,10 @@ slr_df %>%
   facet_grid(~model)
 ```
 
-The three models are very similar.
+The three models with original scales are very similar. Therefore, when we visualize the three models, we change the y-axis scale to 0-3 as a zoom-in function in order to see the nuance differences between each model. 
 
-Re-sample the dataset by `crossv_mc` and let's see the rmse of each model
+
+Re-sample the dataset by `crossv_mc` and let's see the rmse of each model and make a table
 ```{r, warning = FALSE}
 # created a train model and test model; check rmse 
 set.seed(2022)
@@ -227,16 +306,16 @@ cv_df %>%
   mutate(model = fct_inorder(model)) %>% 
   ggplot(aes(x = model, y = rmse)) + geom_violin()
 ```
+From the visualization graphs of three rmse models, it is hard to determine the slightly change of each model, but from our mean rmse table we conclude that the smooth model is the best out of the three with the least mean rmse (1.2688).
 
-Based on the results, there is a slightly improvement using smooth model as it has a lower tail of rmse on the top. Since there are no significant difference between the three model including the non-linear smooth model, we can conclude that the basic linear model is clear enough to be accounted for this relationship in the product of croissant.
+Based on the results, there is a slightly improvement using smooth model as it has the lowest rmse, we can conclude that the smooth model is to be accounted for this relationship in the product of croissant.
 
 <p>&nbsp;</p >
 ## Multiple Linear Regression
 
 We are interested in testing the relationship between the revenue (outcome variable) and 2 main predictors, which are unit price of a product and its quantity being sold. Considering that the sales of bakery varies by month, we included `month` in our model as a confounder to be controlled.
 
-<p>&nbsp;</p>
-<img src="images/baguette.gif" style="width:100%">
+
 <p>&nbsp;</p>
 
 Multivariable linear regression model 
@@ -268,75 +347,3 @@ The tentative model for multiple linear regression of baguette's revenue is
 Revenue = -1.43 + 1.21 * unit_price + 1.19 * quantity + 0.001 * month
 
 We might not consider doing MLR for the sake of this research due to the unmet assumptions.
-
-<p>&nbsp;</p >
-## One-sample T-test
-
-### Regular Baguette (Two-sided)
-
-We are interested in testing if the mean price of `BAGUETTE` in this bakery is significantly different from 
-the average price for a baguette in Paris, which is 1.07 euros. 
-
-Null hypothesis: The mean price of baguette in this bakery is the same as the average price of baguette in Paris.
-
-Alternative hypothesis: The mean price of baguette in this bakery is different from the average price of baguette in Paris.
-
-Our population follows a Poisson distribution as shown below, and we can assume the large sample size being normally distributed by central limit theorem. 
-
-```{r, warning = FALSE, message = FALSE}
-bakery_df %>% 
-  filter(product_name == "TRADITIONAL BAGUETTE") %>% 
-  group_by(date) %>% 
-  summarize(total_sale = sum(quantity)) %>% 
-  ggplot(aes(x = total_sale)) +
-  geom_histogram()
-
-baguette_onet = 
-  bakery_df %>% 
-  filter(product_name == "BAGUETTE") %>%
-  select(unit_price)
-
-baguette_t_results = 
-  t.test(baguette_onet, mu = 1.07 , alternative = "two.sided") %>% 
-  broom::tidy() 
-
-baguette_t_results %>% 
-  knitr::kable(digits = 4)
-```
-
-The p-value is much smaller than the alpha (0.05), so we would reject the null hypothesis. At 5% level of significance, we have sufficient 
-evidence to conclude that the mean price of baguette in this bakery is significantly different from the average price of baguette in Paris.
-
-<p>&nbsp;</p >
-### Traditional Baguette (One-sided)
-
-We noticed that the price of traditional baguette in this bakery is higher than the average price of traditional baguette in France. The
-price of the traditional French loaf is around 0.90 Euros in bakeries. Therefore, we would like to conduct a one-sided T-test to see if the price difference is significant. 
-
-Null hypothesis: The mean price of traditional baguette in this bakery is the same as the average price of traditional baguette in France.
-
-Alternative hypothesis: The mean price of traditional baguette in this bakery is higher than the average price of traditional baguette in
-France.
-
-```{r, warning = FALSE}
-bakery_df %>% 
-  filter(product_name == "TRADITIONAL BAGUETTE") %>% 
-  count(unit_price) %>% 
-   knitr::kable(digits = 4)
-  
-trad_baguette_onet = 
-  bakery_df %>% 
-  filter(product_name == "TRADITIONAL BAGUETTE") %>%
-  select(unit_price)
-
-trad_baguette_t_results = 
-  t.test(trad_baguette_onet, mu = 0.90, alternative = "greater") %>% 
-  broom::tidy() 
-
-trad_baguette_t_results %>% 
-   knitr::kable(digits = 4)
-```
-
-The p-value is much smaller than the alpha (0.05), so we would reject the null hypothesis. At 5% level of significance, we have sufficient 
-evidence to conclude that the mean price of traditional baguette in this bakery is significantly higher than the average price of baguette 
-in Paris.
